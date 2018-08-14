@@ -1,0 +1,129 @@
+
+/* Class = "UILabel"; text = "权限"; ObjectID = "0gr-ce-aH9"; */
+"0gr-ce-aH9.text" = "权限";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "5jY-Bm-gkh"; */
+"5jY-Bm-gkh.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "9Ic-hJ-mgH"; */
+"9Ic-hJ-mgH.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "Email"; ObjectID = "A10-1R-6bC"; */
+"A10-1R-6bC.normalTitle" = "Email";
+
+/* Class = "UILabel"; text = "社交账户"; ObjectID = "AkP-Ym-PHJ"; */
+"AkP-Ym-PHJ.text" = "社交账户";
+
+/* Class = "UITextField"; placeholder = "品牌4"; ObjectID = "FGT-dh-8J3"; */
+"FGT-dh-8J3.placeholder" = "品牌4";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "FTB-6p-kv3"; */
+"FTB-6p-kv3.text" = "Label";
+
+/* Class = "UITextField"; placeholder = "品牌5"; ObjectID = "FqH-qa-Oyc"; */
+"FqH-qa-Oyc.placeholder" = "品牌5";
+
+/* Class = "UIButton"; normalTitle = "保存"; ObjectID = "GPr-17-trU"; */
+"GPr-17-trU.normalTitle" = "保存";
+
+/* Class = "UILabel"; text = "标题"; ObjectID = "Gxj-Wd-wB7"; */
+"Gxj-Wd-wB7.text" = "标题";
+
+/* Class = "UILabel"; text = "地区/区号"; ObjectID = "Hkv-EM-86L"; */
+"Hkv-EM-86L.text" = "地区/区号";
+
+/* Class = "UITextField"; placeholder = "款式最低零售价"; ObjectID = "J4U-Nx-sUU"; */
+"J4U-Nx-sUU.placeholder" = "最低零售价";
+
+/* Class = "UILabel"; text = "还可以输入300字"; ObjectID = "K4J-BC-jIg"; */
+"K4J-BC-jIg.text" = "还可以输入300字";
+
+/* Class = "UITextField"; placeholder = "品牌2"; ObjectID = "Owr-jm-31t"; */
+"Owr-jm-31t.placeholder" = "品牌2";
+
+/* Class = "UITextField"; placeholder = "品牌1"; ObjectID = "PIq-Xy-i1M"; */
+"PIq-Xy-i1M.placeholder" = "品牌1";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Q18-Lt-zzF"; */
+"Q18-Lt-zzF.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "Email"; ObjectID = "Rao-O0-c1s"; */
+"Rao-O0-c1s.normalTitle" = "Email";
+
+/* Class = "UITextField"; placeholder = "其他合作品牌，用逗号隔开（非必须）"; ObjectID = "RxF-8j-NxD"; */
+"RxF-8j-NxD.placeholder" = "其他合作品牌，用逗号隔开（非必须）";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "W6i-IG-emR"; */
+"W6i-IG-emR.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Wfj-Xb-bmW"; */
+"Wfj-Xb-bmW.text" = "Label";
+
+/* Class = "UITextField"; placeholder = "品牌3"; ObjectID = "YKh-v7-avX"; */
+"YKh-v7-avX.placeholder" = "品牌3";
+
+/* Class = "UILabel"; text = "买手店简介"; ObjectID = "YcQ-nb-t1F"; */
+"YcQ-nb-t1F.text" = "买手店简介";
+
+/* Class = "UILabel"; text = "固定电话"; ObjectID = "ZZ3-8o-aw9"; */
+"ZZ3-8o-aw9.text" = "电话";
+
+/* Class = "UITextField"; placeholder = "区号"; ObjectID = "akq-hE-sTE"; */
+"akq-hE-sTE.placeholder" = "区号";
+
+/* Class = "UILabel"; text = "上传照片"; ObjectID = "b0C-km-Yof"; */
+"b0C-km-Yof.text" = "上传照片";
+
+/* Class = "UITextField"; placeholder = "款式最高零售价"; ObjectID = "bib-wu-usK"; */
+"bib-wu-usK.placeholder" = "最高零售价";
+
+/* Class = "UITextField"; placeholder = "品牌6"; ObjectID = "eAo-tB-Piu"; */
+"eAo-tB-Piu.placeholder" = "品牌6";
+
+/* Class = "UILabel"; text = "权限"; ObjectID = "fSa-gj-StT"; */
+"fSa-gj-StT.text" = "权限";
+
+/* Class = "UILabel"; text = "地区/区号"; ObjectID = "kaQ-Hf-jY1"; */
+"kaQ-Hf-jY1.text" = "地区/区号";
+
+/* Class = "UIButton"; normalTitle = "编辑"; ObjectID = "l3U-Yg-CEX"; */
+"l3U-Yg-CEX.normalTitle" = "编辑";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "lIa-dZ-ZbG"; */
+"lIa-dZ-ZbG.text" = "Label";
+
+/* Class = "UITextField"; placeholder = "电话号码"; ObjectID = "laH-0L-aQ6"; */
+"laH-0L-aQ6.placeholder" = "电话号码";
+
+/* Class = "UILabel"; text = "权限"; ObjectID = "ls5-KA-8of"; */
+"ls5-KA-8of.text" = "权限";
+
+/* Class = "UILabel"; text = "￥"; ObjectID = "nHC-mB-tkI"; */
+"nHC-mB-tkI.text" = "￥";
+
+/* Class = "UILabel"; text = "网站"; ObjectID = "nLz-c9-DRJ"; */
+"nLz-c9-DRJ.text" = "网站";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "o1k-qw-BGm"; */
+"o1k-qw-BGm.text" = "Label";
+
+/* Class = "UILabel"; text = "买手店照片"; ObjectID = "tHO-tY-PsK"; */
+"tHO-tY-PsK.text" = "买手店照片";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "tZK-Pa-p4H"; */
+"tZK-Pa-p4H.text" = "Label";
+
+/* Class = "UITextField"; placeholder = "分机"; ObjectID = "ueP-xq-6e7"; */
+"ueP-xq-6e7.placeholder" = "分机";
+
+/* Class = "UILabel"; text = "手机号"; ObjectID = "wWC-jx-W7n"; */
+"wWC-jx-W7n.text" = "手机号";
+
+/* Class = "UILabel"; text = "合作过的品牌"; ObjectID = "weO-70-xx2"; */
+"weO-70-xx2.text" = "合作过的品牌";
+
+/* Class = "UILabel"; text = "店铺地址"; ObjectID = "wwt-3H-nLZ"; */
+"wwt-3H-nLZ.text" = "店铺地址";
+
+/* Class = "UILabel"; text = "商务联系"; ObjectID = "zm8-XC-qHZ"; */
+"zm8-XC-qHZ.text" = "商务联系";

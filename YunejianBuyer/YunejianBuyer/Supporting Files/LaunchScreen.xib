@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" restorationIdentifier="LaunchScreen" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="569"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launch.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="iYb-uq-syM">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="569"/>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="iYb-uq-syM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="ALZ-TG-gs6"/>
+                <constraint firstItem="iYb-uq-syM" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="NWi-Q7-5C8"/>
+                <constraint firstAttribute="trailing" secondItem="iYb-uq-syM" secondAttribute="trailing" id="ieE-rK-spo"/>
+                <constraint firstAttribute="bottom" secondItem="iYb-uq-syM" secondAttribute="bottom" id="vh4-kT-F1q"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="548" y="499.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="launch.jpg" width="1125" height="2001"/>
+    </resources>
+</document>

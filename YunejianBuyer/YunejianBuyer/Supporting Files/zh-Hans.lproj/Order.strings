@@ -1,0 +1,120 @@
+
+/* Class = "UILabel"; text = "本次支付"; ObjectID = "1WX-rK-lua"; */
+"1WX-rK-lua.text" = "本次支付";
+
+/* Class = "UILabel"; text = "订单号"; ObjectID = "1h2-gZ-JBI"; */
+"1h2-gZ-JBI.text" = "订单号";
+
+/* Class = "UILabel"; text = "原始订单关联"; ObjectID = "22B-tG-GOw"; */
+"22B-tG-GOw.text" = "原始订单关联";
+
+/* Class = "UIButton"; normalTitle = "线下支付"; ObjectID = "2Hh-Ee-gob"; */
+"2Hh-Ee-gob.normalTitle" = "线下支付";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "2iE-rk-34Z"; */
+"2iE-rk-34Z.text" = "Label";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "8EM-kX-v8Y"; */
+"8EM-kX-v8Y.text" = "1";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "A5x-rZ-tt4"; */
+"A5x-rZ-tt4.text" = "Label";
+
+/* Class = "UILabel"; text = "已经支付"; ObjectID = "ARX-Gc-cVX"; */
+"ARX-Gc-cVX.text" = "已经支付";
+
+/* Class = "UILabel"; text = "待审核"; ObjectID = "D8c-wZ-YId"; */
+"D8c-wZ-YId.text" = "待审核";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Dbn-EL-erM"; */
+"Dbn-EL-erM.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "拒绝"; ObjectID = "GEg-wP-phi"; */
+"GEg-wP-phi.normalTitle" = "拒绝";
+
+/* Class = "UIButton"; normalTitle = "返回订单详情"; ObjectID = "HVU-xT-gdk"; */
+"HVU-xT-gdk.normalTitle" = "返回订单详情";
+
+/* Class = "UITextField"; placeholder = "请输入买手店名称"; ObjectID = "K4l-XW-pKo"; */
+"K4l-XW-pKo.placeholder" = "请输入买手店名称";
+
+/* Class = "UIButton"; normalTitle = "税制"; ObjectID = "Kbb-Y1-Yni"; */
+"Kbb-Y1-Yni.normalTitle" = "税制";
+
+/* Class = "UILabel"; text = "本次支付"; ObjectID = "M2V-6f-QOz"; */
+"M2V-6f-QOz.text" = "本次支付";
+
+/* Class = "UILabel"; text = "已成功付款"; ObjectID = "NFV-qM-mSk"; */
+"NFV-qM-mSk.text" = "已成功付款";
+
+/* Class = "UILabel"; text = "尚未支付"; ObjectID = "P1V-97-sIv"; */
+"P1V-97-sIv.text" = "尚未支付";
+
+/* Class = "UILabel"; text = "待对方退款给您"; ObjectID = "z2G-Kb-rMI"; */
+"z2G-Kb-rMI.text" = "待对方退款给您";
+
+/* Class = "UIButton"; normalTitle = "完成"; ObjectID = "Sh8-1F-cvr"; */
+"Sh8-1F-cvr.normalTitle" = "完成";
+
+/* Class = "UIButton"; normalTitle = "建立订单"; ObjectID = "TQV-PM-blw"; */
+"TQV-PM-blw.normalTitle" = "建立订单";
+
+/* Class = "UILabel"; text = "尚未支付"; ObjectID = "VJz-gt-DuX"; */
+"VJz-gt-DuX.text" = "尚未支付";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Vrd-fF-hYn"; */
+"Vrd-fF-hYn.text" = "Label";
+
+/* Class = "UILabel"; text = "支付方式"; ObjectID = "W3K-jS-Emv"; */
+"W3K-jS-Emv.text" = "支付方式";
+
+/* Class = "UIButton"; normalTitle = "确认添加"; ObjectID = "YKr-1s-w0R"; */
+"YKr-1s-w0R.normalTitle" = "确认添加";
+
+/* Class = "UIButton"; normalTitle = "确认"; ObjectID = "aKX-Gv-uHq"; */
+"aKX-Gv-uHq.normalTitle" = "确认";
+
+/* Class = "UIButton"; normalTitle = "同意"; ObjectID = "brQ-uO-NQ2"; */
+"brQ-uO-NQ2.normalTitle" = "同意";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "cfV-ot-jUZ"; */
+"cfV-ot-jUZ.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "确定"; ObjectID = "dOv-Cp-SqR"; */
+"dOv-Cp-SqR.normalTitle" = "确定";
+
+/* Class = "UILabel"; text = "%"; ObjectID = "eiL-TE-gTl"; */
+"eiL-TE-gTl.text" = "%";
+
+/* Class = "UIButton"; normalTitle = "编辑"; ObjectID = "fqr-h0-m1b"; */
+"fqr-h0-m1b.normalTitle" = "编辑";
+
+/* Class = "UITextField"; text = "90"; ObjectID = "hKO-ex-Cie"; */
+"hKO-ex-Cie.text" = "90";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "kqM-L1-0b9"; */
+"kqM-L1-0b9.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "订单总价"; ObjectID = "lW4-9r-PPc"; */
+"lW4-9r-PPc.text" = "订单总价";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "r4y-ZZ-yxz"; */
+"r4y-ZZ-yxz.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "保存修改"; ObjectID = "rhh-qb-qsZ"; */
+"rhh-qb-qsZ.normalTitle" = "保存修改";
+
+/* Class = "UIButton"; normalTitle = "删除"; ObjectID = "t7I-mE-kkN"; */
+"t7I-mE-kkN.normalTitle" = "删除";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "tZc-sl-0UZ"; */
+"tZc-sl-0UZ.text" = "Label";
+
+/* Class = "UILabel"; text = "！请仔细检查买手店名称、注册邮箱，及所在地信息"; ObjectID = "vdD-f9-NEN"; */
+"vdD-f9-NEN.text" = "！请仔细检查买手店名称、注册邮箱，及所在地信息";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "vgP-lc-AvE"; */
+"vgP-lc-AvE.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "yk2-qW-GqN"; */
+"yk2-qW-GqN.text" = "Label";

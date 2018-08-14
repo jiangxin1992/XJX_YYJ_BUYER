@@ -1,0 +1,12 @@
+
+/* Class = "UIButton"; normalTitle = "已支持支付宝付款"; ObjectID = "Hfo-37-Cle"; */
+"Hfo-37-Cle.normalTitle" = "已支持支付宝付款";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Hva-hQ-QuB"; */
+"Hva-hQ-QuB.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "付款"; ObjectID = "JPr-7n-XmY"; */
+"JPr-7n-XmY.normalTitle" = "付款";
+
+/* Class = "UILabel"; text = "80%货款已付"; ObjectID = "Sj2-yZ-i3n"; */
+"Sj2-yZ-i3n.text" = "80%货款已付";

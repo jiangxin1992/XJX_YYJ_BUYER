@@ -1,0 +1,270 @@
+
+/* Class = "UILabel"; text = "上传注册公司营业执照"; ObjectID = "0Gm-Ry-lrD"; */
+"0Gm-Ry-lrD.text" = "上传注册公司营业执照";
+
+/* Class = "UITextField"; placeholder = "品牌6"; ObjectID = "3ab-m5-NDd"; */
+"3ab-m5-NDd.placeholder" = "品牌6";
+
+/* Class = "UILabel"; text = "4"; ObjectID = "3xf-wM-ltE"; */
+"3xf-wM-ltE.text" = "4";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "4hg-AQ-fZ8"; */
+"4hg-AQ-fZ8.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "登录"; ObjectID = "576-xa-3wq"; */
+"576-xa-3wq.normalTitle" = "登录";
+
+/* Class = "UILabel"; text = "请列举三个合作买手店名称"; ObjectID = "7Ik-HB-2uj"; */
+"7Ik-HB-2uj.text" = "请列举三个合作买手店名称";
+
+/* Class = "UILabel"; text = "还可输入 200 字"; ObjectID = "7aA-Sl-acT"; */
+"7aA-Sl-acT.text" = "还可输入 200 字";
+
+/* Class = "UITextField"; placeholder = "买手店3"; ObjectID = "7id-vn-3cN"; */
+"7id-vn-3cN.placeholder" = "买手店3";
+
+/* Class = "UILabel"; text = "Step 1.选择品牌商标的注册形式"; ObjectID = "7ot-Jv-RIw"; */
+"7ot-Jv-RIw.text" = "Step 1.选择品牌商标的注册形式";
+
+/* Class = "UIButton"; normalTitle = "返回登录"; ObjectID = "83F-QP-uno"; */
+"83F-QP-uno.normalTitle" = "返回登录";
+
+/* Class = "UILabel"; text = "您是通过什么知道我们的？(可多选)"; ObjectID = "83p-lq-f9w"; */
+"83p-lq-f9w.text" = "您是通过什么知道我们的？(可多选)";
+
+/* Class = "UILabel"; text = "2"; ObjectID = "84b-rm-aoR"; */
+"84b-rm-aoR.text" = "2";
+
+/* Class = "UILabel"; text = "到"; ObjectID = "85e-gt-wrw"; */
+"85e-gt-wrw.text" = "到";
+
+/* Class = "UIButton"; normalTitle = "提交"; ObjectID = "863-SK-viC"; */
+"863-SK-viC.normalTitle" = "提交";
+
+/* Class = "UITextField"; placeholder = "展会或订货会名称"; ObjectID = "8D9-VI-Wl2"; */
+"8D9-VI-Wl2.placeholder" = "展会或订货会名称";
+
+/* Class = "UIButton"; normalTitle = "作废此条付款记录"; ObjectID = "9fZ-Z5-X2n"; */
+"9fZ-Z5-X2n.normalTitle" = "作废此条付款记录";
+
+/* Class = "UIButton"; normalTitle = "此EMAIL已经注册"; ObjectID = "B1p-Qh-a5x"; */
+"B1p-Qh-a5x.normalTitle" = "此EMAIL已经注册";
+
+/* Class = "UIButton"; normalTitle = "没收到，再发一封"; ObjectID = "BTq-kq-vG4"; */
+"BTq-kq-vG4.normalTitle" = "没收到，再发一封";
+
+/* Class = "UILabel"; text = "万元"; ObjectID = "Bu3-KR-UKh"; */
+"Bu3-KR-UKh.text" = "万元";
+
+/* Class = "UILabel"; text = "付款时间"; ObjectID = "EMZ-rJ-VbO"; */
+"EMZ-rJ-VbO.text" = "付款时间";
+
+/* Class = "UITextField"; placeholder = "其他合作品牌，用逗号隔开（非必填）"; ObjectID = "Exl-L4-5T2"; */
+"Exl-L4-5T2.placeholder" = "其他合作品牌，用逗号隔开（非必填）";
+
+/* Class = "UILabel"; text = "3"; ObjectID = "Fgg-fx-rnn"; */
+"Fgg-fx-rnn.text" = "3";
+
+/* Class = "UITextField"; placeholder = "输入验证码"; ObjectID = "Glp-2t-E5y"; */
+"Glp-2t-E5y.placeholder" = "输入验证码";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "HUM-fM-Yss"; */
+"HUM-fM-Yss.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "验证邮箱"; ObjectID = "HfO-sh-YIB"; */
+"HfO-sh-YIB.normalTitle" = "验证邮箱";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "IhF-kA-4f5"; */
+"IhF-kA-4f5.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "上传照片"; ObjectID = "Jgv-xV-sPv"; */
+"Jgv-xV-sPv.text" = "上传照片";
+
+/* Class = "UILabel"; text = "Step2.上传文件"; ObjectID = "JjH-k8-zjc"; */
+"JjH-k8-zjc.text" = "Step2.上传文件";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Kf2-9q-YTy"; */
+"Kf2-9q-YTy.normalTitle" = "Button";
+
+/* Class = "UITextField"; placeholder = "登录密码"; ObjectID = "L7Z-T5-RhC"; */
+"L7Z-T5-RhC.placeholder" = "登录密码";
+
+/* Class = "UILabel"; text = "从"; ObjectID = "LWn-sD-wgQ"; */
+"LWn-sD-wgQ.text" = "从";
+
+/* Class = "UILabel"; text = "买手店"; ObjectID = "MuE-bu-UhH"; */
+"MuE-bu-UhH.text" = "买手店";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "NaV-bx-yOD"; */
+"NaV-bx-yOD.text" = "1";
+
+/* Class = "UITextField"; placeholder = "媒体名称"; ObjectID = "Nih-gN-jKp"; */
+"Nih-gN-jKp.placeholder" = "媒体名称";
+
+/* Class = "UITextField"; placeholder = "买手店1"; ObjectID = "NkL-YL-w0r"; */
+"NkL-YL-w0r.placeholder" = "买手店1";
+
+/* Class = "UILabel"; text = "到账时间"; ObjectID = "Oh9-Pr-duR"; */
+"Oh9-Pr-duR.text" = "到账时间";
+
+/* Class = "UILabel"; text = "为确保您品牌在YCO System的唯一性，我们需要对品牌商标进行验证。我们将在2-3个工作日完成验证。"; ObjectID = "QYU-Wp-tDE"; */
+"QYU-Wp-tDE.text" = "为确保您品牌在YCO System的唯一性，我们需要对品牌商标进行验证。我们将在2-3个工作日完成验证。";
+
+/* Class = "UITextField"; placeholder = "款式最低零售价"; ObjectID = "RbG-bt-aJB"; */
+"RbG-bt-aJB.placeholder" = "款式最低零售价";
+
+/* Class = "UIButton"; normalTitle = "买手店入驻"; ObjectID = "SDA-rj-KdH"; */
+"SDA-rj-KdH.normalTitle" = "买手店入驻";
+
+/* Class = "UILabel"; text = "2"; ObjectID = "SNc-t3-Kba"; */
+"SNc-t3-Kba.text" = "2";
+
+/* Class = "UILabel"; text = "标题名称"; ObjectID = "Tak-21-Oj1"; */
+"Tak-21-Oj1.text" = "标题名称";
+
+/* Class = "UIButton"; normalTitle = "删除此条付款记录"; ObjectID = "U38-yy-rzY"; */
+"U38-yy-rzY.normalTitle" = "删除此条付款记录";
+
+/* Class = "UIButton"; normalTitle = "提交申请"; ObjectID = "UAz-Ua-ZJv"; */
+"UAz-Ua-ZJv.normalTitle" = "提交申请";
+
+/* Class = "UITextField"; placeholder = "设计师品牌"; ObjectID = "UJI-BN-ZXj"; */
+"UJI-BN-ZXj.placeholder" = "设计师品牌";
+
+/* Class = "UIButton"; normalTitle = "注册 YCO BUYER 账户"; ObjectID = "VWC-Dl-8aF"; */
+"VWC-Dl-8aF.normalTitle" = "注册 YCO BUYER 账户";
+
+/* Class = "UIButton"; normalTitle = "即刻身份验证"; ObjectID = "Vrs-EI-bn4"; */
+"Vrs-EI-bn4.normalTitle" = "即刻身份验证";
+
+/* Class = "UITextField"; placeholder = "登录邮箱"; ObjectID = "Xb4-SM-nqB"; */
+"Xb4-SM-nqB.placeholder" = "登录邮箱";
+
+/* Class = "UITextField"; placeholder = "买手店名称"; ObjectID = "YAf-Ie-ZgH"; */
+"YAf-Ie-ZgH.placeholder" = "买手店名称";
+
+/* Class = "UIButton"; normalTitle = "确认到账"; ObjectID = "YZT-oF-rdg"; */
+"YZT-oF-rdg.normalTitle" = "确认到账";
+
+/* Class = "UILabel"; text = "订单编号"; ObjectID = "bJh-t3-yTy"; */
+"bJh-t3-yTy.text" = "订单编号";
+
+/* Class = "UITextField"; placeholder = "填写数值"; ObjectID = "c1n-I2-O8Q"; */
+"c1n-I2-O8Q.placeholder" = "填写数值";
+
+/* Class = "UIButton"; normalTitle = "我知道了"; ObjectID = "c5w-yR-1Lp"; */
+"c5w-yR-1Lp.normalTitle" = "我知道了";
+
+/* Class = "UIButton"; normalTitle = "帮助"; ObjectID = "cXj-Ce-wJU"; */
+"cXj-Ce-wJU.normalTitle" = "帮助";
+
+/* Class = "UITextField"; placeholder = "填写数值"; ObjectID = "d0K-mn-LO3"; */
+"d0K-mn-LO3.placeholder" = "填写数值";
+
+/* Class = "UILabel"; text = "买手店身份验证"; ObjectID = "ziQ-Qj-cgK"; */
+"ziQ-Qj-cgK.text" = "买手店身份验证";
+
+/* Class = "UIButton"; normalTitle = "提交申请"; ObjectID = "dwm-jp-kxv"; */
+"dwm-jp-kxv.normalTitle" = "提交申请";
+
+/* Class = "UILabel"; text = "标题名称"; ObjectID = "e38-tt-HVS"; */
+"e38-tt-HVS.text" = "标题名称";
+
+/* Class = "UILabel"; text = "交易单号"; ObjectID = "eAI-A8-uy1"; */
+"eAI-A8-uy1.text" = "交易单号";
+
+/* Class = "UILabel"; text = "媒体平台"; ObjectID = "eJ1-b8-Gjx"; */
+"eJ1-b8-Gjx.text" = "媒体平台";
+
+/* Class = "UIButton"; normalTitle = "请至邮件点击激活邮箱"; ObjectID = "f7J-cR-Ham"; */
+"f7J-cR-Ham.normalTitle" = "请至邮件点击激活邮箱";
+
+/* Class = "UILabel"; text = "年销售额*"; ObjectID = "f9A-Hw-H2t"; */
+"f9A-Hw-H2t.text" = "年销售额*";
+
+/* Class = "UILabel"; text = "4"; ObjectID = "h6l-vK-Isw"; */
+"h6l-vK-Isw.text" = "4";
+
+/* Class = "UITextField"; placeholder = "款式最高零售价"; ObjectID = "hLR-uV-kVX"; */
+"hLR-uV-kVX.placeholder" = "款式最高零售价";
+
+/* Class = "UIButton"; normalTitle = "选择或输入买手店"; ObjectID = "jL1-lR-oW0"; */
+"jL1-lR-oW0.normalTitle" = "选择或输入买手店";
+
+/* Class = "UILabel"; text = "公司须与商标注册证上的公司保持一致"; ObjectID = "jx3-Dd-ukU"; */
+"jx3-Dd-ukU.text" = "公司须与商标注册证上的公司保持一致";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "lBw-AD-4qd"; */
+"lBw-AD-4qd.text" = "1";
+
+/* Class = "UITextField"; placeholder = "买手店2"; ObjectID = "n5A-Um-zTh"; */
+"n5A-Um-zTh.placeholder" = "买手店2";
+
+/* Class = "UITextField"; placeholder = "品牌1"; ObjectID = "n9F-Rf-ITT"; */
+"n9F-Rf-ITT.placeholder" = "品牌1";
+
+/* Class = "UIButton"; normalTitle = "请至邮箱点击激活链接。"; ObjectID = "oU9-Tp-XKt"; */
+"oU9-Tp-XKt.normalTitle" = "请至邮箱点击激活链接。";
+
+/* Class = "UIButton"; normalTitle = "申请成功!"; ObjectID = "pbi-AT-Z6v"; */
+"pbi-AT-Z6v.normalTitle" = "申请成功!";
+
+/* Class = "UITextField"; placeholder = "品牌4"; ObjectID = "q2d-i0-Mdv"; */
+"q2d-i0-Mdv.placeholder" = "品牌4";
+
+/* Class = "UITextField"; placeholder = "品牌2"; ObjectID = "rSP-74-x9P"; */
+"rSP-74-x9P.placeholder" = "品牌2";
+
+/* Class = "UILabel"; text = "买手店朋友推荐"; ObjectID = "ti5-sF-ZJX"; */
+"ti5-sF-ZJX.text" = "买手店朋友推荐";
+
+/* Class = "UIButton"; normalTitle = "没收到，再发一封"; ObjectID = "tiH-KZ-pfm"; */
+"tiH-KZ-pfm.normalTitle" = "没收到，再发一封";
+
+/* Class = "UILabel"; text = "支付流水号"; ObjectID = "uCR-VU-jxi"; */
+"uCR-VU-jxi.text" = "支付流水号";
+
+/* Class = "UILabel"; text = "上传公司商标注册证"; ObjectID = "um8-2j-1TK"; */
+"um8-2j-1TK.text" = "上传公司商标注册证";
+
+/* Class = "UIButton"; normalTitle = "登　录"; ObjectID = "vIP-yA-lAn"; */
+"vIP-yA-lAn.normalTitle" = "登　录";
+
+/* Class = "UIButton"; normalTitle = "帮助"; ObjectID = "vhW-7u-i0D"; */
+"vhW-7u-i0D.normalTitle" = "帮助";
+
+/* Class = "UILabel"; text = "展会或订货会"; ObjectID = "vmU-mT-WcC"; */
+"vmU-mT-WcC.text" = "展会或订货会";
+
+/* Class = "UIButton"; normalTitle = "此EMAIL已经注册"; ObjectID = "w5U-E6-tkI"; */
+"w5U-E6-tkI.normalTitle" = "此EMAIL已经注册";
+
+/* Class = "UILabel"; text = "3"; ObjectID = "wL9-U0-Xso"; */
+"wL9-U0-Xso.text" = "3";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "wbH-M3-k5d"; */
+"wbH-M3-k5d.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "xBl-Yo-nzr"; */
+"xBl-Yo-nzr.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "设计师朋友推荐"; ObjectID = "xnL-4y-Fp7"; */
+"xnL-4y-Fp7.text" = "设计师朋友推荐";
+
+/* Class = "UILabel"; text = "上传买手店营业执照"; ObjectID = "xs7-aT-lgJ"; */
+"xs7-aT-lgJ.text" = "上传买手店营业执照";
+
+/* Class = "UITextView"; text = "已同意服务条款"; ObjectID = "yFw-Fb-70N"; */
+"yFw-Fb-70N.text" = "已同意服务条款";
+
+/* Class = "UILabel"; text = "下线合租买手店数量*"; ObjectID = "yYy-sw-ZNl"; */
+"yYy-sw-ZNl.text" = "下线合租买手店数量*";
+
+/* Class = "UITextField"; placeholder = "品牌5"; ObjectID = "zNb-hA-SDp"; */
+"zNb-hA-SDp.placeholder" = "品牌5";
+
+/* Class = "UITextField"; placeholder = "品牌3"; ObjectID = "zwt-0C-tYh"; */
+"zwt-0C-tYh.placeholder" = "品牌3";
+
+/* Class = "UITextField"; placeholder = "填写其他渠道"; ObjectID = "zyM-ld-pC8"; */
+"zyM-ld-pC8.placeholder" = "填写其他渠道";

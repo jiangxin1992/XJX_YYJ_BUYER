@@ -1,0 +1,9 @@
+
+/* Class = "UILabel"; text = "订单备注："; ObjectID = "EVw-T0-WvY"; */
+"EVw-T0-WvY.text" = "订单备注：";
+
+/* Class = "UILabel"; text = "建单时间："; ObjectID = "iO1-3v-b3Z"; */
+"iO1-3v-b3Z.text" = "建单时间：";
+
+/* Class = "UILabel"; text = "订单编号："; ObjectID = "qXV-kf-MdO"; */
+"qXV-kf-MdO.text" = "订单编号：";

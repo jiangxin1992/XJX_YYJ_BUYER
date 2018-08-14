@@ -1,0 +1,66 @@
+
+/* Class = "UIButton"; normalTitle = "收藏"; ObjectID = "7MC-E7-LRK"; */
+"7MC-E7-LRK.normalTitle" = "收藏";
+
+/* Class = "UIButton"; selectedTitle = "已收藏"; ObjectID = "7MC-E7-LRK"; */
+"7MC-E7-LRK.selectedTitle" = "已收藏";
+
+/* Class = "UILabel"; text = "款式数"; ObjectID = "99o-LH-gpv"; */
+"99o-LH-gpv.text" = "款式数";
+
+/* Class = "UILabel"; text = "款式名称"; ObjectID = "A0I-Zt-Re2"; */
+"A0I-Zt-Re2.text" = "款式名称";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Cyt-IQ-zUK"; */
+"Cyt-IQ-zUK.text" = "Label";
+
+/* Class = "UILabel"; text = "系列名称"; ObjectID = "EwJ-Kv-8uf"; */
+"EwJ-Kv-8uf.text" = "系列名称";
+
+/* Class = "UILabel"; text = "起订额"; ObjectID = "Fas-Jn-jdK"; */
+"Fas-Jn-jdK.text" = "起订额";
+
+/* Class = "UILabel"; text = "材料"; ObjectID = "GAE-8x-pnf"; */
+"GAE-8x-pnf.text" = "材料";
+
+/* Class = "UILabel"; text = "款式款号"; ObjectID = "MeK-kf-QHs"; */
+"MeK-kf-QHs.text" = "款式款号";
+
+/* Class = "UILabel"; text = "批发价"; ObjectID = "Rld-wO-wYs"; */
+"Rld-wO-wYs.text" = "批发价";
+
+/* Class = "UILabel"; text = "没有获取到数据"; ObjectID = "U8D-rP-Nw4"; */
+"U8D-rP-Nw4.text" = "没有获取到数据";
+
+/* Class = "UILabel"; text = "LookBook"; ObjectID = "UYR-wf-U0L"; */
+"UYR-wf-U0L.text" = "LookBook";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "b6M-PX-V3N"; */
+"b6M-PX-V3N.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "dvL-Hy-wfo"; */
+"dvL-Hy-wfo.text" = "Label";
+
+/* Class = "UILabel"; text = "没有系列相关Lookbook"; ObjectID = "fYS-N1-Dx5"; */
+"fYS-N1-Dx5.text" = "没有系列相关Lookbook";
+
+/* Class = "UILabel"; text = "尺码"; ObjectID = "hNV-Ch-zl7"; */
+"hNV-Ch-zl7.text" = "尺码";
+
+/* Class = "UILabel"; text = "分类"; ObjectID = "hkT-oi-iDz"; */
+"hkT-oi-iDz.text" = "分类";
+
+/* Class = "UIButton"; normalTitle = "加入购物车"; ObjectID = "YKK-xM-Q0K"; */
+"YKK-xM-Q0K.normalTitle" = "加入购物车";
+
+/* Class = "UILabel"; text = "发货波段"; ObjectID = "kef-40-oWc"; */
+"kef-40-oWc.text" = "发货波段";
+
+/* Class = "UILabel"; text = "起订量"; ObjectID = "lkU-5T-CdG"; */
+"lkU-5T-CdG.text" = "起订量";
+
+/* Class = "UILabel"; text = "！您与此品牌不是合作关系，只有订单已包含的系列在此可见。"; ObjectID = "rxf-fW-MCR"; */
+"rxf-fW-MCR.text" = "！您与此品牌不是合作关系，只有订单已包含的系列在此可见。";
+
+/* Class = "UILabel"; text = "零售价"; ObjectID = "vRB-Af-BpM"; */
+"vRB-Af-BpM.text" = "零售价";

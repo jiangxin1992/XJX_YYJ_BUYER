@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F27" minimumToolsVersion="Xcode 4.3">
+    <entity name="LookBook" representedClassName="LookBook" syncable="YES">
+        <attribute name="coverPic" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createTime" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="designerId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="isOnHomepage" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="lookBookId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="note" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="picCount" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="pics" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LookBookPics" inverseName="lookBook" inverseEntity="LookBookPics" syncable="YES"/>
+    </entity>
+    <entity name="LookBookPics" representedClassName="LookBookPics" syncable="YES">
+        <attribute name="lookBookId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="picUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="lookBook" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="LookBook" inverseName="pics" inverseEntity="LookBook" syncable="YES"/>
+    </entity>
+    <entity name="Series" representedClassName="Series" syncable="YES">
+        <attribute name="album_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="auth_type" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="designer_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="lookBookId" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="note" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order_due_time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="season" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="series_description" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="series_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="styleAmount" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="supply_end_time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="supply_start_time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="supply_status" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="year" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="style" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StyleSummary" inverseName="series" inverseEntity="StyleSummary" syncable="YES"/>
+    </entity>
+    <entity name="StyleColors" representedClassName="StyleColors" syncable="YES">
+        <attribute name="color_id" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="color_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="color_value" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="style_color" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StyleSummary" inverseName="colors" inverseEntity="StyleSummary" syncable="YES"/>
+    </entity>
+    <entity name="StyleDeatilSizes" representedClassName="StyleDeatilSizes" syncable="YES">
+        <attribute name="size_id" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="size_value" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="style_size" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StyleDetail" inverseName="sizes" inverseEntity="StyleDetail" syncable="YES"/>
+    </entity>
+    <entity name="StyleDetail" representedClassName="StyleDetail" syncable="YES">
+        <attribute name="albumImg" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="designerId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="materials" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="modifyTime" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="orderAmountMin" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="region" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="retailPrice" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="sizeCatName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_description" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="styleCode" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tradePrice" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="colors" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StyleDetailColors" inverseName="style" inverseEntity="StyleDetailColors" syncable="YES"/>
+        <relationship name="sizes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StyleDeatilSizes" inverseName="style_size" inverseEntity="StyleDeatilSizes" syncable="YES"/>
+    </entity>
+    <entity name="StyleDetailColorImages" representedClassName="StyleDetailColorImages" syncable="YES">
+        <attribute name="color_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="image_path" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="color" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StyleDetailColors" inverseName="images" inverseEntity="StyleDetailColors" syncable="YES"/>
+    </entity>
+    <entity name="StyleDetailColors" representedClassName="StyleDetailColors" syncable="YES">
+        <attribute name="color_id" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="color_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="color_value" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="images" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StyleDetailColorImages" inverseName="color" inverseEntity="StyleDetailColorImages" syncable="YES"/>
+        <relationship name="style" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="StyleDetail" inverseName="colors" inverseEntity="StyleDetail" syncable="YES"/>
+    </entity>
+    <entity name="StyleSummary" representedClassName="StyleSummary" syncable="YES">
+        <attribute name="album_img" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="category" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="designer_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="materials" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order_amount_min" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="region" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="retail_price" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="series_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="size_cat_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_code" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_description" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="trade_price" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="colors" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="StyleColors" inverseName="style_color" inverseEntity="StyleColors" syncable="YES"/>
+        <relationship name="series" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Series" inverseName="style" inverseEntity="Series" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Series" positionX="583" positionY="54" width="128" height="283"/>
+        <element name="StyleColors" positionX="304" positionY="36" width="128" height="120"/>
+        <element name="StyleDeatilSizes" positionX="133" positionY="378" width="128" height="105"/>
+        <element name="StyleDetail" positionX="-135" positionY="198" width="128" height="285"/>
+        <element name="StyleDetailColorImages" positionX="-90" positionY="9" width="128" height="103"/>
+        <element name="StyleDetailColors" positionX="115" positionY="171" width="128" height="135"/>
+        <element name="StyleSummary" positionX="412" positionY="185" width="101" height="283"/>
+        <element name="LookBook" positionX="495" positionY="486" width="128" height="178"/>
+        <element name="LookBookPics" positionX="196" positionY="576" width="128" height="88"/>
+    </elements>
+</model>

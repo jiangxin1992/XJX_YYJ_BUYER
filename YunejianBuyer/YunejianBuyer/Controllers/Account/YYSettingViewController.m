@@ -1,0 +1,419 @@
+//
+//  YYSettingViewController.m
+//  Yunejian
+//
+//  Created by yyj on 15/7/12.
+//  Copyright (c) 2015年 yyj. All rights reserved.
+//
+
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
+#import "YYSettingViewController.h"
+#import "YYHelpViewController.h"
+#import "YYFeedbackViewController.h"
+#import "YYAboutUsViewController.h"
+#import "YYModifyPasswordViewController.h"
+
+// 自定义视图
+#import "YYNavView.h"
+#import "YYActionSheet.h"
+#import "YYGuideHandler.h"
+#import "YYUserInfoCell.h"
+
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "JpushHandler.h"
+#import <SDImageCache.h>
+#import "UserDefaultsMacro.h"
+#import "AppDelegate.h"
+
+@interface YYSettingViewController ()
+
+@property(nonatomic,strong) YYFeedbackViewController *feedbackViewController;
+@property(nonatomic,strong) YYHelpViewController *helpViewController;
+@property(nonatomic,strong) YYAboutUsViewController *aboutUsViewController;
+@property (nonatomic, strong) YYNavView *navView;
+
+@property(nonatomic,strong) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIView *containerView;
+@property(nonatomic,assign) long cachedSize;
+
+@end
+
+@implementation YYSettingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"设置",nil) WithSuperView:self.view haveStatusView:YES];
+    WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    // 进入埋点
+    [MobClick beginLogPageView:kYYPageSetting];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    // 退出埋点
+    [MobClick endLogPageView:kYYPageSetting];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:5 inSection:0]];
+    if(cell){
+        UIView *targetView = [cell viewWithTag:20001];
+        [YYGuideHandler showGuideView:GuideTypeHelpNewFlag parentView:self.view targetView:targetView];
+    }
+}
+
+- (void)goBack {
+    [self cancelClicked:nil];
+}
+
+- (IBAction)cancelClicked:(id)sender{
+    if (_cancelButtonClicked) {
+        _cancelButtonClicked();
+    }
+}
+
+- (IBAction)testButtonAction:(id)sender{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
+    YYHelpViewController *helpViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYHelpViewController"];
+    [self.navigationController pushViewController:helpViewController animated:YES];
+    
+}
+
+//计算缓存大小
+- (float)calculateCacheSize{
+    self.cachedSize = 0;
+    NSString *cacheDir = yyjDocumentsDirectory();
+    float nowSize = [self fileSizeForDir:cacheDir];
+    NSUInteger bytesCache = [[SDImageCache sharedImageCache] getSize];
+    float MBCache = bytesCache/1000/1000;
+    NSLog(@"nowSize: %f",nowSize+MBCache);
+    return nowSize+MBCache;
+}
+
+- (IBAction)logout:(id)sender{
+    WeakSelf(ws);
+    CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"确定退出登录？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"取消",nil) otherButtonTitles:@[NSLocalizedString(@"退出登录",nil)]];
+    alertView.specialParentView = self.view;
+    [alertView setAlertViewBlock:^(NSInteger selectedIndex){
+        if (selectedIndex == 1) {
+
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+            //jpush登出
+            [JpushHandler sendEmptyAlias];
+
+            //清除用户相关的搜索数据
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            NSString *searchNoteListFile = getOrderSearchNoteStorePath();
+            [fileManager removeItemAtPath:searchNoteListFile error:nil];
+            NSString *documents = yyjDocumentsDirectory();
+            [fileManager removeItemAtPath:documents error:nil];
+
+            //清除本地用户个人信息
+            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+            [userDefaults removeObjectForKey:kUserInfoKey];
+            [userDefaults synchronize];
+
+            //清除购物车
+            [appDelegate clearBuyCar];
+
+            //清空delegate下的临时数据
+            [appDelegate delegateTempDataClear];
+
+            //跳转回主页
+            [ws cancelClicked:nil];
+
+            //重新登录通知
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNeedLoginNotification object:nil];
+        }
+        
+    }];
+    [alertView show];
+}
+
+//显示反馈界面
+- (void)showFeedBack{
+    
+    WeakSelf(ws);
+
+    UIView *superView = self.view;
+    
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
+    YYFeedbackViewController *feedbackViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYFeedbackViewController"];
+    self.feedbackViewController = feedbackViewController;
+    
+    __weak UIView *weakSuperView = superView;
+    UIView *showView = feedbackViewController.view;
+    __weak UIView *weakShowView = showView;
+    [feedbackViewController setCancelButtonClicked:^(){
+        removeFromSuperviewUseUseAnimateAndDeallocViewController(weakShowView,ws.feedbackViewController);
+    }];
+    
+    [feedbackViewController setModifySuccess:^(){
+        removeFromSuperviewUseUseAnimateAndDeallocViewController(weakShowView,ws.feedbackViewController);
+    }];
+    
+    
+    [superView addSubview:showView];
+    [showView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(weakSuperView.mas_top);
+        make.left.equalTo(weakSuperView.mas_left);
+        make.bottom.equalTo(weakSuperView.mas_bottom);
+        make.right.equalTo(weakSuperView.mas_right);
+        
+    }];
+    
+    addAnimateWhenAddSubview(showView);
+}
+
+
+- (void)showHelpView{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
+    YYHelpViewController *helpViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYHelpViewController"];
+    self.helpViewController = helpViewController;
+    
+    UIView *superView = self.view;
+    
+    WeakSelf(ws);
+    __weak UIView *weakSuperView = superView;
+    UIView *showView = helpViewController.view;
+    __weak UIView *weakShowView = showView;
+    [helpViewController setCancelButtonClicked:^(){
+        removeFromSuperviewUseUseAnimateAndDeallocViewController(weakShowView,ws.helpViewController);
+    }];
+    
+    
+    
+    
+    [superView addSubview:showView];
+    [showView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(weakSuperView.mas_top);
+        make.left.equalTo(weakSuperView.mas_left);
+        make.bottom.equalTo(weakSuperView.mas_bottom);
+        make.right.equalTo(weakSuperView.mas_right);
+        
+    }];
+    
+    addAnimateWhenAddSubview(showView);
+    
+    [YYGuideHandler markGuide:GuideTypeHelpNewFlag];
+}
+
+- (void)showAboutView{
+    WeakSelf(ws);
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
+    YYAboutUsViewController *aboutUsViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYAboutUsViewController"];
+    self.aboutUsViewController = aboutUsViewController;
+    [self.navigationController pushViewController:aboutUsViewController animated:YES];
+    [aboutUsViewController setCancelButtonClicked:^(){
+        [ws.navigationController popViewControllerAnimated:YES];
+        ws.aboutUsViewController = nil;
+    }];
+}
+
+#pragma mark - UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    return 13;
+}
+
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+        NSString *CellIdentifier = @"MyCell0";
+        if(indexPath.row == 0 || indexPath.row == 2 || indexPath.row == 4 || indexPath.row == 6 || indexPath.row == 10 || indexPath.row == 12){
+            CellIdentifier = @"MyCell0";
+        }else if(indexPath.row == 1){
+            CellIdentifier = @"MyCell7";
+        }else if(indexPath.row == 3){
+            CellIdentifier = @"MyCell3";
+        }else if(indexPath.row == 8){
+            CellIdentifier = @"MyCell2";
+        }else if(indexPath.row == 9){
+            CellIdentifier = @"MyCell1";
+        }else if(indexPath.row == 11){
+            CellIdentifier = @"MyCell4";
+        }else if(indexPath.row == 5){
+            CellIdentifier = @"MyCell6";
+        }else if(indexPath.row == 7){
+            CellIdentifier = @"MyCell5";
+        }
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if(indexPath.row == 0 || indexPath.row == 2 || indexPath.row == 4 || indexPath.row == 6 || indexPath.row == 10 || indexPath.row == 12){
+            UILabel *lable1 = (UILabel *)[cell viewWithTag:10001];
+            UILabel *lable2 = (UILabel *)[cell viewWithTag:10002];
+            if(indexPath.row ==0 || indexPath.row ==10){
+                lable1.hidden = YES;
+                lable2.hidden = YES;
+            }else{
+                lable1.hidden = NO;
+                lable2.hidden = NO;
+            }
+        }
+
+        if (indexPath.row == 3) {
+            UILabel *lable = (UILabel *)[cell viewWithTag:89990];
+            if (lable) {
+                float nowSize = [self calculateCacheSize];
+                NSString *showValue = @"";
+                if (nowSize < 1) {
+                    showValue = @"0M";
+                }else{
+                    showValue = [NSString stringWithFormat:@"%iM",(int)nowSize];
+                }
+
+                lable.text = showValue;
+            }
+
+        }else if(indexPath.row == 5){
+            UILabel *lable = (UILabel *)[cell viewWithTag:89990];
+            if (lable) {
+                lable.text = [LanguageManager currentLanguageString];
+            }
+        }
+        
+        if (cell == nil){
+            [NSException raise:@"DetailCell == nil.." format:@"No cells with matching CellIdentifier loaded from your storyboard"];
+        }
+        cell.selectionStyle=UITableViewCellSelectionStyleNone;
+        return cell;
+}
+
+
+#pragma mark - UITableViewDelegate
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.row == 0 || indexPath.row == 2 || indexPath.row == 4 || indexPath.row == 6 || indexPath.row == 10 || indexPath.row == 12){
+        return 10;
+    }else{
+        return 54;
+    }
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.row == 1) {
+        [self modifyPassword];
+    }else if (indexPath.row == 7) {
+        [self showHelpView];
+    }else if (indexPath.row == 9) {
+        [self  showAboutView];
+    }else if (indexPath.row == 8) {
+        [self showFeedBack];
+    }else if (indexPath.row == 3){
+        [self clearCache];
+    }else if (indexPath.row == 5){
+        [self changeLanguage];
+    }
+}
+-(void)changeLanguage{
+    YYActionSheet *sheet = [[YYActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:NSLocalizedString(@"取消",nil) otherButtonTitles:@"中文", @"English", nil];
+    [sheet show];
+}
+//清楚缓存
+-(void)clearCache{
+    CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"确定清理？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"否",nil) otherButtonTitles:@[NSLocalizedString(@"是",nil)]];
+    alertView.specialParentView = self.view;
+    [alertView setAlertViewBlock:^(NSInteger selectedIndex){
+        if (selectedIndex == 1) {
+
+            NSString *cacheDir = yyjDocumentsDirectory();
+            NSString *usersListFile = getUsersStorePath();
+            NSString *searchNoteListFile = getOrderSearchNoteStorePath();
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            [fileManager removeItemAtPath:usersListFile error:nil];
+            [fileManager removeItemAtPath:searchNoteListFile error:nil];
+            [fileManager removeItemAtPath:cacheDir error:nil];
+
+            [[SDImageCache sharedImageCache] clearDiskOnCompletion:nil];
+            [[SDImageCache sharedImageCache] clearMemory];//可有可无
+
+            //清除购物车
+            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+            [appDelegate clearBuyCar];
+            [self.tableView reloadData];
+        }
+
+    }];
+    [alertView show];
+}
+#pragma mark 跳转修改密码界面
+-(void)modifyPassword{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
+    YYModifyPasswordViewController *modifyPasswordViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYModifyPasswordViewController"];
+    [self.navigationController pushViewController:modifyPasswordViewController animated:YES];
+    WeakSelf(ws);
+    [modifyPasswordViewController setCancelButtonClicked:^(){
+        [ws.navigationController popViewControllerAnimated:YES];
+    }];
+
+    [modifyPasswordViewController setModifySuccess:^(){
+        [ws.navigationController popViewControllerAnimated:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNeedLoginNotification object:nil];
+    }];
+}
+
+- (void)actionSheet:(YYActionSheet *)sheet clickedButtonIndex:(NSInteger)buttonIndex{
+    if(buttonIndex == 0){
+        [self changeLaunguage:1];
+    }else{
+        [self changeLaunguage:0];
+    }
+}
+
+
+- (void)changeLaunguage:(NSInteger)index
+{
+    [LanguageManager saveLanguageByIndex:index];
+    [self.tableView reloadData];
+    [self reloadRootViewController];
+    [LanguageManager setLanguageToServer];
+}
+
+- (void)reloadRootViewController
+{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    [appDelegate reloadRootViewController:appDelegate.leftMenuIndex];
+}
+
+-(float)fileSizeForDir:(NSString*)path//计算文件夹下文件的总大小
+{
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSArray* array = [fileManager contentsOfDirectoryAtPath:path error:nil];
+    for(int i = 0; i<[array count]; i++)
+    {
+        NSString *fullPath = [path stringByAppendingPathComponent:[array objectAtIndex:i]];
+        
+        BOOL isDir;
+        if ( !([fileManager fileExistsAtPath:fullPath isDirectory:&isDir] && isDir) )
+        {
+            NSDictionary *fileAttributeDic=[fileManager attributesOfItemAtPath:fullPath error:nil];
+            _cachedSize += fileAttributeDic.fileSize;
+        }
+        else
+        {
+            [self fileSizeForDir:fullPath];
+        }
+    }
+    return _cachedSize/(1024.0*1024.0);
+    
+}
+
+
+@end

@@ -7,39 +7,22 @@
 //
 
 #import "YYUserApi.h"
-
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
-
-// 自定义视图
-
-// 接口
-
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "RequestMacro.h"
 #import "YYRequestHelp.h"
+#import "RequestMacro.h"
+#import "UserDefaultsMacro.h"
 #import "YYHttpHeaderManager.h"
 
-#import "YYAddress.h"
 #import "YYUserModel.h"
-#import "YYLookBookModel.h"
-#import "YYHomePageModel.h"
-#import "YYNewsListModel.h"
+#import "YYRspStatusAndMessage.h"
 #import "YYDesignerModel.h"
 #import "YYBrandInfoModel.h"
-#import "YYBuyerListModel.h"
-#import "YYIndexPicsModel.h"
 #import "YYBuyerStoreModel.h"
-#import "YYAddressListModel.h"
-#import "YYBuyerDetailModel.h"
-#import "YYCountryListModel.h"
 #import "YYSalesManListModel.h"
+#import "YYLookBookModel.h"
+#import "YYBrandIntroductionModel.h"
+#import "YYLookBookListModel.h"
 #import "YYBrandHomeInfoModel.h"
-#import "YYBuyerHomeInfoModel.h"
-#import "YYBuyerAddressListModel.h"
+#import "MJExtension.h"
 
 @implementation YYUserApi
 
@@ -224,7 +207,7 @@
 
 /**
  *
- * 获取收件地址列表
+ * 获取收货地址列表
  *
  */
 + (void)getAddressListWithBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYAddressListModel *addressListModel,NSError *error))block{
@@ -247,7 +230,7 @@
 
 /**
  *
- * 买手-删除地址
+ * 买家-删除地址
  *
  */
 + (void)deleteAddress:(NSInteger)addressId andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
@@ -292,7 +275,7 @@
 
 /**
  *
- * 修改买手用户名或电话
+ * 修改买家用户名或电话
  *
  */
 + (void)updateBuyerUsername:(NSString *)username phone:(NSString *)phone province:(NSString *)province city:(NSString *)city andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
@@ -372,7 +355,7 @@
 
 /**
  *
- * 修改买手店铺信息
+ * 修改买家店铺信息
  *
  */
 + (void)storeUpdateByBuyerStoreModel:(YYBuyerStoreModel *)BuyerStoreModel andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
@@ -392,7 +375,7 @@
 
 /**
  *
- * 添加或修改收件地址
+ * 添加或修改收货地址
  *
  */
 + (void)createOrModifyAddress:(YYAddress *)address andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
@@ -758,7 +741,7 @@
 
 /**
  *
- * 获取收件地址列表
+ * 获取收货地址列表
  *
  */
 + (void)getAddressListWithID:(NSInteger)buyerId pageIndex:(int)pageIndex pageSize:(int)pageSize andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYBuyerAddressListModel *addressListModel,NSError *error))block{

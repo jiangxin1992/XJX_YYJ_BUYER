@@ -16,12 +16,11 @@
 #import "MBProgressHUD.h"
 #import "YYOpusApi.h"
 #import "AppDelegate.h"
-#import "YYUserStyleModel.h"
-#import "YYStyleOneColorModel.h"
-#import "YYUserSeriesModel.h"
+#import "YYInventoryBoardModel.h"
 
 #import "YYChooseStyleViewController.h"
 #import "YYUserStyleCollectionViewController.h"
+#import "YYBrandSeriesViewController.h"
 #import "YYUserSeriesCollectionViewController.h"
 #import "UINavigationController+YRBackGesture.h"
 
@@ -71,10 +70,14 @@
     self.view.backgroundColor = _define_white_color;
     
     _navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"我的收藏",nil) WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws GoBack:nil];
-    };
+    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
+    [_navView addSubview:backBtn];
+    [backBtn addTarget:self action:@selector(GoBack:) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.mas_equalTo(0);
+        make.width.mas_equalTo(40);
+        make.bottom.mas_equalTo(-1);
+    }];
 }
 
 #pragma mark - UIConfig
@@ -121,7 +124,7 @@
 
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [YYOpusApi updateSeriesCollectStateBySeriesId:[userSeriesModel.seriesId integerValue] isCollect:NO andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
                 [self.right deleteRowsAtIndexPaths:indexPath];
             }else{
                 [YYToast showToastWithView:self.view title:rspStatusAndMessage.message andDuration:kAlertToastDuration];
@@ -134,7 +137,7 @@
     
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [YYOpusApi updateStyleCollectStateByStyleId:[userStyleModel.styleId integerValue] isCollect:NO andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
                 [self.left deleteRowsAtIndexPaths:indexPath];
             }else{
                 [YYToast showToastWithView:self.view title:rspStatusAndMessage.message andDuration:kAlertToastDuration];
@@ -155,7 +158,7 @@
         if([userStyleModel.status integerValue] == 0){
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             
-            YYStyleOneColorModel *infoModel = [self modelTransformByUserStyleModel:userStyleModel];
+            YYInventoryBoardModel *infoModel = [self modelTransformByUserStyleModel:userStyleModel];
             [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
         }
     }
@@ -204,8 +207,8 @@
         [_pageVc setViewControllers:@[_left] direction:1 animated:YES completion:nil];
     }
 }
--(YYStyleOneColorModel *)modelTransformByUserStyleModel:(YYUserStyleModel *)userStyleModel{
-    YYStyleOneColorModel *tempModel = [[YYStyleOneColorModel alloc] init];
+-(YYInventoryBoardModel *)modelTransformByUserStyleModel:(YYUserStyleModel *)userStyleModel{
+    YYInventoryBoardModel *tempModel = [[YYInventoryBoardModel alloc] init];
     tempModel.albumImg = userStyleModel.albumImg;
     tempModel.brandName = userStyleModel.brandName;
     tempModel.brandLogo = userStyleModel.brandLogo;

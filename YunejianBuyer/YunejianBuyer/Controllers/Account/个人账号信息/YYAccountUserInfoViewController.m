@@ -50,10 +50,15 @@
     self.view.backgroundColor = _define_white_color;
 
     _navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"个人账号信息",nil) WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws GoBack:nil];
-    };
+
+    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
+    [_navView addSubview:backBtn];
+    [backBtn addTarget:self action:@selector(GoBack:) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.mas_equalTo(0);
+        make.width.mas_equalTo(40);
+        make.bottom.mas_equalTo(-1);
+    }];
 }
 
 #pragma mark - --------------UIConfig----------------------
@@ -63,12 +68,12 @@
 -(void)CreateTableView
 {
     WeakSelf(ws);
-    _tableview = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableview=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     [self.view addSubview:_tableview];
     //    消除分割线
-    _tableview.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _tableview.delegate = self;
-    _tableview.dataSource = self;
+    _tableview.separatorStyle=UITableViewCellSeparatorStyleNone;
+    _tableview.delegate=self;
+    _tableview.dataSource=self;
     [_tableview mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.bottom.mas_equalTo(0);
         make.top.mas_equalTo(ws.navView.mas_bottom).with.offset(0);

@@ -6,35 +6,29 @@
 //  Copyright © 2017年 Apple. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYVisibleContactInfoViewController.h"
+#import "YYNavigationBarViewController.h"
 #import "YYVisibleAuditPickerViewController.h"
 #import "YYVisibleShopInfoViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
 #import "YYCountryPickView.h"
 #import "YYPickView.h"
-#import "YYVisibleContactInfoTableViewCell.h"
 
-// 接口
 #import "YYUserApi.h"
 #import "YYAuditingApi.h"
 
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "MLInputDodger.h"
 #import "YYCountryListModel.h"
 #import "YYPerfectInfoModel.h"
+
+#import "MLInputDodger.h"
+
+#import "YYVisibleContactInfoTableViewCell.h"
 
 @interface YYVisibleContactInfoViewController ()<UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, YYPickViewDelegate, YYCountryPickViewDelegate, YYVisibleContactInfoCellDelegate>
 /** tableView */
 @property (nonatomic, strong) UITableView *tableView;
 /** 导航栏 */
-@property (nonatomic, strong) YYNavView *navView;
+@property (nonatomic, strong) YYNavigationBarViewController *navigationBarViewController;
 
 /** 图片集合 */
 @property (nonatomic, strong) NSArray *imageViewArray;
@@ -248,7 +242,7 @@
         case 1:{
             if(!_countryInfo){
                 [YYUserApi getCountryInfoWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSError *error) {
-                    if (rspStatusAndMessage.status == YYReqStatusCode100) {
+                    if (rspStatusAndMessage.status == kCode100) {
                         _countryInfo = countryListModel;
                         NSLog(@"%@", _countryInfo);
                         if(_countryInfo.result.count){
@@ -355,12 +349,12 @@
 - (void)submitClick{
     // 检查/ 所在省市区、 填写详细地址、 按钮状态
 
-    if ([NSString isNilOrEmpty:self.perfectInfoModel.province]) {
+    if ([self.perfectInfoModel.province isNilOrEmpty]) {
         [YYToast showToastWithTitle:NSLocalizedString(@"所在省/市/区", nil) andDuration:kAlertToastDuration];
         return;
     }
 
-    if ([NSString isNilOrEmpty:self.perfectInfoModel.addressDetail]) {
+    if ([self.perfectInfoModel.addressDetail isNilOrEmpty]) {
         [YYToast showToastWithTitle:NSLocalizedString(@"填写详细地址", nil) andDuration:kAlertToastDuration];
         return;
     }
@@ -378,7 +372,7 @@
     if (self.isChangeNation) {
         // 先进性网络请求
         [YYUserApi getSubCountryInfoWithCountryID:[self.perfectInfoModel.nationId integerValue] WithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSInteger impId,NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
                 self.isChangeNation = NO;
                 // 处理数据
                 if(countryListModel.result.count){
@@ -420,13 +414,27 @@
     id traget = self.navigationController.interactivePopGestureRecognizer.delegate;
     UIPanGestureRecognizer * pan = [[UIPanGestureRecognizer alloc]initWithTarget:traget action:nil];
     [self.view addGestureRecognizer:pan];
+
     self.view.backgroundColor = _define_white_color;
 
-    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"买手店入驻",nil) WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    self.navigationBarViewController = navigationBarViewController;
+    navigationBarViewController.previousTitle = @"";
+    navigationBarViewController.nowTitle = NSLocalizedString(@"买手店入驻",nil);
+    [self.view addSubview:navigationBarViewController.view];
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(self.mas_topLayoutGuideBottom).with.offset(0);
+        make.left.right.mas_equalTo(0);
+        make.height.mas_equalTo(45);
+    }];
+
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType) {
+        if (self.goBack) {
+            self.goBack();
+        }
+        [self.navigationController popViewControllerAnimated:YES];
+    }];
 
     UIButton *submitButton = [[UIButton alloc] init];
     submitButton.backgroundColor = [UIColor blackColor];
@@ -452,7 +460,7 @@
     [tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(12.5);
         make.right.mas_equalTo(-12.5);
-        make.top.mas_equalTo(ws.navView.mas_bottom).with.offset(0);
+        make.top.mas_equalTo(navigationBarViewController.view.mas_bottom).with.offset(0);
         make.bottom.mas_equalTo(submitButton.mas_top).with.offset(0);
     }];
 

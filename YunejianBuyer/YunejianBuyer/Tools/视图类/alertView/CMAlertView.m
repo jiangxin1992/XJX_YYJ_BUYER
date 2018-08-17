@@ -315,7 +315,7 @@
     reasonTextView.layer.borderWidth = 1.0f;
     reasonTextView.layer.borderColor = [UIColor colorWithHex:@"d3d3d3"].CGColor;
 
-    resetInputLabel = [UILabel getLabelWithAlignment:0 WithTitle:[NSString stringWithFormat:NSLocalizedString(@"还可输入 %@ 字",nil),@"100.00"] WithFont:12.0f WithTextColor:[UIColor colorWithHex:@"919191"] WithSpacing:0];
+    resetInputLabel = [UILabel getLabelWithAlignment:0 WithTitle:[NSString stringWithFormat:NSLocalizedString(@"还可输入 %@ 字",nil),@"100"] WithFont:12.0f WithTextColor:[UIColor colorWithHex:@"919191"] WithSpacing:0];
     [infoView addSubview:resetInputLabel];
     resetInputLabel.frame = CGRectMake(27, CGRectGetMaxY(reasonTextView.frame), CGRectGetWidth(infoView.frame)-27*2, 32);
 
@@ -324,7 +324,7 @@
 
     UIButton *button = [UIButton getCustomTitleBtnWithAlignment:0 WithFont:14.0f WithSpacing:0 WithNormalTitle:nil WithNormalColor:_define_white_color WithSelectedTitle:nil WithSelectedColor:nil];
     [alertView addSubview:button];
-    if(![NSArray isNilOrEmpty:_otherBts]){
+    if(![_otherBts isNilOrEmpty]){
         [button setTitle:_otherBts[0] forState:UIControlStateNormal];
     }
     button.backgroundColor = _define_black_color;

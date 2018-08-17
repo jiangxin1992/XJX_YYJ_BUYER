@@ -8,16 +8,20 @@
 
 #import "YYIndexViewController.h"
 
+#import "YYNavigationBarViewController.h"
 #import "YYCartDetailViewController.h"
 #import "YYIndexBannerDetailViewController.h"
 #import "YYOrderListViewController.h"
+#import "YYBrandHomePageViewController.h"
 #import "YYOrderingDetailViewController.h"
+#import "YYBrandSeriesViewController.h"
 #import "YYOrderingListViewController.h"
 #import "YYMainViewController.h"
 #import "YYVisibleContactInfoViewController.h"
+#import "YYMessageDetailViewController.h"
+#import "YYConnAddViewController.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 
-#import "YYNavView.h"
 #import "YYIndexTableHeadView.h"
 #import "YYIndexOrderingNoDataCell.h"
 #import "YYUserOrderCell.h"
@@ -32,16 +36,13 @@
 
 #import "MBProgressHUD.h"
 
-#import "YYStyleInfoModel.h"
 #import "YYBrandHomeInfoModel.h"
 #import "YYIndexManageModel.h"
 #import "YYScanFunctionModel.h"
 #import "YYSeriesInfoModel.h"
-#import "YYStyleOneColorModel.h"
+#import "YYInventoryBoardModel.h"
 #import "YYHotDesignerBrandsModel.h"
 #import "YYHotDesignerBrandsSeriesModel.h"
-#import "YYUntreatedMsgAmountModel.h"
-#import "YYSeriesInfoDetailModel.h"
 #import "YYIndexApi.h"
 #import "YYOpusApi.h"
 #import "YYOrderingApi.h"
@@ -73,7 +74,7 @@
 
 @interface YYIndexViewController ()<UITableViewDelegate,UITableViewDataSource>
 
-@property (nonatomic, strong) YYNavView *navView;
+@property (nonatomic, strong) YYNavigationBarViewController *navigationBarViewController;
 
 @property (nonatomic,strong) UITableView *tableView;
 @property (nonatomic,strong) YYIndexTableHeadView *headView;
@@ -134,27 +135,36 @@
 }
 
 - (void)PrepareUI{
-    self.view.backgroundColor = _define_white_color;
+    self.view.backgroundColor = [UIColor colorWithHex:@"f8f8f8"];
     //创建导航栏
-    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
-    [self.navView setNavTitleImage:[UIImage imageNamed:@"index_nav_head"]];
-    [self.navView hidesBackButton];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    _navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    _navigationBarViewController.previousTitle = nil;
+    _navigationBarViewController.nowTitle = nil;
+    _navigationBarViewController.imageTitle = @"index_nav_head";
+    _navigationBarViewController.isGoBackHide = YES;
+    [self.view addSubview:_navigationBarViewController.view];
+    [_navigationBarViewController updateUI];
+    [_navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.top.mas_equalTo(0);
+        make.height.mas_equalTo(kNavigationBarHeight);
+    }];
 
     UIButton *sweepYardButton = [UIButton getCustomImgBtnWithImageStr:@"scan_button_icon" WithSelectedImageStr:nil];
-    [self.navView addSubview:sweepYardButton];
+    [_navigationBarViewController.view addSubview:sweepYardButton];
     [sweepYardButton addTarget:self action:@selector(sweepYardButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     [sweepYardButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(kStatusBarHeight);
+        make.top.mas_equalTo(0);
         make.bottom.mas_equalTo(-1);
         make.width.mas_equalTo(50);
         make.left.mas_equalTo(0);
     }];
 
     _messageButton = [[YYMessageButton alloc] init];
-    [self.navView addSubview:_messageButton];
+    [_navigationBarViewController.view addSubview:_messageButton];
     [_messageButton addTarget:self action:@selector(messageButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     [_messageButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(kStatusBarHeight);
+        make.top.mas_equalTo(0);
         make.bottom.mas_equalTo(-1);
         make.right.mas_equalTo(0);
         make.width.mas_equalTo(50);
@@ -181,11 +191,11 @@
     [self.view addSubview:_tableView];
     //    消除分割线
     _tableView.backgroundColor = [UIColor colorWithHex:@"f8f8f8"];
-    _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _tableView.delegate = self;
-    _tableView.dataSource = self;
+    _tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
+    _tableView.delegate=self;
+    _tableView.dataSource=self;
     [_tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.navView.mas_bottom).with.offset(0);
+        make.top.mas_equalTo(_navigationBarViewController.view.mas_bottom).with.offset(0);
         make.left.right.bottom.mas_equalTo(0);
     }];
 
@@ -247,7 +257,7 @@
         if(!_indexManageModel.bannerDataHaveBeenSuccessful){
             _indexManageModel.bannerDataHaveBeenSuccessful = YES;
         }
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             ws.indexManageModel.bannerListModelArray = returnArr;
         }
         [ws reloadTableView];
@@ -262,7 +272,7 @@
         if(!_indexManageModel.orderingDataHaveBeenSuccessful){
             _indexManageModel.orderingDataHaveBeenSuccessful = YES;
         }
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             ws.indexManageModel.orderingListModel = orderingListModel;
         }
         [ws reloadTableView];
@@ -277,9 +287,9 @@
         if(!_indexManageModel.hotDesignerBrandsDataHaveBeenSuccessful){
             _indexManageModel.hotDesignerBrandsDataHaveBeenSuccessful = YES;
         }
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             for (YYHotDesignerBrandsModel *brandModel in hotList) {
-                if([NSArray isNilOrEmpty:brandModel.seriesBoList]){
+                if([brandModel.seriesBoList isNilOrEmpty]){
                     brandModel.seriesBoListNum = @(0);
                 }else{
                     brandModel.seriesBoListNum = @(brandModel.seriesBoList.count);
@@ -368,7 +378,7 @@
                     [self showOrderingListView];
                 }else if(cell.sectionHeadType == EIndexSectionHeadOrder){
                     //更多订单
-                    [self showOrderViewAtIndex:0];
+                    [self showOrderView:type];
                 }else if(cell.sectionHeadType == EIndexSectionHeadHot){
                     //查看更多品牌
                     [self scanMoreBrands];
@@ -429,8 +439,23 @@
             YYUserOrderCell *userOrderCell=[_tableView dequeueReusableCellWithIdentifier:cellid];
             if(!userOrderCell)
             {
-                userOrderCell=[[YYUserOrderCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellid WithActionBlock:^(NSInteger pageIndex) {
-                    [self showOrderViewAtIndex:pageIndex];
+                userOrderCell=[[YYUserOrderCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellid WithBlock:^(NSString *type) {
+                    if([type isEqualToString:@"order_ordered"]){
+                        //已下单
+                        [self showOrderView:type];
+                    }else if([type isEqualToString:@"order_confirmed"]){
+                        //已确认
+                        [self showOrderView:type];
+                    }else if([type isEqualToString:@"order_produced"]){
+                        //已生产
+                        [self showOrderView:type];
+                    }else if([type isEqualToString:@"order_delivered"]){
+                        //已发货
+                        [self showOrderView:type];
+                    }else if([type isEqualToString:@"order_received"]){
+                        //已收货
+                        [self showOrderView:type];
+                    }
                 }];
                 userOrderCell.selectionStyle = UITableViewCellSelectionStyleNone;
             }
@@ -535,10 +560,10 @@
     return cell;
 }
 -(CGFloat )getHotCellHeightWithIndexPath:(NSIndexPath *)indexPath{
-    if(![NSArray isNilOrEmpty:_indexManageModel.hotDesignerBrandsModelArray]){
+    if(![_indexManageModel.hotDesignerBrandsModelArray isNilOrEmpty]){
         if(_indexManageModel.hotDesignerBrandsModelArray.count > indexPath.row){
             YYHotDesignerBrandsModel *brandsModel = _indexManageModel.hotDesignerBrandsModelArray[indexPath.row];
-            if(![NSArray isNilOrEmpty:brandsModel.seriesBoList]){
+            if(![brandsModel.seriesBoList isNilOrEmpty]){
                 if(indexPath.row == _indexManageModel.hotDesignerBrandsModelArray.count - 1){
                     return IndexHotBrandCellHeight + 30;
                 }else{
@@ -559,9 +584,9 @@
 //修改当前用户与品牌的关联状态
 -(void)showOprateView:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
     WeakSelf(ws);
-    if(hotDesignerBrandsModel && [hotDesignerBrandsModel.connectStatus integerValue] == YYUserConnStatusNone){
+    if(hotDesignerBrandsModel && [hotDesignerBrandsModel.connectStatus integerValue] == kConnStatus){
         [YYConnApi invite:[hotDesignerBrandsModel.designerId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if(rspStatusAndMessage.status == YYReqStatusCode100){
+            if(rspStatusAndMessage.status == kCode100){
                 hotDesignerBrandsModel.connectStatus = 0;
                 [YYToast showToastWithTitle:NSLocalizedString(@"已向品牌发送合作邀请",nil) andDuration:kAlertToastDuration];
                 [ws reloadTableData];
@@ -604,12 +629,32 @@
     }];
 }
 //跳转更多订单界面
--(void)showOrderViewAtIndex:(NSInteger)pageIndex{
+-(void)showOrderView:(NSString *)type{
     WeakSelf(ws);
 
     UIStoryboard *orderStoryboard = [UIStoryboard storyboardWithName:@"OrderDetail" bundle:[NSBundle mainBundle]];
     YYOrderListViewController *orderListViewController = [orderStoryboard instantiateViewControllerWithIdentifier:@"YYOrderListViewController"];
-    orderListViewController.currentIndex = pageIndex;
+    orderListViewController.isFromIndex = YES;
+    orderListViewController.currentIndex = 0;
+    if([type isEqualToString:@"more_order"]){
+        //    更多订单
+        orderListViewController.currentIndex = 0;
+    }else if([type isEqualToString:@"order_ordered"]){
+        //    已下单
+        orderListViewController.currentIndex = 1;
+    }else if([type isEqualToString:@"order_confirmed"]){
+        //    已确认
+        orderListViewController.currentIndex = 2;
+    }else if([type isEqualToString:@"order_produced"]){
+        //    已生产
+        orderListViewController.currentIndex = 3;
+    }else if([type isEqualToString:@"order_delivered"]){
+        //    已发货
+        orderListViewController.currentIndex = 4;
+    }else if([type isEqualToString:@"order_received"]){
+        //    已收货
+        orderListViewController.currentIndex = 5;
+    }
 
     [orderListViewController setCancelButtonClicked:^(){
         [ws.navigationController popViewControllerAnimated:YES];
@@ -681,7 +726,7 @@
 -(void)pushBrandHomePageWithDesignerID:(NSInteger )designerId{
 
     [YYUserApi getDesignerHomeInfo:[[NSString alloc] initWithFormat:@"%ld",designerId] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBrandHomeInfoModel *infoModel, NSError *error) {
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             NSString *brandName = infoModel.brandName;
             NSString *logoPath = infoModel.logoPath;
@@ -693,7 +738,7 @@
 -(void)PushSeriesDetailViewWithDesignerID:(NSInteger )designerId WithSeriesID:(NSInteger )seriesId{
     //信息全
     [YYOpusApi getConnSeriesInfoWithId:designerId seriesId:seriesId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100) {
+        if (rspStatusAndMessage.status == kCode100) {
 
             NSString *brandName = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandName]?@"":infoDetailModel.series.designerBrandName;
             NSString *brandLogo = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandLogo]?@"":infoDetailModel.series.designerBrandLogo;
@@ -792,12 +837,12 @@
     [YYOpusApi getStyleInfoByStyleId:[scanModel.id longLongValue] orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYStyleInfoModel *styleInfoModel, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         if(rspStatusAndMessage){
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
                 [code dismissController];
                 //表示有权限访问，跳转款式详情页
                 if(styleInfoModel){
                     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-                    YYStyleOneColorModel *infoModel = [styleInfoModel transformToStyleOneColorModel];
+                    YYInventoryBoardModel *infoModel = [styleInfoModel transformToInventoryBoardModel];
                     [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
                 }
             }else{
@@ -815,7 +860,17 @@
 #pragma mark - --------------自定义方法----------------------
 -(void)updateMessageCount{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
+    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
+
+    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
+        if(msgAmount > 0 ){
+            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
+        }else{
+            [_messageButton updateButtonNumber:@"dot"];
+        }
+    }else{
+        [_messageButton updateButtonNumber:@""];
+    }
 }
 
 - (void)messageCountChanged:(NSNotification *)notification{

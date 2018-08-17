@@ -15,6 +15,7 @@
 // 自定义视图
 
 // 接口
+#import "YYInventoryApi.h"
 
 // 分类
 #import "UIImage+YYImage.h"
@@ -22,7 +23,7 @@
 
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import "YYUser.h"
-#import "YYUntreatedMsgAmountModel.h"
+
 #import "AppDelegate.h"
 #import "YYGuideHandler.h"
 
@@ -47,7 +48,7 @@ static const NSInteger buttonTagOffset = 50000;
 @property (weak, nonatomic) IBOutlet UIButton *leftMenuButton_5;
 
 @property (nonatomic, strong) UILabel *userUnreadMsg;
-@property (nonatomic, strong) NSArray *menuButtons;
+//@property (nonatomic, strong) UILabel *indexUnreadMsg;
 
 @end
 
@@ -66,6 +67,12 @@ static const NSInteger buttonTagOffset = 50000;
     [self updateSelectedButton:_currentSelectedButton];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+
+    UIView *targetView = self.leftMenuButton_4;
+    [YYGuideHandler showGuideView:GuideTypeTabMe parentView:self.view targetView:targetView];
+
+}
 #pragma mark - --------------SomePrepare--------------
 -(void)SomePrepare
 {
@@ -88,52 +95,46 @@ static const NSInteger buttonTagOffset = 50000;
 
 #pragma mark - --------------UIConfig----------------------
 -(void)initUserUnreadMsg{
-    UIButton *userButton = nil;
-    for (UIButton *menuButton in self.menuButtons) {
-        if (menuButton.tag == LeftMenuButtonTypeAccount) {
-            userButton = menuButton;
-        }
-    }
-    if (userButton) {
-        _userUnreadMsg = [UILabel getLabelWithAlignment:1 WithTitle:nil WithFont:11.0f WithTextColor:_define_white_color WithSpacing:0];
-        [userButton addSubview:_userUnreadMsg];
-        [_userUnreadMsg mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.mas_equalTo(10);
-            make.width.height.mas_equalTo(14);
-            make.centerX.mas_equalTo(userButton).with.offset(12);
-        }];
-        _userUnreadMsg.backgroundColor = [UIColor colorWithHex:@"EF4E31"];
-        _userUnreadMsg.layer.masksToBounds = YES;
-        _userUnreadMsg.layer.cornerRadius = 7;
-        _userUnreadMsg.hidden = YES;
-    }
+    _userUnreadMsg = [UILabel getLabelWithAlignment:1 WithTitle:nil WithFont:11.0f WithTextColor:_define_white_color WithSpacing:0];
+    [_leftMenuButton_3 addSubview:_userUnreadMsg];
+    [_userUnreadMsg mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(10);
+        make.width.height.mas_equalTo(14);
+        make.centerX.mas_equalTo(_leftMenuButton_3).with.offset(12);
+    }];
+    _userUnreadMsg.backgroundColor = [UIColor colorWithHex:@"EF4E31"];
+    _userUnreadMsg.layer.masksToBounds = YES;
+    _userUnreadMsg.layer.cornerRadius = 7;
+    _userUnreadMsg.hidden = YES;
 }
-
+/*-(void)initIndexUnreadMsg{
+    _indexUnreadMsg = [UILabel getLabelWithAlignment:1 WithTitle:nil WithFont:11.0f WithTextColor:_define_white_color WithSpacing:0];
+    [_leftMenuButton_0 addSubview:_indexUnreadMsg];
+    [_indexUnreadMsg mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(10);
+        make.width.height.mas_equalTo(14);
+        make.centerX.mas_equalTo(_leftMenuButton_0).with.offset(12);
+    }];
+    _indexUnreadMsg.backgroundColor = [UIColor colorWithHex:@"EF4E31"];
+    _indexUnreadMsg.layer.masksToBounds = YES;
+    _indexUnreadMsg.layer.cornerRadius = 7;
+    _indexUnreadMsg.hidden = YES;
+}*/
 - (void)initAndHiddenSomeButton{
-    YYUser *user = [YYUser currentUser];
-    NSInteger btnsCount = user.stockEnable ? 5 : 4;
+    NSInteger btnsCount = 4;
     NSInteger btnWidth = SCREEN_WIDTH/btnsCount;
 
     [self initButtonIcon:self.leftMenuButton_0 tag:LeftMenuButtonTypeIndex];
     [self initButtonIcon:self.leftMenuButton_1 tag:LeftMenuButtonTypeAddBrand];
     [self initButtonIcon:self.leftMenuButton_2 tag:LeftMenuButtonTypeOrder];
-    
-    if (user.stockEnable) {
-        [self initButtonIcon:self.leftMenuButton_3 tag:LeftMenuButtonTypeInventory];
-        [self initButtonIcon:self.leftMenuButton_4 tag:LeftMenuButtonTypeAccount];
-        
-        [self.leftMenuButton_4 setConstraintConstant:btnWidth forAttribute:NSLayoutAttributeWidth];
-    }else {
-        [self initButtonIcon:self.leftMenuButton_3 tag:LeftMenuButtonTypeAccount];
-        
-        [self.leftMenuButton_4 hideByWidth:YES];
-    }
+    [self initButtonIcon:self.leftMenuButton_3 tag:LeftMenuButtonTypeAccount];
+
     [self.leftMenuButton_0 setConstraintConstant:btnWidth forAttribute:NSLayoutAttributeWidth];
     [self.leftMenuButton_1 setConstraintConstant:btnWidth forAttribute:NSLayoutAttributeWidth];
     [self.leftMenuButton_2 setConstraintConstant:btnWidth forAttribute:NSLayoutAttributeWidth];
     [self.leftMenuButton_3 setConstraintConstant:btnWidth forAttribute:NSLayoutAttributeWidth];
+    [self.leftMenuButton_4 hideByWidth:YES];
     [self.leftMenuButton_5 hideByWidth:YES];
-    self.menuButtons = @[self.leftMenuButton_0, self.leftMenuButton_1, self.leftMenuButton_2, self.leftMenuButton_3, self.leftMenuButton_4, self.leftMenuButton_5];
 
     [self.view updateSizes];
 
@@ -184,6 +185,9 @@ static const NSInteger buttonTagOffset = 50000;
 
     UIButton *button = (UIButton *)sender;
     if (button != _currentSelectedButton) {
+        if(_currentSelectedButton.tag == LeftMenuButtonTypeInventory){
+            [YYInventoryApi markAsReadOnMsg:nil adnBlock:nil];
+        }
         [self updateSelectedButton:button];
     }
 }
@@ -202,10 +206,10 @@ static const NSInteger buttonTagOffset = 50000;
         return NSLocalizedString(@"品牌",nil);
     }else if(tag == LeftMenuButtonTypeSetting){
         return NSLocalizedString(@"设置",nil);
+    }else if(tag == LeftMenuButtonTypeInventory){
+        return NSLocalizedString(@"库存",nil);
     }else if(tag == LeftMenuButtonTypeIndexChooseStyle){
         return NSLocalizedString(@"选款",nil);
-    }else if (tag == LeftMenuButtonTypeInventory) {
-        return NSLocalizedString(@"库存", nil);
     }
     return @"";
 }
@@ -218,7 +222,7 @@ static const NSInteger buttonTagOffset = 50000;
 -(void)updateUserUnreadMsg{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     NSInteger userCount = 0;
-    if(appDelegate.untreatedMsgAmountModel.unreadAppointmentStatusMsgAmount > 0){
+    if(appDelegate.unreadAppointmentStatusMsgAmount > 0){
         userCount++;
     }
     if(userCount > 0){
@@ -228,6 +232,30 @@ static const NSInteger buttonTagOffset = 50000;
         _userUnreadMsg.hidden = YES;
         _userUnreadMsg.text = @"";
     }
+
+    /*NSInteger indexCount = 0;
+    if(appDelegate.unconfirmedOrderedMsgAmount > 0){
+        indexCount ++;
+    }
+    if(appDelegate.unconfirmedConfirmedMsgAmount > 0){
+        indexCount ++;
+    }
+    if(appDelegate.unconfirmedProducedMsgAmount > 0){
+        indexCount ++;
+    }
+    if(appDelegate.unconfirmedDeliveredMsgAmount > 0){
+        indexCount ++;
+    }
+    if(appDelegate.unconfirmedReceivedMsgAmount > 0){
+        indexCount ++;
+    }
+    if(indexCount > 0){
+        _indexUnreadMsg.hidden = NO;
+        _indexUnreadMsg.text = [[NSString alloc] initWithFormat:@"%ld",indexCount];
+    }else{
+        _indexUnreadMsg.hidden = YES;
+        _indexUnreadMsg.text = @"";
+    }*/
 }
 - (void)updateSelectedButton:(UIButton *)button{
     if (_currentSelectedButton != button) {

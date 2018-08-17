@@ -102,13 +102,13 @@
 }
 -(void)CreateTableView
 {
-    _tableview = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableview=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
 
     [self.view addSubview:_tableview];
     //    消除分割线
-    _tableview.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _tableview.delegate = self;
-    _tableview.dataSource = self;
+    _tableview.separatorStyle=UITableViewCellSeparatorStyleNone;
+    _tableview.delegate=self;
+    _tableview.dataSource=self;
     [_tableview mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(0);
         make.top.mas_equalTo(kIPhoneX?(kStatusBarHeight):(-20));
@@ -126,8 +126,7 @@
 }
 -(void)CreateNavView{
     
-    _navView = [[YYNavView alloc] initWithTitle:_previousTitle WithSuperView:self.view haveStatusView:YES];
-    [self.navView hidesBackButton];
+    _navView = [[YYNavView alloc] initWithTitle:_previousTitle WithSuperView:self.view haveStatusView:NO];
     _navView.hidden = YES;
     
     _operationBtn = [UIButton getCustomImgBtnWithImageStr:@"operation_circle_icon" WithSelectedImageStr:nil];
@@ -163,12 +162,12 @@
     NSString *buyerID = _isHomePage?@"":[[NSString alloc] initWithFormat:@"%ld",_buyerId];
     [YYUserApi getBuyerHomeInfo:buyerID andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBuyerHomeInfoModel *infoModel, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             
             ws.homeInfoModel = infoModel;
             [ws.homeInfoModel SetPickerRowAndComponent];
             
-            if(ws.isHomePage || (ws.homeInfoModel && [ws.homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected)){
+            if(ws.isHomePage || (ws.homeInfoModel && [ws.homeInfoModel.connectStatus integerValue] == kConnStatus1)){
                 _operationBtn.hidden = NO;
             }else{
                 _operationBtn.hidden = YES;
@@ -331,7 +330,7 @@
 }
 -(void)operationAction:(UIButton *)btn{
     
-    if(_isHomePage || (_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected)){
+    if(_isHomePage || (_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1)){
         NSInteger menuUIWidth = 137;
         NSInteger menuUIHeight = 58;
         NSArray *menuData = @[@""];
@@ -339,7 +338,7 @@
         
         if(_isHomePage){
             menuData = @[NSLocalizedString(@"编辑",nil)];
-        }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+        }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1){
             menuData = @[NSLocalizedString(@"解除合作",nil)];
         }
         
@@ -352,7 +351,7 @@
                 if(_isHomePage){
                     //编辑
                     [self editAction];
-                }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+                }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1){
                     
                     CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"解除合作后，买手店将不能浏览本品牌作品。确认解除合作吗？",nil) needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"继续合作_no",nil) otherButtonTitles:@[NSLocalizedString(@"解除合作_yes",nil)]];
                     alertView.specialParentView = self.view;
@@ -416,9 +415,9 @@
         return;
     }
     
-    if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+    if([_homeInfoModel.connectStatus integerValue] == kConnStatus1){
         [self showChatView];
-    }else if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusInvite){
+    }else if([_homeInfoModel.connectStatus integerValue] == kConnStatus0){
         CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"取消邀请吗？",nil) needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"继续邀请_no",nil) otherButtonTitles:@[NSLocalizedString(@"取消邀请_yes",nil)]];
         alertView.specialParentView = self.view;
         [alertView setAlertViewBlock:^(NSInteger selectedIndex){
@@ -428,7 +427,7 @@
         }];
         
         [alertView show];
-    }else if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusBeInvited){
+    }else if([_homeInfoModel.connectStatus integerValue] == kConnStatus2){
         CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"确定接受邀请吗？",nil) needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"拒绝邀请",nil) otherButtonTitles:@[NSLocalizedString(@"同意邀请|00000",nil)]];
         alertView.specialParentView = self.view;
         [alertView setAlertViewBlock:^(NSInteger selectedIndex){
@@ -440,7 +439,7 @@
         }];
         
         [alertView show];
-    }else if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusNone){//
+    }else if([_homeInfoModel.connectStatus integerValue] == kConnStatus){//
         CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"确定邀请吗？",nil) needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"取消邀请",nil) otherButtonTitles:@[NSLocalizedString(@"继续邀请",nil)]];
         alertView.specialParentView = self.view;
         __block YYBuyerHomeInfoModel *blockBuyerModel = _homeInfoModel;
@@ -448,7 +447,7 @@
         [alertView setAlertViewBlock:^(NSInteger selectedIndex){
             if (selectedIndex == 1) {
                 [YYConnApi invite:[blockBuyerModel.buyerId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                    if(rspStatusAndMessage.status == YYReqStatusCode100){
+                    if(rspStatusAndMessage.status == kCode100){
                         blockBuyerModel.connectStatus = 0;
                         [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
                         //[ws updateUI];
@@ -469,7 +468,7 @@
 - (void)oprateConnWithBuyer:(NSInteger)buyerId status:(NSInteger)status{
     WeakSelf(ws);
     [YYConnApi OprateConnWithBuyer:buyerId status:status andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
             if(ws.cancelButtonClicked){
                 ws.cancelButtonClicked();

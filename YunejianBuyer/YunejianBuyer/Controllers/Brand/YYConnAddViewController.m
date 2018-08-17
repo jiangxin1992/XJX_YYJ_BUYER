@@ -11,11 +11,11 @@
 // c文件 —> 系统文件（c文件在前）
 
 // 控制器
+#import "YYNavigationBarViewController.h"
 #import "YYMainViewController.h"
 #import "YYVisibleContactInfoViewController.h"
 
 // 自定义视图
-#import "YYNavView.h"
 #import "YYNewBrandInfoCell.h"
 #import "YYBrandAddHeadView.h"
 #import "YYConSuitChooseView.h"
@@ -38,8 +38,6 @@
 #import "YYSeriesInfoModel.h"
 #import "YYSeriesInfoDetailModel.h"
 #import "YYHotDesignerBrandsModel.h"
-#import "YYUntreatedMsgAmountModel.h"
-#import "YYNewConnDesignerListModel.h"
 
 #import "AppDelegate.h"
 #import "UserDefaultsMacro.h"
@@ -56,17 +54,17 @@
 
 @interface YYConnAddViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UITextFieldDelegate>
 
-@property (nonatomic, strong) YYNavView *navView;
-@property (strong, nonatomic) YYMessageButton *messageButton;
-@property (strong, nonatomic) UIButton *searchButton;
+@property (weak, nonatomic) IBOutlet YYMessageButton *messageButton;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *navTopLayout;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *navHeightLayout;
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *collectionlayout;
 
-@property (strong, nonatomic) UITextField *searchField;
-@property (strong, nonatomic) UIView *searchView;
-
+@property (weak, nonatomic) IBOutlet UIButton *searchButton;
+@property (weak, nonatomic) IBOutlet UITextField *searchField;
+@property (weak, nonatomic) IBOutlet UIView *searchView;
 
 @property (nonatomic,strong) YYPageInfoModel *currentPageInfo;
 @property (nonatomic,strong) UIView *noDataView;
@@ -146,29 +144,47 @@
     _changing_offset = 0.0f;
     _isAnimation = NO;
     if(_isMainView){
-        _tempHeadViewAppearRect = CGRectMake(0, kStatusBarAndNavigationBarHeight, SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
-        _tempHeadViewDisappearRect = CGRectMake(0, -(YY_COLLECTION_HEADERVIEW_HEIGHT - kStatusBarAndNavigationBarHeight), SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
+        _tempHeadViewAppearRect = CGRectMake(0, 45 , SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
+        _tempHeadViewDisappearRect = CGRectMake(0, -43, SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
     }else{
-        _tempHeadViewAppearRect = CGRectMake(0, kStatusBarAndNavigationBarHeight, SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
-        _tempHeadViewDisappearRect = CGRectMake(0, -(YY_COLLECTION_HEADERVIEW_HEIGHT - kStatusBarAndNavigationBarHeight), SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
+        _tempHeadViewAppearRect = CGRectMake(0, 45 + 20 , SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
+        _tempHeadViewDisappearRect = CGRectMake(0, -43 + 20, SCREEN_WIDTH, YY_COLLECTION_HEADERVIEW_HEIGHT);
     }
     _isOffsetIncrease = NO;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userCheckStatusChangeNotification:) name:UserCheckStatusChangeNotification object:nil];
 }
 -(void)PrepareUI{
-    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"品牌广场",nil) WithSuperView:self.view haveStatusView:YES];
-    if (self.isMainView) {
-        [self.navView hidesBackButton];
-    }else {
-        WeakSelf(ws);
-        self.navView.goBackBlock = ^{
-            [ws goBack];
-        };
-    }
-    [self initMessageButton];
-    [self initSearchButton];
-    [self initSearchView];
+    _navTopLayout.constant = -kStatusBarHeight;
+    _navHeightLayout.constant = kStatusBarAndNavigationBarHeight;
+
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.isGoBackHide = _isMainView;
+    navigationBarViewController.previousTitle = @"";
+    navigationBarViewController.nowTitle = NSLocalizedString(@"品牌广场",nil);
+    [_containerView addSubview:navigationBarViewController.view];
+    _containerView.backgroundColor = [UIColor whiteColor];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(kNavigationBarHeight);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
+
+    WeakSelf(ws);
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            [[NSNotificationCenter defaultCenter] removeObserver:ws name:UIKeyboardWillHideNotification object:nil];
+            if (ws.cancelButtonClicked) {
+                ws.cancelButtonClicked();
+            }
+            [ws.navigationController popViewControllerAnimated:YES];
+            blockVc = nil;
+        }
+    }];
 
     _searchField.delegate = self;
     _searchFieldStr = @"";
@@ -180,6 +196,11 @@
     
     self.noDataView = addNoDataView_phone(self.view,nil,nil,nil);
     self.noDataView.hidden = YES;
+
+    [_messageButton initButton:@""];
+    [self messageCountChanged:nil];
+    [_messageButton addTarget:self action:@selector(messageButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageCountChanged:) name:UnreadMsgAmountChangeNotification object:nil];
 }
 - (void)userCheckStatusChangeNotification:(NSNotification *)notification{
     if(_verifyView){
@@ -231,6 +252,9 @@
         [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"UICollectionReusableView"];
 
         [self isShowPeopleHeadView:YES];
+        [self.view bringSubviewToFront:_searchButton];
+        [self.view bringSubviewToFront:_messageButton];
+        [self.view bringSubviewToFront:_searchView];
     }
 }
 #pragma mark - RequestData
@@ -245,11 +269,11 @@
 -(void)RequestClassData{
     WeakSelf(ws);
     [YYConnApi getConBrandClassWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYConClass *connClass, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100){
+        if (rspStatusAndMessage.status == kCode100){
             ws.connClass = connClass;
             [ws updatePeopleHeadView];
         }
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadCollectionViewData];
@@ -266,10 +290,10 @@
     }else{
         tempArr = [_designerListArray copy];
     }
-    if(![NSArray isNilOrEmpty:tempArr]){
+    if(![tempArr isNilOrEmpty]){
         if(tempArr.count > indexPath.row){
             YYHotDesignerBrandsModel *brandsModel = tempArr[indexPath.row];
-            if(![NSArray isNilOrEmpty:brandsModel.seriesBoList]){
+            if(![brandsModel.seriesBoList isNilOrEmpty]){
                 return CGSizeMake(SCREEN_WIDTH, IndexHotBrandCellHeight);
             }else{
                 return CGSizeMake(SCREEN_WIDTH, IndexHotBrandNoSeriesCellHeight);
@@ -366,7 +390,17 @@
 
 - (void)messageCountChanged:(NSNotification *)notification{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
+    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
+
+    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
+        if(msgAmount > 0 ){
+            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
+        }else{
+            [_messageButton updateButtonNumber:@"dot"];
+        }
+    }else{
+        [_messageButton updateButtonNumber:@""];
+    }
 }
 #pragma mark - 动画相关
 //导航栏的动画显示与隐藏
@@ -419,7 +453,7 @@
 }
 -(void)setAnimationAppear{
     //不在动画中 并且y位置正确
-    CGFloat origin_y = -(YY_COLLECTION_HEADERVIEW_HEIGHT - kStatusBarAndNavigationBarHeight);
+    CGFloat origin_y = _isMainView?-43:-23;
     if(!_isAnimation && _peopleHeadView && _peopleHeadView.frame.origin.y == origin_y){
         NSLog(@"_peopleHeadView.frame.origin.y = %lf",_peopleHeadView.frame.origin.y);
         NSLog(@"peopleHeadView ishide = %d",_peopleHeadView.hidden);
@@ -435,7 +469,7 @@
 }
 -(void)setAnimationDisappear{
     //不在动画中 并且y位置正确
-    CGFloat origin_y = kStatusBarAndNavigationBarHeight;
+    CGFloat origin_y = _isMainView?45:65;
     if(!_isAnimation && _peopleHeadView && _peopleHeadView.frame.origin.y == origin_y){
         NSLog(@"_peopleHeadView.frame.origin.y = %lf",_peopleHeadView.frame.origin.y);//-43
         NSLog(@"peopleHeadView ishide = %d",_peopleHeadView.hidden);
@@ -464,21 +498,13 @@
     }
 }
 #pragma mark - SomeAction
-- (void)goBack {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-    if (self.cancelButtonClicked) {
-        self.cancelButtonClicked();
-    }
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
 //修改当前用户与品牌的关联状态
 -(void)showOprateView:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
-    if(hotDesignerBrandsModel && [hotDesignerBrandsModel.connectStatus integerValue] == YYUserConnStatusNone){
+    if(hotDesignerBrandsModel && [hotDesignerBrandsModel.connectStatus integerValue] == kConnStatus){
         WeakSelf(ws);
         __block YYHotDesignerBrandsModel *blockDesignerModel = hotDesignerBrandsModel;
         [YYConnApi invite:[blockDesignerModel.designerId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if(rspStatusAndMessage.status == YYReqStatusCode100){
+            if(rspStatusAndMessage.status == kCode100){
                 blockDesignerModel.connectStatus = 0;
                 [YYToast showToastWithTitle:NSLocalizedString(@"已向品牌发送合作邀请",nil) andDuration:kAlertToastDuration];
                 [ws reloadCollectionViewData];
@@ -490,7 +516,7 @@
 -(void)clickLatestSeriesCardWithModel:(YYHotDesignerBrandsSeriesModel *)seriesModel{
 
     [YYOpusApi getConnSeriesInfoWithId:[seriesModel.designerId integerValue] seriesId:[seriesModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100) {
+        if (rspStatusAndMessage.status == kCode100) {
 
             NSString *brandName = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandName]?@"":infoDetailModel.series.designerBrandName;
             NSString *brandLogo = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandLogo]?@"":infoDetailModel.series.designerBrandLogo;
@@ -543,7 +569,6 @@
     if(!_peopleHeadView){
         _peopleHeadView = [[YYBrandPeopleHeadView alloc] init];
         [self.view addSubview:_peopleHeadView];
-        [self.view bringSubviewToFront:self.navView];
         _peopleHeadView.frame = _tempHeadViewAppearRect;
 
         [_peopleHeadView setBlockPeople:^(NSInteger index){
@@ -561,6 +586,7 @@
             [ws reloadCollectionViewData];
             [ws reloadListData];
         }];
+        [self.view bringSubviewToFront:_containerView];
     }
     _peopleHeadView.hidden = !isshow;
     if(_connClass){
@@ -649,7 +675,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     _isLoadingListData = YES;
     [YYConnApi queryDesignerWithQueryStr:queryStr WithSuitIds:SuitIds WithPeopleIds:PeopleIds pageIndex:pageIndex pageSize:8 andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYNewConnDesignerListModel *designerListModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100 && designerListModel.result
+        if (rspStatusAndMessage.status == kCode100 && designerListModel.result
                 && [designerListModel.result count] > 0) {
             if(!_isSearchView){
                 ws.currentPageInfo = designerListModel.pageInfo;
@@ -683,7 +709,7 @@
         }
 
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
         }
         _isLoadingListData = NO;
@@ -745,7 +771,7 @@
 }
 
 #pragma mark - search
-- (void)showSearchView:(id)sender {
+- (IBAction)showSearchView:(id)sender {
     if (_searchView.hidden == YES) {
         
         self.suitChooseView.hidden = YES;
@@ -773,7 +799,7 @@
         }];
     }
 }
-- (void)hideSearchView:(id)sender {
+- (IBAction)hideSearchView:(id)sender {
     if ( _searchView.hidden == NO) {
         _searchFieldStr = @"";
         _searchView.alpha = 1.0;
@@ -844,101 +870,9 @@
     return NO;
 }
 #pragma mark - Other
-- (void)initMessageButton {
-    self.messageButton = [[YYMessageButton alloc] init];
-    [self.messageButton initButton:@""];
-    [self messageCountChanged:nil];
-    [self.messageButton addTarget:self action:@selector(messageButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageCountChanged:) name:UnreadMsgAmountChangeNotification object:nil];
-    [self.navView addSubview:self.messageButton];
-    [self.messageButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(50);
-        make.height.mas_equalTo(44);
-        make.top.mas_equalTo(kStatusBarHeight);
-        make.right.mas_equalTo(0);
-    }];
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
 }
 
-- (void)initSearchButton {
-    WeakSelf(ws);
-    self.searchButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.searchButton setImage:[UIImage imageNamed:@"search_icon"] forState:UIControlStateNormal];
-    self.searchButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-    [self.searchButton addTarget:self action:@selector(showSearchView:) forControlEvents:UIControlEventTouchUpInside];
-    [self.navView addSubview:self.searchButton];
-    [self.searchButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(50);
-        make.height.mas_equalTo(44);
-        make.centerY.mas_equalTo(ws.messageButton.mas_centerY);
-        make.right.mas_equalTo(ws.messageButton.mas_left);
-    }];
-}
-
-- (void)initSearchView {
-    self.searchView = [[UIView alloc] init];
-    self.searchView.backgroundColor = _define_white_color;
-    self.searchView.hidden = YES;
-    [self.navView addSubview:self.searchView];
-    [self.searchView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.height.mas_equalTo(44);
-        make.top.mas_equalTo(kStatusBarHeight);
-        make.left.right.mas_equalTo(0);
-    }];
-    
-    UIView *searchBackView = [[UIView alloc] init];
-    searchBackView.backgroundColor = [UIColor colorWithHex:@"efefef"];
-    searchBackView.layer.masksToBounds = YES;
-    searchBackView.layer.cornerRadius = 3.0f;
-    [self.searchView addSubview:searchBackView];
-    [searchBackView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.height.mas_equalTo(30);
-        make.centerY.mas_equalTo(0);
-        make.left.mas_equalTo(13);
-    }];
-    
-    UIButton *iconButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [iconButton setImage:[UIImage imageNamed:@"search_Img"] forState:UIControlStateNormal];
-    iconButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-    [searchBackView addSubview:iconButton];
-    [iconButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(18);
-        make.height.mas_equalTo(22);
-        make.centerY.mas_equalTo(0);
-        make.left.mas_equalTo(10);
-    }];
-    
-    self.searchField = [[UITextField alloc] init];
-    self.searchField.delegate = self;
-    self.searchField.borderStyle = UITextBorderStyleNone;
-    self.searchField.returnKeyType = UIReturnKeySearch;
-    self.searchField.backgroundColor = [UIColor colorWithHex:@"efefef"];
-    self.searchField.placeholder = NSLocalizedString(@"输入款式名称/款号/颜色搜索", nil);
-    if (IsPhone6_gt) {
-        self.searchField.font = [UIFont systemFontOfSize:14];
-    }else {
-        self.searchField.font = [UIFont systemFontOfSize:12];
-    }
-    self.searchField.clearButtonMode = UITextFieldViewModeAlways;
-    [searchBackView addSubview:self.searchField];
-    [self.searchField mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.bottom.right.mas_equalTo(0);
-        make.left.mas_equalTo(iconButton.mas_right);
-    }];
-    
-    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cancelButton setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
-    [cancelButton setTitleColor:[UIColor colorWithHex:@"919191"] forState:UIControlStateNormal];
-    cancelButton.titleLabel.font = [UIFont systemFontOfSize:18];
-    cancelButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
-    [cancelButton addTarget:self action:@selector(hideSearchView:) forControlEvents:UIControlEventTouchUpInside];
-    [self.searchView addSubview:cancelButton];
-    [cancelButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.mas_equalTo(60);
-        make.height.mas_equalTo(44);
-        make.top.mas_equalTo(0);
-        make.left.mas_equalTo(searchBackView.mas_right);
-        make.right.mas_equalTo(-13);
-    }];
-}
 
 @end

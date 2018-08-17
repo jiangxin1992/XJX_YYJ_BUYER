@@ -6,26 +6,16 @@
 //  Copyright © 2016年 Apple. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYProtocolViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
+#import "YYNavigationBarViewController.h"
+
 #import "YYBaseWebView.h"
-
-// 接口
-
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 
 @interface YYProtocolViewController ()
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet YYBaseWebView *webView;
-
-@property (nonatomic, strong) YYNavView *navView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *navHeightLayout;
 
 @end
 
@@ -57,21 +47,38 @@
 }
 
 -(void)PrepareData{}
+-(void)PrepareUI{
 
--(void)PrepareUI {
-    self.navView = [[YYNavView alloc] initWithTitle:_nowTitle WithSuperView:self.view haveStatusView:YES];
+    _navHeightLayout.constant = kStatusBarAndNavigationBarHeight-20.f;
+
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    //self.navigationBarViewController = navigationBarViewController;
+    navigationBarViewController.nowTitle = _nowTitle;
+    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
+    //[_containerView addSubview:navigationBarViewController.view];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(_weakContainerView.mas_top);
+        make.height.mas_equalTo(45);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
     WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
     
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            [ws cancelClicked:nil];
+            blockVc = nil;
+        }
+    }];
     _webView.backgroundColor = _define_white_color;
 }
 
 #pragma mark - SomeAction
-- (void)goBack {
-    [self cancelClicked:nil];
-}
 
 - (IBAction)cancelClicked:(id)sender{
     if (_cancelButtonClicked) {
@@ -104,5 +111,10 @@
 }
 
 #pragma mark - Other
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 
 @end

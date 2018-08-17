@@ -15,6 +15,7 @@
 #import "YYBuyerHomePageViewController.h"
 #import "YYUserCollectionViewController.h"
 #import "YYBuyerAddressViewController.h"
+#import "YYInventoryViewController.h"
 #import "YYAccountUserInfoViewController.h"
 #import "YYVisibleContactInfoViewController.h"
 #import "YYBrandViewController.h"
@@ -32,7 +33,6 @@
 
 #import "YYUserInfo.h"
 #import "YYBuyerStoreModel.h"
-#import "YYUntreatedMsgAmountModel.h"
 #import "YYUser.h"
 #import "YYUserApi.h"
 #import "AppDelegate.h"
@@ -163,7 +163,7 @@
             ws.userInfo.username = BuyerStoreModel.contactName;
             ws.userInfo.phone = BuyerStoreModel.contactPhone;
             ws.userInfo.email = BuyerStoreModel.contactEmail;
-            ws.userInfo.userType = YYUserTypeRetailer;
+            ws.userInfo.userType = kBuyerStorUserType;
             ws.userInfo.brandName = BuyerStoreModel.name;
             ws.userInfo.brandLogoName = BuyerStoreModel.logoPath;
 
@@ -319,7 +319,7 @@
                 //我的预约
                 [userInfoCell updateUIWithShowType:ShowTypeOrdering];
             }else if (indexPath.row == 3){
-                //收件地址
+                //收货地址
                 [userInfoCell updateUIWithShowType:ShowTypeAddress];
             }else if (indexPath.row == 4){
                 //设置
@@ -352,6 +352,10 @@
                     break;
                 case ShowTypeCopBrands:{
                     [ws showUserCopBrands];
+                }
+                    break;
+                case ShowTypeInventory:{
+                    [ws showTypeInventoryView];
                 }
                     break;
                 case ShowTypeSetting:{
@@ -540,6 +544,20 @@
 
     [self.navigationController pushViewController:brandViewController animated:YES];
 }
+#pragma mark 跳转库存调拨页面
+-(void)showTypeInventoryView{
+
+    WeakSelf(ws);
+
+    UIStoryboard *inventoryStoryboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
+    YYInventoryViewController *inventoryViewController = [inventoryStoryboard instantiateViewControllerWithIdentifier:@"YYInventoryViewController"];
+
+    [inventoryViewController setCancelButtonClicked:^(){
+        [ws.navigationController popViewControllerAnimated:YES];
+    }];
+
+    [self.navigationController pushViewController:inventoryViewController animated:YES];
+}
 #pragma mark 跳转我的收件地址界面
 -(void)showAddressView{
 
@@ -649,7 +667,17 @@
 #pragma mark 消息数量变化监听 回调
 - (void)unreadMsgAmountChangeNotification:(NSNotification *)notification{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
+    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
+
+    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
+        if(msgAmount > 0 ){
+            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
+        }else{
+            [_messageButton updateButtonNumber:@"dot"];
+        }
+    }else{
+        [_messageButton updateButtonNumber:@""];
+    }
 }
 #pragma mark 未读消息变化监听 回调
 - (void)unreadMsgAmountStatusChange:(NSNotification *)notification{
@@ -667,7 +695,7 @@
 #pragma mark check 当前用户状态
 -(void)checkUserIdentity{
     WeakSelf(ws);
-    if([_userInfo.status integerValue] == YYReqStatusCode300){
+    if([_userInfo.status integerValue] == kCode300){
         [YYToast showToastWithTitle:NSLocalizedString(@"审核中!",nil) andDuration:kAlertToastDuration];
         return ;
     }

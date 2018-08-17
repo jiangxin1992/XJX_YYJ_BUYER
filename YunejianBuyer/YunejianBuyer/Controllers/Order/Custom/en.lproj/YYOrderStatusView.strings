@@ -1,0 +1,21 @@
+
+/* Class = "UILabel"; text = "已确认2"; ObjectID = "Rbc-Mg-grW"; */
+"Rbc-Mg-grW.text" = "Confirmed";
+
+/* Class = "UILabel"; text = "已生产"; ObjectID = "bkl-kv-koY"; */
+"bkl-kv-koY.text" = "Produced";
+
+/* Class = "UILabel"; text = "已发货"; ObjectID = "dPV-Vt-7AS"; */
+"dPV-Vt-7AS.text" = "Delivered";
+
+/* Class = "UILabel"; text = "已收货"; ObjectID = "fX6-sn-Eff"; */
+"fX6-sn-Eff.text" = "Received";
+
+/* Class = "UILabel"; text = "已下单"; ObjectID = "uIS-dr-xVm"; */
+"uIS-dr-xVm.text" = "Ordered";
+
+/* Class = "UILabel"; text = "已确认1"; ObjectID = "vSE-eS-A1t"; */
+"vSE-eS-A1t.text" = "Confirmed";
+
+/* Class = "UILabel"; text = "2015/11/11 15:45"; ObjectID = "yqZ-c2-YXl"; */
+"yqZ-c2-YXl.text" = "2015/11/11 15:45";

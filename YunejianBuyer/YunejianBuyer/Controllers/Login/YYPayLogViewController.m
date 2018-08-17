@@ -67,7 +67,17 @@
 
 - (void)PrepareUI{
     self.view.backgroundColor = _define_white_color;
+    
     self.navView = [[YYNavView alloc] initWithTitle:[self.noteModel.payType integerValue] == 0 ? NSLocalizedString(@"线下收款记录",nil) : NSLocalizedString(@"线上收款记录",nil) WithSuperView: self.view haveStatusView:YES];
+    
+    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
+    [self.navView addSubview:backBtn];
+    [backBtn addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.mas_equalTo(0);
+        make.width.mas_equalTo(40);
+        make.bottom.mas_equalTo(-1);
+    }];
 }
 
 #pragma mark - --------------UIConfig----------------------
@@ -87,7 +97,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:NO];
     [YYOrderApi confirmPayment:[self.noteModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             if(self.affirmRecordBlock){
                 self.affirmRecordBlock();
             }
@@ -101,7 +111,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:NO];
     [YYOrderApi discardPayment:[self.noteModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             if(self.cancelRecordBlock){
                 self.cancelRecordBlock();
             }
@@ -115,7 +125,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:NO];
     [YYOrderApi deletePayment:[self.noteModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             if(self.deleteRecordBlock){
                 self.deleteRecordBlock();
             }
@@ -193,7 +203,7 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     YYTableViewCellData *cellData = [self.cellDataArray objectAtIndex:indexPath.row];
     if (cellData.selectedCellBlock) {
-        cellData.selectedCellBlock(tableView, indexPath);
+        cellData.selectedCellBlock(indexPath);
     }
 }
 
@@ -201,6 +211,9 @@
 
 
 #pragma mark - --------------自定义响应----------------------
+- (void)goBack {
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 #pragma mark - --------------自定义方法----------------------
 - (void)buildTableViewDataSource {

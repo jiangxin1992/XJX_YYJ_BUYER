@@ -12,17 +12,17 @@
 #import "YYPageInfoModel.h"
 #import "AppDelegate.h"
 #import "YYMessageButton.h"
+#import "YYConnMsgListController.h"
 #import "YYOrderApi.h"
 #import "YYConnApi.h"
+#import "YYBrandSeriesListViewController.h"
 #import "YYConnAddViewController.h"
 #import "YYCartDetailViewController.h"
 #import "UserDefaultsMacro.h"
 #import "YYUserApi.h"
 #import "TitlePagerView.h"
-#import "YYConnBrandInfoModel.h"
 #import "YYBrandTableViewController.h"
 #import "YYStylesAndTotalPriceModel.h"
-#import "YYUntreatedMsgAmountModel.h"
 
 @interface YYBrandViewController ()<ViewPagerDataSource, ViewPagerDelegate, TitlePagerViewDelegate,YYTableCellDelegate>
 @property (weak, nonatomic) IBOutlet UIView *msgBtnContainer;
@@ -128,7 +128,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             ws.stylesAndTotalPriceModel = getLocalShoppingCartStyleCount(appdelegate.cartDesignerIdArray);
-            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%li", self.stylesAndTotalPriceModel.totalStyles]];
+            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%i", self.stylesAndTotalPriceModel.totalStyles]];
         });
     });
 }
@@ -136,7 +136,17 @@
 
 - (void)unreadMsgAmountChangeNotification:(NSNotification *)notification{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
+    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
+    
+    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
+        if(msgAmount > 0 ){
+            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
+        }else{
+            [_messageButton updateButtonNumber:@"dot"];
+        }
+    }else{
+        [_messageButton updateButtonNumber:@""];
+    }
 }
 
 

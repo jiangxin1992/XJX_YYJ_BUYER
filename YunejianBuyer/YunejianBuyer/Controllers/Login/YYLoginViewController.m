@@ -212,8 +212,10 @@ static CGFloat viewMargin = 0;
     verificationCode = verificationCode&&[verificationCode length]?verificationCode:nil;
     
     [YYUserApi loginWithUsername:email password:md5(password) verificationCode:verificationCode andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUserModel *userModel, NSError *error) {
+     //   NSLog(@"test login %@, %@",rspStatusAndMessage.status,rspStatusAndMessage.message);
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        if (rspStatusAndMessage.status == YYReqStatusCode406) {
+        //rspStatusAndMessage.status = kCode305;
+        if (rspStatusAndMessage.status == kCode406) {
             //需要输验证码
             [ws updateVerificationCode];
             _verificationCodeViewShouldHidden = NO;
@@ -228,15 +230,21 @@ static CGFloat viewMargin = 0;
                     [_registerButton layoutIfNeeded];
                     [_forgetPasswordButton layoutIfNeeded];
                 }];
+                
+                //[_weakSelf moveViewWhenKeyboardIsShow];
             }
             
-        }else if (rspStatusAndMessage.status == YYReqStatusCode100 || rspStatusAndMessage.status == YYReqStatusCode1000){
-            if([userModel.type integerValue] != YYUserTypeRetailer && [userModel.type integerValue] != YYUserTypeProductManager){
-                [YYToast showToastWithView:self.view title:NSLocalizedString(@"该账号没有APP登录权限，请在WEB端登录",nil)  andDuration:kAlertToastDuration];
+        }else if (rspStatusAndMessage.status == kCode100 || rspStatusAndMessage.status == kCode1000){
+            if([userModel.type integerValue]!= kBuyerStorUserType){
+                [YYToast showToastWithView:self.view title:NSLocalizedString(@"当前账户不是买手店身份",nil)  andDuration:kAlertToastDuration];
                 return ;
             }
             YYUser *user = [YYUser currentUser];
-            [user saveUserWithEmail:email password:password userInfo:userModel];
+            NSString *checkStatus = nil;
+            if(userModel.checkStatus){
+                checkStatus = [userModel.checkStatus stringValue];
+            }
+            [user saveUserWithEmail:email username:userModel.name password:password userType:[userModel.type intValue] userId:userModel.id logo:userModel.logo status:[userModel.authStatus stringValue] checkStatus:checkStatus];
             if(YYDEBUG){
                 if(_usersList ==nil){
                     _usersList = [[NSMutableArray alloc] init];
@@ -260,7 +268,7 @@ static CGFloat viewMargin = 0;
             
             //进入首页
             [ws enterMainIndexPage];
-            if(rspStatusAndMessage.status == YYReqStatusCode1000 || [user.status integerValue] == YYReqStatusCode305){
+            if(rspStatusAndMessage.status == kCode1000 || [user.status integerValue] == kCode305){
                 CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:rspStatusAndMessage.message message:nil needwarn:YES delegate:nil cancelButtonTitle:NSLocalizedString(@"下一次再说",nil) otherButtonTitles:@[NSLocalizedString(@"去验证",nil)]];
                 alertView.noLongerRemindKey = NoLongerRemindBrand;
                 [alertView setAlertViewBlock:^(NSInteger selectedIndex){
@@ -273,18 +281,18 @@ static CGFloat viewMargin = 0;
             
             [LanguageManager setLanguageToServer];
             
-        }else if(rspStatusAndMessage.status == YYReqStatusCode305){
-            //                #define YYReqStatusCode305 305 //需要审核
+        }else if(rspStatusAndMessage.status == kCode305){
+            //                #define kCode305 305 //需要审核
             [self showYellowAlert:ECheckStyleNeedSubmit needVerify:1 userModel:userModel];
-        }else if(rspStatusAndMessage.status == YYReqStatusCode301 || rspStatusAndMessage.status == YYReqStatusCode306){
-            //#define YYReqStatusCode301 301 //审核被拒//#define YYReqStatusCode306 306 //审核过期
+        }else if(rspStatusAndMessage.status == kCode301 || rspStatusAndMessage.status == kCode306){
+            //#define kCode301 301 //审核被拒//#define kCode306 306 //审核过期
             [self showYellowAlert:ECheckStyleConfirmReject needVerify:1 userModel:userModel];
-        }else if(rspStatusAndMessage.status == YYReqStatusCode300){
-            //                #define YYReqStatusCode300 300 //审核中
+        }else if(rspStatusAndMessage.status == kCode300){
+            //                #define kCode300 300 //审核中
             [self showYellowAlert:ECheckStyleToBeConfirm needVerify:0 userModel:userModel];
-        }else if(rspStatusAndMessage.status ==YYReqStatusCode304){
+        }else if(rspStatusAndMessage.status ==kCode304){
             [YYUserApi reSendMailConfirmMail:userModel.email andUserType:[userModel.type stringValue]  andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                if(rspStatusAndMessage.status == YYReqStatusCode100){
+                if(rspStatusAndMessage.status == kCode100){
                     [YYToast showToastWithTitle: NSLocalizedString(@"发送成功！",nil) andDuration:kAlertToastDuration];
                     [self emailVerfy:email];
                 }else{
@@ -364,15 +372,68 @@ static CGFloat viewMargin = 0;
         }
 
     }else{
-        [self loginByEmail:email  password:password verificationCode:verificationCode];
+    [self loginByEmail:email  password:password verificationCode:verificationCode];
     }
 }
 
 - (IBAction)registerButtonClicked:(id)sender{
     YYRegisterViewController *registerViewController = [[YYRegisterViewController alloc] init];
-    registerViewController.registerType = YYUserTypeRetailer;
+    registerViewController.registerType = kBuyerStorUserType;
     [self.navigationController pushViewController:registerViewController animated:YES];
 }
+
+- (void)showSelectRoleView:(NSInteger)logoHeight{
+    
+//    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+//    YYSelectRoleViewController *selectRoleViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYSelectRoleViewController"];
+//    if (selectRoleViewController) {
+//        __weak UIView *_weakSelectRoleView = selectRoleViewController.view;
+//        self.selectRoleViewController = selectRoleViewController;
+//        [self.selectRoleViewController updateLogoIcon:logoHeight] ;
+//        WeakSelf(weakSelf);
+//        __weak UIStoryboard *_weakStoryboard = storyboard;
+//        [selectRoleViewController setRoleButtonClicked:^(RoleButtonType buttonType){
+//            switch (buttonType) {
+//                case RoleButtonTypeBuyer:{
+//                    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+//
+//                    [MBProgressHUD showHUDAddedTo:appDelegate.window animated:YES];
+//                    YYRegisterViewController *registerViewController = [_weakStoryboard instantiateViewControllerWithIdentifier:@"YYRegisterViewController"];
+//                    registerViewController.registerType = kBuyerStorUserType;
+//                    [self.navigationController pushViewController:registerViewController animated:YES];
+//                    [MBProgressHUD hideAllHUDsForView:appDelegate.window animated:YES];
+//
+//                    //removeFromSuperviewUseUseAnimateAndDeallocViewController(_weakSelectRoleView,weakSelf.selectRoleViewController);
+//                }
+//                    break;
+//                case RoleButtonTypeCancel:{
+//                    //                    YYRegisterViewController *registerViewController = [_weakStoryboard instantiateViewControllerWithIdentifier:@"YYRegisterViewController"];
+//                    //                    registerViewController.registerType = kForgetPasswordType;
+//                    //                    [self.navigationController pushViewController:registerViewController animated:YES];
+//                    
+//                    removeFromSuperviewUseUseAnimateAndDeallocViewController(_weakSelectRoleView,weakSelf.selectRoleViewController);
+//                }
+//                    break;
+//                    
+//                default:
+//                    break;
+//            }
+//        }];
+//        
+//        
+//        
+//        [self.view addSubview:_weakSelectRoleView];
+//        __weak UIView *_weakSelfView = self.view;
+//        [_weakSelectRoleView mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.top.equalTo(_weakSelfView.mas_top);
+//            make.left.equalTo(_weakSelfView.mas_left);
+//            make.bottom.equalTo(_weakSelfView.mas_bottom);
+//            make.right.equalTo(_weakSelfView.mas_right);
+//            
+//        }];
+//    }
+}
+
 
 - (IBAction)forgetPasswordButtonClicked:(id)sender{
     YYForgetPasswordViewController *viewController = [[YYForgetPasswordViewController alloc] init];
@@ -551,7 +612,7 @@ static CGFloat viewMargin = 0;
             [ws.navigationController pushViewController:viewController animated:YES];
         }else if(weakNeedVerify == 2){
             [YYUserApi reSendMailConfirmMail:userModel.email andUserType:[userModel.type stringValue]  andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                if(rspStatusAndMessage.status == YYReqStatusCode100){
+                if(rspStatusAndMessage.status == kCode100){
                     [YYToast showToastWithTitle:NSLocalizedString(@"发送成功！",nil) andDuration:kAlertToastDuration];
                 }else{
                     [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];

@@ -16,7 +16,6 @@
 #import "YYAccountDetailViewController.h"
 #import "YYOrderListViewController.h"
 #import "YYIndexViewController.h"
-#import "YYInventoryViewController.h"
 
 // 自定义视图
 
@@ -26,7 +25,6 @@
 
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import <AFNetworking/AFNetworkReachabilityManager.h>
-#import "YYUntreatedMsgAmountModel.h"
 
 #import "AppDelegate.h"
 #import "JPUSHService.h"
@@ -41,7 +39,6 @@
 @property(nonatomic,strong) YYConnAddViewController *addBrandViewController;
 @property(nonatomic,strong) YYOrderListViewController *orderListViewController;
 @property(nonatomic,strong) YYIndexViewController *indexViewController;
-@property (nonatomic, strong) YYInventoryViewController *inventoryViewController;
 
 @property (weak, nonatomic) IBOutlet UIView *rightContainerView;
 @property(nonatomic,strong) UIView *currentRightView;
@@ -53,7 +50,7 @@
 #pragma mark - --------------生命周期--------------
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self SomePrepare];
+    [self PrepareData];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -156,7 +153,7 @@
     if (msgType == 4 && isowner == 0) {//私信
         NSInteger unreadPersonalMsgAmount = [[extra objectForKey:@"unreadCount"] integerValue];
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        appDelegate.untreatedMsgAmountModel.unreadPersonalMsgAmount =unreadPersonalMsgAmount;
+        appDelegate.unreadPersonalMsgAmount =unreadPersonalMsgAmount;
         [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
     }
 }
@@ -274,20 +271,7 @@
         }
     }
 }
--(void)PrepareUI{
-    if (kIPhoneX) {
-        UIView *bottomView = [[UIView alloc] init];
-        bottomView.backgroundColor = _define_white_color;
-        [self.view addSubview:bottomView];
-        WeakSelf(ws);
-        [bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.height.mas_equalTo(34);
-            make.top.equalTo(ws.leftMenuViewController.view.mas_bottom);
-            make.left.mas_equalTo(0);
-            make.right.mas_equalTo(0);
-        }];
-    }
-}
+-(void)PrepareUI{}
 
 #pragma mark - --------------UIConfig----------------------
 //-(void)UIConfig{}
@@ -315,9 +299,6 @@
     addBrandViewController.isMainView = YES;
     self.addBrandViewController = addBrandViewController;
     [self addChildViewController:addBrandViewController];
-    
-    self.inventoryViewController = [[YYInventoryViewController alloc] init];
-    [self addChildViewController:self.inventoryViewController];
 
     UIStoryboard *accountStoryboard = [UIStoryboard storyboardWithName:@"Account" bundle:[NSBundle mainBundle]];
     YYAccountDetailViewController *accountDetailViewController = [accountStoryboard instantiateViewControllerWithIdentifier:@"YYAccountDetailViewController"];
@@ -374,7 +355,7 @@
         }
             break;
         case LeftMenuButtonTypeOrder:{
-            // 订单
+            // 选款
             [_rightContainerView addSubview:_orderListViewController.view];
             [_orderListViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.top.equalTo(_weakRightContainerView.mas_top);
@@ -387,7 +368,7 @@
         }
             break;
         case LeftMenuButtonTypeIndex:{
-            // 首页
+            // 选款
             [_rightContainerView addSubview:_indexViewController.view];
             [_indexViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.top.equalTo(_weakRightContainerView.mas_top);
@@ -397,18 +378,6 @@
 
             }];
             self.currentRightView = _indexViewController.view;
-        }
-            break;
-        case LeftMenuButtonTypeInventory:{
-            // 库存管理
-            [self.rightContainerView addSubview:self.inventoryViewController.view];
-            [self.inventoryViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.top.equalTo(_weakRightContainerView.mas_top);
-                make.left.equalTo(_weakRightContainerView.mas_left);
-                make.bottom.equalTo(_weakRightContainerView.mas_bottom);
-                make.right.equalTo(_weakRightContainerView.mas_right);
-            }];
-            self.currentRightView = self.inventoryViewController.view;
         }
             break;
         default:

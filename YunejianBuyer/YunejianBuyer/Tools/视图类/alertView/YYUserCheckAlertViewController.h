@@ -18,10 +18,10 @@ typedef NS_ENUM(NSInteger, ECheckStyle)
 
 @interface YYUserCheckAlertViewController : UIViewController
 
-@property (nonatomic, strong) ModifySuccess modifySuccess;
-@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
+@property (nonatomic,strong) ModifySuccess modifySuccess;
+@property (nonatomic,strong) CancelButtonClicked cancelButtonClicked;
 
-@property (nonatomic, assign) ECheckStyle checkStyle;
+@property (nonatomic,assign) ECheckStyle checkStyle;
 
 -(void)UpdateUI;
 

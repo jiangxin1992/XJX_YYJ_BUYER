@@ -6,33 +6,21 @@
 //  Copyright © 2016年 Apple. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYBuyerAddressViewController.h"
-#import "YYCreateOrModifyAddressViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
+#import "YYUserApi.h"
 #import "YYAddressCell.h"
 #import "YYAddAddressCell.h"
-
-// 接口
-#import "YYUserApi.h"
-
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "YYAddressListModel.h"
 #import "YYAddress.h"
+#import "YYCreateOrModifyAddressViewController.h"
 #import "AppDelegate.h"
+#import "YYNavigationBarViewController.h"
 
 @interface YYBuyerAddressViewController ()<UITableViewDataSource,UITableViewDelegate,YYTableCellDelegate, MGSwipeTableCellDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *_containerView;
 @property (nonatomic,strong) NSMutableArray *addressArray;
-@property (nonatomic,strong) YYCreateOrModifyAddressViewController *createOrModifyAddressViewController;
-@property (nonatomic, strong) YYNavView *navView;
+@property(nonatomic,strong) YYCreateOrModifyAddressViewController *createOrModifyAddressViewController;
 
 @end
 
@@ -42,16 +30,37 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    //self.navigationBarViewController = navigationBarViewController;
     if(_isSelect){
-        [self.navView setNavTitle:NSLocalizedString(@"添加收件地址",nil)];
+         navigationBarViewController.nowTitle = NSLocalizedString(@"添加收件地址",nil);
     }else{
-        [self.navView setNavTitle:NSLocalizedString(@"管理收件地址",nil)];
+        navigationBarViewController.nowTitle = NSLocalizedString(@"管理收件地址",nil);
     }
+    [__containerView insertSubview:navigationBarViewController.view atIndex:0];
+    //[_containerView addSubview:navigationBarViewController.view];
+    __weak UIView *_weakContainerView = __containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_weakContainerView.mas_top);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
+    
+    WeakSelf(ws);
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+    
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            //[weakSelf.navigationController popViewControllerAnimated:YES];
+            [ws closeBtnHandler:nil];
+            blockVc = nil;
+        }
+    }];
+    //_tableView.backgroundColor = [UIColor colorWithHex:@"efefef"];
+//    _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     [self getAddressList];
 }
@@ -193,7 +202,7 @@
                 if (selectedIndex == 1) {
                     YYAddress *address = [ws.addressArray objectAtIndex:indexPath.row];
                     [YYUserApi deleteAddress:[address.addressId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                        if(rspStatusAndMessage.status == YYReqStatusCode100){
+                        if(rspStatusAndMessage.status == kCode100){
                             [ws getAddressList];
                         }else{
                             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
@@ -215,10 +224,6 @@
 
 
 #pragma mark - --------------自定义响应----------------------
-- (void)goBack {
-    [self closeBtnHandler:nil];
-}
-
 - (IBAction)closeBtnHandler:(id)sender {
     if (_cancelButtonClicked) {
         _cancelButtonClicked();
@@ -269,7 +274,7 @@
     [_tableView reloadData];
 }
 
-//创建或修改收件地址
+//创建或修改收货地址
 - (void)createOrModifyAddress:(YYAddress *)address{
 
     WeakSelf(ws);

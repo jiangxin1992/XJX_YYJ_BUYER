@@ -49,22 +49,6 @@
  *  @return 带有toolbar的datePicker
  */
 -(instancetype)initDatePickWithDate:(NSDate *)defaulDate datePickerMode:(UIDatePickerMode)datePickerMode isHaveNavControler:(BOOL)isHaveNavControler;
-/**
- *   设置最小日期
- */
-- (void)setDatePickMinDate:(NSDate *)minDate;
-/**
- *   设置最大日期
- */
-- (void)setDatePickMaxDate:(NSDate *)maxDate;
-/**
- *   设置选中时间
- */
-- (void)setDatePickSelectedDate:(NSDate *)date;
-/**
- *   获取选中的时间
- */
-- (NSDate *)getSelectedDate;
 
 /**
  *   移除本控件
@@ -78,10 +62,6 @@
  *  设置PickView的颜色
  */
 -(void)setPickViewColer:(UIColor *)color;
-/**
- *  设置toobar的标题
- */
-- (void)setToolbarTitle:(NSString *)title;
 /**
  *  设置toobar的文字颜色
  */

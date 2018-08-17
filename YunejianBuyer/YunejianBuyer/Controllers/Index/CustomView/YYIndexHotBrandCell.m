@@ -330,10 +330,10 @@
     NSString *connedImg = @"brandadd_icon";
     _connectStatusBtn.userInteractionEnabled = YES;
     NSInteger connectStatus = [_hotDesignerBrandsModel.connectStatus integerValue];
-    if(connectStatus == YYUserConnStatusInvite || connectStatus == YYUserConnStatusBeInvited){
+    if(connectStatus == kConnStatus0 || connectStatus == kConnStatus2){
         connedImg = @"brandwait_icon";
         _connectStatusBtn.userInteractionEnabled = NO;
-    }else if(connectStatus == YYUserConnStatusConnected){
+    }else if(connectStatus == kConnStatus1){
         connedImg = @"conn_cancel_green_icon";
         _connectStatusBtn.userInteractionEnabled = NO;
     }

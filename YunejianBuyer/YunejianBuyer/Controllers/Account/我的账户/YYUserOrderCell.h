@@ -10,7 +10,7 @@
 
 @interface YYUserOrderCell : UITableViewCell
 
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier WithActionBlock:(void(^)(NSInteger pageIndex))block;
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier WithBlock:(void(^)(NSString *type))block;
 
 -(void)updateUI;
 

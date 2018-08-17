@@ -11,11 +11,11 @@
 // c文件 —> 系统文件（c文件在前）
 
 // 控制器
+#import "YYNavigationBarViewController.h"
 #import "YYNewsTableViewController.h"
 #import "YYNewsDetailViewController.h"
 
 // 自定义视图
-#import "YYNavView.h"
 #import "HMSegmentedControl.h"
 
 // 接口
@@ -23,7 +23,6 @@
 // 分类
 
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "YYUntreatedMsgAmountModel.h"
 #import "AppDelegate.h"
 
 @interface YYNewsViewController ()<ViewPagerDataSource, ViewPagerDelegate,YYTableCellDelegate>{
@@ -31,7 +30,6 @@
 }
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (nonatomic, strong) YYNavView *navView;
 @property (strong, nonatomic) HMSegmentedControl *segmentedControl;
 @property (nonatomic, assign) NSInteger currentType;
 
@@ -68,6 +66,7 @@
 - (void)PrepareData{}
 - (void)PrepareUI{
     [self createNavView];
+    [self createSegmentedControl];
     self.dataSource = self;
     self.delegate = self;
     [self scrollEnabled:YES];
@@ -79,16 +78,32 @@
 #pragma mark - --------------UIConfig----------------------
 -(void)UIConfig{}
 -(void)createNavView{
-    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
-    self.segmentedControl = [self createSegmentedControl];
-    [self.navView setNavCustomView:self.segmentedControl];
-}
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    navigationBarViewController.nowTitle = @"";
+    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_weakContainerView.mas_top);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
 
--(HMSegmentedControl *)createSegmentedControl{
+    WeakSelf(ws);
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            if(ws.cancelButtonClicked){
+                ws.cancelButtonClicked();
+            }
+            blockVc = nil;
+        }
+    }];
+}
+-(void)createSegmentedControl{
     titleArr = @[NSLocalizedString(@"YCO新闻",nil)];
     CGSize titleSize= CGSizeZero;
     float titlesWidth = 0;
@@ -110,26 +125,26 @@
     if(titlesWidth < ( SCREEN_WIDTH-40-20)){
         segmentedControlOffset = ((SCREEN_WIDTH-40-20)-titlesWidth)/2;
     }
-    HMSegmentedControl *segmentedControl =  [[HMSegmentedControl alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH-40-20-segmentedControlOffset*2, 40)];
-    segmentedControl.backgroundColor = [UIColor clearColor];
-    [segmentedControl setSectionTitles:titleArr];
-    segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
-    segmentedControl.selectionIndicatorColor = [UIColor blackColor];
-    segmentedControl.selectionIndicatorHeight =2;
-    segmentedControl.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"919191"],NSFontAttributeName:[UIFont systemFontOfSize:14]};
-    segmentedControl.selectedTitleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"000000"],NSFontAttributeName:[UIFont systemFontOfSize:14]};
-    segmentedControl.selectedSegmentIndex = 0;
-    segmentedControl.borderWidth = 100;
-    [segmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
+    _segmentedControl =  [[HMSegmentedControl alloc] initWithFrame:CGRectMake(40+segmentedControlOffset, 4, SCREEN_WIDTH-40-20-segmentedControlOffset*2, 40)];
+    _segmentedControl.backgroundColor = [UIColor clearColor];
+    [_segmentedControl setSectionTitles:titleArr];
+    _segmentedControl.selectionIndicatorLocation = HMSegmentedControlSelectionIndicatorLocationDown;
+    _segmentedControl.selectionIndicatorColor = [UIColor blackColor];
+    _segmentedControl.selectionIndicatorHeight =2;
+    _segmentedControl.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"919191"],NSFontAttributeName:[UIFont systemFontOfSize:14]};
+    _segmentedControl.selectedTitleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"000000"],NSFontAttributeName:[UIFont systemFontOfSize:14]};
+    _segmentedControl.selectedSegmentIndex = 0;
+    _segmentedControl.borderWidth = 100;
+    [_segmentedControl addTarget:self action:@selector(segmentedControlChangedValue:) forControlEvents:UIControlEventValueChanged];
     //当一个title时处理
     if([titleArr count] == 1){
-        segmentedControl.selectionIndicatorColor = [UIColor clearColor];
-        segmentedControl.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"919191"],NSFontAttributeName:[UIFont systemFontOfSize:17]};
-        segmentedControl.selectedTitleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"000000"],NSFontAttributeName:[UIFont systemFontOfSize:17]};
-        segmentedControl.userInteractionEnabled = NO;
+        _segmentedControl.selectionIndicatorColor = [UIColor clearColor];
+        _segmentedControl.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"919191"],NSFontAttributeName:[UIFont systemFontOfSize:17]};
+        _segmentedControl.selectedTitleTextAttributes = @{NSForegroundColorAttributeName : [UIColor colorWithHex:@"000000"],NSFontAttributeName:[UIFont systemFontOfSize:17]};
+        _segmentedControl.userInteractionEnabled = NO;
     }
 
-    return segmentedControl;
+    [self.containerView addSubview:_segmentedControl];
 }
 #pragma mark - --------------请求数据----------------------
 -(void)RequestData{}
@@ -154,12 +169,6 @@
 }
 
 #pragma mark - --------------自定义响应----------------------
-- (void)goBack {
-    if(self.cancelButtonClicked){
-        self.cancelButtonClicked();
-    }
-}
-
 - (void)segmentedControlChangedValue:(HMSegmentedControl *)segmentedControl {
     NSInteger index = (int)segmentedControl.selectedSegmentIndex;
     UIPageViewControllerNavigationDirection direction;
@@ -232,8 +241,8 @@
 
 +(void)markAsRead{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if(appDelegate.untreatedMsgAmountModel.unreadNewsAmount > 0){
-        appDelegate.untreatedMsgAmountModel.unreadNewsAmount = 0;
+    if(appDelegate.unreadNewsAmount > 0){
+        appDelegate.unreadNewsAmount = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
     }
 }

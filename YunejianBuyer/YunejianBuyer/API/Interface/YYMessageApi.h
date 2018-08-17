@@ -7,13 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-
 #import "YYRspStatusAndMessage.h"
-
-@class YYMessageTalkListModel,YYMessageUserChatListModel;
+#import "YYMessageUserChatListModel.h"
+#import "YYMessageTalkListModel.h"
 
 @interface YYMessageApi : NSObject
-
 //获取合作买手店
 + (void)getUserChatListPageIndex:(int)pageIndex pageSize:(int)pageSize andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYMessageUserChatListModel *chatListModel,NSError *error))block;
 
@@ -28,5 +26,4 @@
 
 //发送私信
 +(void)sendTalkWithOppositeId:(NSNumber *)oppositeId content:(NSString*)content charType:(NSString *)charType andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error))block;
-
 @end

@@ -69,7 +69,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     WeakSelf(ws);
     [YYUserApi getBuyerHomeInfo:@"" andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBuyerHomeInfoModel *infoModel, NSError *error) {
-        [MBProgressHUD hideHUDForView:ws.view animated:YES];
+        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
         
         if(rspStatusAndMessage.status == kCode100){
             ws.homeInfoModel = infoModel;

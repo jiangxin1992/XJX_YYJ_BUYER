@@ -17,5 +17,4 @@
 @property (strong, nonatomic) NSString <Optional>*logo;
 @property (strong, nonatomic) NSNumber <Optional>*authStatus;
 @property (strong, nonatomic) NSNumber <Optional>*checkStatus;//1:待提交文件 2:待审核 3:审核通过 4:审核拒绝 5:停止
-@property (nonatomic, strong) NSNumber <Optional>*buyerNormal;//是否开通库存管理
 @end

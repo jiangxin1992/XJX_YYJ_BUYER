@@ -32,36 +32,16 @@ typedef NS_ENUM(NSInteger, RegisterTableCellType) {
 
 
 @interface YYTableViewCellData : NSObject
-@property  NSInteger type;  //RegisterTableCellType, 只用于Register相关页面
-
-/**自定义Cell**/
+@property  NSInteger type;
 @property (nonatomic, strong) NSString *reuseIdentifier;
-@property (nonatomic,strong) id object;
-/****/
-
-/**系统定义的4个Cell**/
-@property (nonatomic, assign) UITableViewCellStyle tableViewCellStyle;
-@property (nonatomic, strong) NSString *text;
-@property (nonatomic, strong) NSString *detailText;
-@property (nonatomic, strong) UIColor *textColor;
-@property (nonatomic, strong) UIColor *detailTextColor;
-@property (nonatomic, strong) UIFont *textFont;
-@property (nonatomic, strong) UIFont *detailTextFont;
-@property (nonatomic, assign) UITableViewCellAccessoryType accessoryType;
-@property (nonatomic, strong) UIView *accessoryView;
-/****/
-
-/**公用部分**/
 @property (nonatomic, assign) BOOL useDynamicRowHeight;
 @property (nonatomic, assign) CGFloat estimatedRowHeight;
 @property (nonatomic, assign) CGFloat tableViewCellRowHeight;
+@property (nonatomic,strong) id object;
 
-@property (nonatomic, copy) void(^dynamicCellBlock)(UITableViewCell *cell, NSIndexPath *indexPath);
 @property (nonatomic, copy) CGFloat(^dynamicCellRowHeight)(void);
-@property (nonatomic, copy) void(^selectedCellBlock)(UITableView *tableView, NSIndexPath *indexPath);
-/****/
+@property (nonatomic, copy) void(^selectedCellBlock)(NSIndexPath *indexPath);
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;

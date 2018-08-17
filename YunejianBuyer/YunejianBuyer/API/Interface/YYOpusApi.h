@@ -7,13 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-
 #import "YYRspStatusAndMessage.h"
-
-@class YYOpusSeriesListModel,YYOpusStyleListModel,YYStyleInfoModel,YYSeriesInfoDetailModel,YYUserStyleListModel,YYUserSeriesListModel;
+#import "YYOpusSeriesListModel.h"
+#import "YYOpusStyleListModel.h"
+#import "YYStyleInfoModel.h"
+#import "YYSeriesInfoDetailModel.h"
+#import "YYLookBookModel.h"
+#import "YYUserStyleListModel.h"
+#import "YYUserSeriesListModel.h"
 
 @interface YYOpusApi : NSObject
-
 /**
  *
  * 系列收藏列表
@@ -83,7 +86,7 @@
  *合作设计师系列详情
  *
  */
-+ (void)getConnSeriesInfoWithId:(NSInteger )designerId seriesId:(NSInteger )seriesId andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block;
++ (void)getConnSeriesInfoWithId:(NSInteger )designerId seriesId:(NSInteger )seriesId  andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block;
 
 /**
  *
@@ -97,13 +100,13 @@
  * 更改系列权限
  *
  */
-+ (void)updateSeriesAuthType:(long)seriesId authType:(NSInteger)authType andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block;
++ (void)updateSeriesAuthType:(long)seriesId authType:(NSInteger)authType  andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block;
 
 /**
  *
  *设计师系列详情
  *
  */
-+ (void)getSeriesInfo:(NSInteger )seriesId andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block;
++ (void)getSeriesInfo:(NSInteger )seriesId  andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block;
 
 @end

@@ -16,11 +16,10 @@
 #import "UserDefaultsMacro.h"
 #import <MJRefresh.h>
 #import "MLInputDodger.h"
-#import "YYChooseStyleListModel.h"
 
 #import "YYChooseStyleCell.h"
 #import "YYChooseStyleApi.h"
-#import "YYStyleOneColorModel.h"
+#import "YYInventoryBoardModel.h"
 
 #define YY_COLLECTION_PAGESZIE 20
 
@@ -220,7 +219,7 @@
     WeakSelf(ws);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYChooseStyleApi getOrderingListWithReqModel:_reqModel pageIndex:pageIndex pageSize:YY_COLLECTION_PAGESZIE andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYChooseStyleListModel *chooseStyleListModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100 && chooseStyleListModel.result
+        if (rspStatusAndMessage.status == kCode100 && chooseStyleListModel.result
             && [chooseStyleListModel.result count] > 0) {
             ws.currentPageInfo = chooseStyleListModel.pageInfo;
             if (ws.currentPageInfo== nil || ws.currentPageInfo.isFirstPage) {
@@ -239,7 +238,7 @@
         }
         
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadCollectionViewData];
@@ -328,11 +327,11 @@
     //跳转对应页面
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     
-    YYStyleOneColorModel *infoModel = [self modelTransformByChooseStyleModel:chooseStyleModel];
+    YYInventoryBoardModel *infoModel = [self modelTransformByChooseStyleModel:chooseStyleModel];
     [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
 }
--(YYStyleOneColorModel *)modelTransformByChooseStyleModel:(YYChooseStyleModel *)chooseStyleModel{
-    YYStyleOneColorModel *infoModel = [[YYStyleOneColorModel alloc] init];
+-(YYInventoryBoardModel *)modelTransformByChooseStyleModel:(YYChooseStyleModel *)chooseStyleModel{
+    YYInventoryBoardModel *infoModel = [[YYInventoryBoardModel alloc] init];
     infoModel.designerId = chooseStyleModel.designerId;
     infoModel.brandName = chooseStyleModel.brandName;
     infoModel.brandLogo = chooseStyleModel.brandLogo;

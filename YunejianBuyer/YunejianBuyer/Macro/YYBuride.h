@@ -13,17 +13,6 @@
 
 #define currentServerUrlRelease(monitor, placeholder) [[[NSUserDefaults standardUserDefaults] objectForKey: kLastYYServerURL] containsString:@"http://ycosystem.com"]? monitor: placeholder
 
-//查看订单改动内容
-#define kYYPageDeliveringDoneConfirm currentServerUrlRelease(@"YYDeliveringDoneConfirm", @"not-release")
-//原订单内容
-#define kYYPageOriginalOrderDetail currentServerUrlRelease(@"YYOriginalOrderDetail", @"not-release")
-//查看异常反馈
-#define kYYPageParcelExceptionDetail currentServerUrlRelease(@"YYParcelExceptionDetail", @"not-release")
-//包裹单详情
-#define kYYPagePackageDetail currentServerUrlRelease(@"YYPackageDetail", @"not-release")
-//包裹单列表
-#define kYYPagePackageList currentServerUrlRelease(@"YYPackageList", @"not-release")
-
 // 产品介绍页（安装后的三张介绍）
 #define kYYPageIntroduction currentServerUrlRelease(@"YYIntroduction", @"not-release")
 // 登录
@@ -54,6 +43,8 @@
 #define kYYPageAccountDetail currentServerUrlRelease(@"YYAccountDetail", @"not-release")
 // (首页)品牌
 #define kYYPageBrand currentServerUrlRelease(@"YYBrand", @"not-release")
+// (首页)库存
+#define kYYPageInventory currentServerUrlRelease(@"YYInventory", @"not-release")
 
 // 选款-搜索
 #define kYYPageChooseStyleSearch currentServerUrlRelease(@"YYChooseStyleSearch", @"not-release")
@@ -88,19 +79,6 @@
 #define kYYPageOrderModifyUpdate currentServerUrlRelease(@"YYOrderModify_update", @"not-release")
 // 补货追单
 #define kYYPageOrderModifyReplenishment currentServerUrlRelease(@"YYOrderModify_replenishment", @"not-release")
-
-/// ----------  库存管理  ---------------
-// 商品库存页面
-
-// 商品库存
-#define kYYMerchandiseInventory currentServerUrlRelease(@"YYMerchandiseInventory", @"not-release")
-// 入库记录
-#define kYYInventoryWarehouse currentServerUrlRelease(@"YYWarehouse", @"not-release")
-// 入库单详情
-#define kYYInventoryWarehouseDetail currentServerUrlRelease(@"YYWarehouseDetail", @"not-release")
-
-// 出库记录
-
 /// ---------- OrderModify  end   ---------
 
 // 消息中心
@@ -146,6 +124,15 @@
 
 // 聊天
 #define kYYPageMessageDetail currentServerUrlRelease(@"YYMessageDetail", @"not-release")
+
+// 我要补货/我有库存-选择合作品牌
+#define kYYPageInventorySelectBrand currentServerUrlRelease(@"YYInventorySelectBrand", @"not-release")
+// 我要补货/我有库存-选择款式
+#define kYYPageInventorySelectOrderStyle currentServerUrlRelease(@"YYInventorySelectOrderStyle", @"not-release")
+// 我要补货/我有库存-添加补货需求
+#define kYYPageInventorySubmitStyleInfo currentServerUrlRelease(@"YYInventorySubmitStyleInfo", @"not-release")
+// 我有库存-添加库存
+#define kYYPageInventoryStore currentServerUrlRelease(@"YYInventoryStore", @"not-release")
 
 // 我的买手店主页
 #define kYYPageBuyerHomePage currentServerUrlRelease(@"YYBuyerHomePage", @"not-release")

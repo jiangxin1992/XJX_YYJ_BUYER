@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "YYUserModel.h"
 
 @interface YYUser : NSObject
 
@@ -20,8 +19,7 @@
 @property (nonatomic, copy) NSString *status;//300 //审核中301 //审核被 303 //需要审核
 @property (nonatomic, copy) NSString *checkStatus;//1:待提交文件 2:待审核 3:审核通过 4:审核拒绝 5:停止
 
-@property (nonatomic, assign) YYUserType userType;//用户类型 0:设计师 1:买手店、admin 2:销售代表 5:Showroom 6:Showroom子账号 11:品牌主管 12:店长 13:财务 14:店员 15:仓库管理员
-@property (nonatomic, assign) BOOL stockEnable;//是否开通库存管理
+@property (nonatomic,assign) NSInteger userType;//用户类型 0:设计师 1:买手店 2:销售代表 5:Showroom 6:Showroom子账号
 
 //获取当前用户
 + (YYUser *)currentUser;
@@ -39,7 +37,7 @@
 - (BOOL )hasPermissionsToVisit;
 
 //保存用户数据
-- (void)saveUserWithEmail:(NSString *)email password:(NSString *)password userInfo:(YYUserModel *)userModel;
+- (void)saveUserWithEmail:(NSString *)email username:(NSString *)username password:(NSString *)password userType:(NSInteger)userType userId:(NSString*)userId logo:(NSString *)logo status:(NSString*)status checkStatus:(NSString*)checkStatus;
 - (void)saveUserData;
 //登出
 - (void)loginOut;

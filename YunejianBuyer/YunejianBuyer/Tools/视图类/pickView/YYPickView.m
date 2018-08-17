@@ -51,8 +51,8 @@
     }
     return _componentArray;
 }
-
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame
+{
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = _define_white_color;
@@ -88,10 +88,11 @@
 }
 
 -(instancetype)initDatePickWithDate:(NSDate *)defaulDate datePickerMode:(UIDatePickerMode)datePickerMode isHaveNavControler:(BOOL)isHaveNavControler{
+    
     self=[super init];
     if (self) {
         self.backgroundColor = _define_white_color;
-        _defaulDate = defaulDate;
+        _defaulDate=defaulDate;
         [self setUpDatePickerWithdatePickerMode:(UIDatePickerMode)datePickerMode];
         [self setFrameWith:isHaveNavControler];
     }
@@ -210,30 +211,21 @@
     datePicker.datePickerMode = datePickerMode;
     datePicker.backgroundColor=[UIColor whiteColor];
     NSDate* minDate = [[NSDate alloc] initWithTimeIntervalSince1970:1000];
+    
+    NSDate* maxDate =_defaulDate;
+    
     datePicker.minimumDate = minDate;
+    datePicker.maximumDate = maxDate;
     if (_defaulDate) {
         [datePicker setDate:_defaulDate];
     }
     _datePicker=datePicker;
     _pickeviewHeight=_datePicker.frame.size.height-ZHViewOffset*2;
-    datePicker.frame=CGRectMake(0, ZHToobarHeight, SCREEN_WIDTH, _pickeviewHeight);
+    datePicker.frame=CGRectMake(0, ZHToobarHeight, datePicker.frame.size.width,_pickeviewHeight);
+    //_pickeviewHeight=datePicker.frame.size.height;
+    //[self addSubview:datePicker];
     [self insertSubview:datePicker atIndex:0];
-}
-
-- (void)setDatePickMinDate:(NSDate *)minDate {
-    self.datePicker.minimumDate = minDate;
-}
-
-- (void)setDatePickMaxDate:(NSDate *)maxDate {
-    self.datePicker.maximumDate = maxDate;
-}
-
-- (void)setDatePickSelectedDate:(NSDate *)date {
-    [self.datePicker setDate:date animated:YES];
-}
-
-- (NSDate *)getSelectedDate {
-    return self.datePicker.date;
+    
 }
 
 -(void)setUpToolBar{
@@ -241,7 +233,6 @@
     [self setToolbarWithPickViewFrame];
     [self addSubview:_toolbar];
 }
-
 -(UIToolbar *)setToolbarStyle{
     UIToolbar *toolbar=[[UIToolbar alloc] init];
     toolbar.backgroundColor = [UIColor whiteColor];
@@ -251,40 +242,24 @@
     UIButton *customLeftBtn = [UIButton getCustomTitleBtnWithAlignment:1 WithFont:17 WithSpacing:0 WithNormalTitle:NSLocalizedString(@"取消",nil) WithNormalColor:nil WithSelectedTitle:nil WithSelectedColor:nil];
     [customLeftBtn addTarget:self action:@selector(remove) forControlEvents:UIControlEventTouchUpInside];
     customLeftBtn.frame = CGRectMake(0, 0, 100, ZHToobarHeight);
-    UIBarButtonItem *leftItem=[[UIBarButtonItem alloc] initWithCustomView:customLeftBtn];
-    [leftItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor grayColor]} forState:UIControlStateNormal];
+    UIBarButtonItem *lefttem=[[UIBarButtonItem alloc] initWithCustomView:customLeftBtn];
+    [lefttem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor grayColor]} forState:UIControlStateNormal];
     
-    UIBarButtonItem *spaceItem=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
-    
-    UILabel *centerLabel = [[UILabel alloc] init];
-    centerLabel.text = nil;
-    centerLabel.font = [UIFont systemFontOfSize:18];
-    UIBarButtonItem *centerTitleItem = [[UIBarButtonItem alloc] initWithCustomView:centerLabel];
-    [centerTitleItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor grayColor]} forState:UIControlStateNormal];
+    UIBarButtonItem *centerSpace=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil];
     
     UIButton *customRightBtn = [UIButton getCustomTitleBtnWithAlignment:2 WithFont:17 WithSpacing:0 WithNormalTitle:NSLocalizedString(@"确定",nil) WithNormalColor:nil WithSelectedTitle:nil WithSelectedColor:nil];
     [customRightBtn addTarget:self action:@selector(doneClick) forControlEvents:UIControlEventTouchUpInside];
     customRightBtn.frame = CGRectMake(0, 0, 100, ZHToobarHeight);
-    UIBarButtonItem *rightItem=[[UIBarButtonItem alloc] initWithCustomView:customRightBtn];
-    [rightItem setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]} forState:UIControlStateNormal];
+    UIBarButtonItem *right=[[UIBarButtonItem alloc] initWithCustomView:customRightBtn];
+    [right setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor blackColor]} forState:UIControlStateNormal];
     
-    toolbar.items=@[lefeRightSpace,leftItem,spaceItem,centerTitleItem,spaceItem,rightItem,lefeRightSpace];
+    toolbar.items=@[lefeRightSpace,lefttem,centerSpace,right,lefeRightSpace];
     
     return toolbar;
 }
 
 -(void)setToolbarWithPickViewFrame{
     _toolbar.frame=CGRectMake(0, 0,[UIScreen mainScreen].bounds.size.width, ZHToobarHeight);
-}
-
-- (void)setToolbarTitle:(NSString *)title {
-    for (UIBarButtonItem *item in self.toolbar.items) {
-        if ([item.customView isKindOfClass:[UILabel class]]) {
-            UILabel *label = item.customView;
-            label.text = title;
-            [label sizeToFit];
-        }
-    }
 }
 
 #pragma mark piackView 数据源方法
@@ -448,7 +423,6 @@
     self.bgView = nil;
     [self removeFromSuperview];
 }
-
 -(void)show:(UIView *)specialParentView{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     if(self.bgView == nil){

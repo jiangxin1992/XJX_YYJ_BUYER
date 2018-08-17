@@ -15,7 +15,7 @@
 #import <MJRefresh.h>
 #import "YYBrandViewCell.h"
 #import "YYBrandAddViewCell.h"
-#import "YYConnBrandInfoListModel.h"
+#import "YYConnAddViewController.h"
 #import "YYUser.h"
 
 @interface YYBrandTableViewController ()<UICollectionViewDataSource,UICollectionViewDelegate>
@@ -96,7 +96,7 @@
 -(void)hasNewBrandsRequest{
     WeakSelf(ws);
     [YYConnApi hasNewBrandsWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, BOOL hasNewBrands, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100){
+        if (rspStatusAndMessage.status == kCode100){
             ws.hasNewBrands = hasNewBrands;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [ws reloadCollectionViewData:NO];
@@ -133,7 +133,7 @@
     WeakSelf(ws);
     __block BOOL blockEndrefreshing =endrefreshing;
     [YYConnApi getConnBrands:_currentListType andPageIndex:pageIndex andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYConnBrandInfoListModel *listModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100){
+        if (rspStatusAndMessage.status == kCode100){
             ws.currentPageInfo = listModel.pageInfo;
             if( !ws.currentPageInfo || ws.currentPageInfo.isFirstPage){
                 ws.brandListArray =  [[NSMutableArray alloc] init];//;
@@ -150,7 +150,7 @@
         
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
         
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
     }];

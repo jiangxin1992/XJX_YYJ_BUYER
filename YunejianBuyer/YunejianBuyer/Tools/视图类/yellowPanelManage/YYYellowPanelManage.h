@@ -19,7 +19,7 @@
 
 + (YYYellowPanelManage *)instance;
 
--(void)showOrderAddMoneyLogPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier orderCode:(NSString*)orderCode params:(NSArray*)params totalMoney:(double)totalMoney moneyType:(NSInteger)moneyType isNeedRefund:(BOOL)isNeedRefund parentView:(UIViewController *)specialParentView andCallBack:(void (^)(NSString *orderCode, NSNumber *totalPercent))callback;
+-(void)showOrderAddMoneyLogPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier orderCode:(NSString*)orderCode params:(NSArray*)params totalMoney:(double)totalMoney moneyType:(NSInteger)moneyType parentView:(UIViewController *)specialParentView andCallBack:(void (^)(NSString *orderCode, NSNumber *totalPercent))callback;
 -(void)showYellowAlertPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier title:(NSString*)title msg:(NSString*)msg btn:(NSString*)btnStr align:(NSTextAlignment)textAlignment andCallBack:(YellowPabelCallBack)callback;
 -(void)showSamllYellowAlertPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier title:(NSString*)title msg:(NSString*)msg btn:(NSString*)btnStr align:(NSTextAlignment)textAlignment parentView:(UIView *)specialParentView andCallBack:(YellowPabelCallBack)callback;
 -(void)showOrderBuyerAddressListPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier needUnDefineBuyer:(NSInteger)needUnDefineBuyer parentView:(UIView *)specialParentView andCallBack:(YellowPabelCallBack)callback;

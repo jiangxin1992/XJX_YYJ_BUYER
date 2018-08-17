@@ -13,6 +13,7 @@
 
 // 控制器
 #import "YYNewsViewController.h"
+#import "YYBrandSeriesViewController.h"
 
 // 自定义视图
 #import "YYNavView.h"
@@ -60,17 +61,21 @@
 - (void)PrepareUI{
     self.view.backgroundColor = _define_white_color;
 
-    WeakSelf(ws);
     _navView = [[YYNavView alloc] initWithTitle:_bannerModel.title WithSuperView:self.view haveStatusView:YES];
-    self.navView.goBackBlock = ^{
-        [ws GoBack:nil];
-    };
+
+    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
+    [_navView addSubview:backBtn];
+    [backBtn addTarget:self action:@selector(GoBack:) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.left.mas_equalTo(0);
+        make.width.mas_equalTo(40);
+        make.bottom.mas_equalTo(-1);
+    }];
 
     UIButton *moreBtn = [UIButton getCustomTitleBtnWithAlignment:0 WithFont:16.0f WithSpacing:0 WithNormalTitle:NSLocalizedString(@"更多",nil) WithNormalColor:nil WithSelectedTitle:nil WithSelectedColor:nil];
     [_navView addSubview:moreBtn];
     [moreBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(kStatusBarHeight);
-        make.right.mas_equalTo(0);
+        make.top.right.mas_equalTo(0);
         make.width.mas_equalTo(50);
         make.bottom.mas_equalTo(-1);
     }];
@@ -203,7 +208,8 @@
 //#pragma mark - --------------自定义代理/block----------------------
 #pragma mark - --------------自定义响应----------------------
 -(void)GoBack:(id)sender {
-    if(_cancelButtonClicked) {
+    if(_cancelButtonClicked)
+    {
         _cancelButtonClicked();
     }
 }
@@ -244,7 +250,7 @@
 -(void)pushBrandHomePageWithDesignerID:(NSInteger )designerId{
 
     [YYUserApi getDesignerHomeInfo:[[NSString alloc] initWithFormat:@"%ld",designerId] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBrandHomeInfoModel *infoModel, NSError *error) {
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             NSString *brandName = infoModel.brandName;
             NSString *logoPath = infoModel.logoPath;
@@ -272,7 +278,7 @@
     if([[tempDict allKeys] count] >= 5){
 
         [YYOpusApi getConnSeriesInfoWithId:[[tempDict objectForKey:@"designerId"] integerValue] seriesId:[[tempDict objectForKey:@"seriesId"] integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
 
                 NSString *brandName = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandName]?@"":infoDetailModel.series.designerBrandName;
                 NSString *brandLogo = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandLogo]?@"":infoDetailModel.series.designerBrandLogo;

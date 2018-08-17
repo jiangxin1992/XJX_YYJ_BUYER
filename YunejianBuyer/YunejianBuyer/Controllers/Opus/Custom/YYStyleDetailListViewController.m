@@ -35,10 +35,6 @@
 #import "YYUser.h"
 #import "YYOpusSeriesModel.h"
 #import "YYOrderInfoModel.h"
-#import "YYSeriesInfoDetailModel.h"
-#import "YYPageInfoModel.h"
-#import "YYOpusSeriesListModel.h"
-#import "YYOpusStyleListModel.h"
 #import "YYStylesAndTotalPriceModel.h"
 
 #import "AppDelegate.h"
@@ -240,7 +236,7 @@ static CGFloat searchFieldWidthMaxConstraint = 200;
         dispatch_async(dispatch_get_main_queue(), ^{
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             ws.stylesAndTotalPriceModel = getLocalShoppingCartStyleCount(appdelegate.cartDesignerIdArray);
-            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%li", self.stylesAndTotalPriceModel.totalStyles]];
+            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%i", self.stylesAndTotalPriceModel.totalStyles]];
         });
     });
 }
@@ -253,7 +249,7 @@ static CGFloat searchFieldWidthMaxConstraint = 200;
     NSString *orderCode = _currentYYOrderInfoModel.orderCode;
     if(![NSString isNilOrEmpty:orderCode]){
         [YYOpusApi getSeriesListWithOrderCode:orderCode pageIndex:1 pageSize:20 andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOpusSeriesListModel *opusSeriesListModel, NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100
+            if (rspStatusAndMessage.status == kCode100
                 && opusSeriesListModel.result
                 && [opusSeriesListModel.result count] > 0) {
 
@@ -273,7 +269,7 @@ static CGFloat searchFieldWidthMaxConstraint = 200;
 -(void)loadSeriesDetailInfo{
     WeakSelf(ws);
     [YYOpusApi getSeriesInfo:_seriesId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100){
+        if (rspStatusAndMessage.status == kCode100){
             ws.seriesInfoDetailModel = infoDetailModel;
             [ws.collectionView reloadData];
         }
@@ -284,7 +280,7 @@ static CGFloat searchFieldWidthMaxConstraint = 200;
     WeakSelf(ws);
     NSString *orderCode = _currentYYOrderInfoModel.orderCode;
     [YYOpusApi getStyleListWithOrderCode:orderCode seriesId:_seriesId orderBy:_sortType queryStr:str pageIndex:pageIndex pageSize:kPageSize andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOpusStyleListModel *opusStyleListModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100
+        if (rspStatusAndMessage.status == kCode100
             && opusStyleListModel.result
             && [opusStyleListModel.result count] > 0) {
 
@@ -311,7 +307,7 @@ static CGFloat searchFieldWidthMaxConstraint = 200;
 
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
 
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
 

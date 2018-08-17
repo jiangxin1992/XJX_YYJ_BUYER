@@ -6,23 +6,13 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYFeedbackViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
-
-// 接口
-#import "YYUserApi.h"
-
-// 分类
-#import "UIView+UpdateAutoLayoutConstraints.h"
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "MLInputDodger.h"
 #import "YYRspStatusAndMessage.h"
+#import "YYUserApi.h"
+#import "YYNavigationBarViewController.h"
+#import "UIView+UpdateAutoLayoutConstraints.h"
+#import "MLInputDodger.h"
 #import "regular.h"
 
 @interface YYFeedbackViewController ()
@@ -32,8 +22,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *saveBtn;
 @property (weak, nonatomic) IBOutlet UIView *txtContaier;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *whiteViewHeightLayout;
-
-@property (nonatomic, strong) YYNavView *navView;
 @end
 
 @implementation YYFeedbackViewController
@@ -63,14 +51,31 @@
 }
 
 -(void)PrepareData{}
-
 -(void)PrepareUI{
-    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"建议反馈",nil) WithSuperView:self.view haveStatusView:YES];
-    WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    //self.navigationBarViewController = navigationBarViewController;
+    navigationBarViewController.nowTitle = NSLocalizedString(@"建议反馈",nil);
+    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
+    //[_containerView addSubview:navigationBarViewController.view];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_weakContainerView.mas_top);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
     
+    WeakSelf(ws);
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+    
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            [ws cancelClicked:nil];
+            blockVc = nil;
+        }
+    }];
     _txtContaier.layer.cornerRadius = 2.5;
     _txtContaier.layer.borderColor = [UIColor colorWithHex:@"d3d3d3"].CGColor;
     _txtContaier.layer.borderWidth = 1;
@@ -81,13 +86,14 @@
     _saveBtn.layer.cornerRadius = 2.5;
     _saveBtn.layer.masksToBounds = YES;
 
-    _whiteViewHeightLayout.constant = kTabbarAndBottomSafeAreaHeight;
+    _whiteViewHeightLayout.constant = kTabbarHeight;
+    
+    //self.view.shiftHeightAsDodgeViewForMLInputDodger = 44.0f+5.0f;
+//    [self.view registerAsDodgeViewForMLInputDodger];
+    //popWindowAddBgView(self.view);
+    //[_feedbackTextView becomeFirstResponder];
 }
-
 #pragma mark - SomeAction
-- (void)goBack {
-    [self cancelClicked:nil];
-}
 
 - (IBAction)cancelClicked:(id)sender{
     if (_cancelButtonClicked) {
@@ -105,7 +111,7 @@
     }
     
     [YYUserApi userFeedBack:feedbackString andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100) {
+        if (rspStatusAndMessage.status == kCode100) {
             [YYToast showToastWithTitle:NSLocalizedString(@"反馈成功!",nil) andDuration:kAlertToastDuration];
             if (_modifySuccess) {
                 _modifySuccess();
@@ -119,7 +125,10 @@
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [regular dismissKeyborad];
 }
-
 #pragma mark - Other
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 
 @end

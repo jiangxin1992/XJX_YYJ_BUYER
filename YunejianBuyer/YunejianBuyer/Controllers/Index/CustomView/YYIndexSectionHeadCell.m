@@ -55,9 +55,6 @@
 
 #pragma mark - --------------UIConfig----------------------
 -(void)UIConfig{
-
-    WeakSelf(ws);
-
     _topLine = [UIView getCustomViewWithColor:[UIColor colorWithHex:@"EFEFEF"]];
     [self addSubview:_topLine];
     [_topLine mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -70,7 +67,7 @@
     [backView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(0);
         make.bottom.mas_equalTo(0);
-        make.top.mas_equalTo(ws.topLine.mas_bottom).with.offset(0);
+        make.top.mas_equalTo(_topLine.mas_bottom).with.offset(0);
     }];
     backView.backgroundColor = _define_white_color;
 
@@ -87,14 +84,14 @@
         make.left.mas_equalTo(17);
         make.right.mas_equalTo(-17);
         make.bottom.mas_equalTo(0);
-        make.top.mas_equalTo(ws.intervalView.mas_bottom).with.offset(0);
+        make.top.mas_equalTo(_intervalView.mas_bottom).with.offset(0);
     }];
 
     _moreBtn = [UIButton getCustomBtn];
     [backView addSubview:_moreBtn];
     [_moreBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(-17);
-        make.centerY.mas_equalTo(ws.titleLabel);
+        make.centerY.mas_equalTo(_titleLabel);
         make.height.mas_equalTo(30);
     }];
     [_moreBtn addTarget:self action:@selector(moreAction) forControlEvents:UIControlEventTouchUpInside];
@@ -129,9 +126,6 @@
 }
 #pragma mark - --------------自定义方法----------------------
 -(void)updateUI{
-
-    WeakSelf(ws);
-
     if(_sectionHeadType == EIndexSectionHeadRecommendationBrand){
         _titleLabel.text = NSLocalizedString(@"推荐品牌",nil);
     }else if(_sectionHeadType == EIndexSectionHeadLatestSeries){
@@ -151,7 +145,7 @@
             make.left.mas_equalTo(17);
             make.right.mas_equalTo(-17);
             make.bottom.mas_equalTo(0);
-            make.top.mas_equalTo(ws.intervalView.mas_bottom).with.offset(0);
+            make.top.mas_equalTo(_intervalView.mas_bottom).with.offset(0);
         }];
     }else{
         [_titleLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -162,7 +156,7 @@
     }
 
     [_intervalView mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.height.mas_equalTo(ws.topLineIsHide?0:10);
+        make.height.mas_equalTo(_topLineIsHide?0:10);
     }];
     _moreBtn.hidden = !_moreBtnIsShow;
 }

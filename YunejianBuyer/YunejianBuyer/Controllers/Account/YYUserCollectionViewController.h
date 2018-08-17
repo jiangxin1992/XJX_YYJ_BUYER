@@ -10,6 +10,6 @@
 
 @interface YYUserCollectionViewController : UIViewController
 
-@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
+@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
 
 @end

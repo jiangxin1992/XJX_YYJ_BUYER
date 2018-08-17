@@ -6,37 +6,29 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYSettingViewController.h"
+
 #import "YYHelpViewController.h"
 #import "YYFeedbackViewController.h"
 #import "YYAboutUsViewController.h"
+#import "YYNavigationBarViewController.h"
 #import "YYModifyPasswordViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
 #import "YYActionSheet.h"
 #import "YYGuideHandler.h"
 #import "YYUserInfoCell.h"
 
-// 接口
-
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
-#import "JpushHandler.h"
-#import <SDImageCache.h>
 #import "UserDefaultsMacro.h"
 #import "AppDelegate.h"
+
+#import "JpushHandler.h"
+#import <SDImageCache.h>
 
 @interface YYSettingViewController ()
 
 @property(nonatomic,strong) YYFeedbackViewController *feedbackViewController;
 @property(nonatomic,strong) YYHelpViewController *helpViewController;
 @property(nonatomic,strong) YYAboutUsViewController *aboutUsViewController;
-@property (nonatomic, strong) YYNavView *navView;
 
 @property(nonatomic,strong) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *containerView;
@@ -49,11 +41,28 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"设置",nil) WithSuperView:self.view haveStatusView:YES];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    navigationBarViewController.nowTitle = NSLocalizedString(@"设置",nil);
+    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_weakContainerView.mas_top);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
+    
     WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+    
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            [ws cancelClicked:nil];
+            blockVc = nil;
+        }
+    }];
 }
 
 - (void)viewWillAppear:(BOOL)animated{
@@ -74,10 +83,6 @@
         UIView *targetView = [cell viewWithTag:20001];
         [YYGuideHandler showGuideView:GuideTypeHelpNewFlag parentView:self.view targetView:targetView];
     }
-}
-
-- (void)goBack {
-    [self cancelClicked:nil];
 }
 
 - (IBAction)cancelClicked:(id)sender{

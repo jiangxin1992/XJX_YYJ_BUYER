@@ -24,8 +24,6 @@
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import <MJRefresh.h>
 
-#import "YYNewsListModel.h"
-
 @interface YYNewsTableViewController ()<UITableViewDataSource,UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -105,7 +103,7 @@
     __block BOOL blockEndrefreshing = endrefreshing;
     if(true){
         [YYUserApi getNewsList:_index pageIndex:pageIndex pageSize:8  andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYNewsListModel *listModel, NSError *error) {
-            if (rspStatusAndMessage.status == YYReqStatusCode100) {
+            if (rspStatusAndMessage.status == kCode100) {
                 if(pageIndex == 1) {
                     [ws.listArray removeAllObjects];
                 }

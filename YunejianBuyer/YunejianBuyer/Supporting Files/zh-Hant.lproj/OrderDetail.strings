@@ -53,9 +53,6 @@
 /* Class = "UILabel"; text = "颜色"; ObjectID = "Gjm-zJ-hgK"; */
 "Gjm-zJ-hgK.text" = "颜色";
 
-/* Class = "UILabel"; text = "确认收货"; ObjectID = "016-Ll-Lo8"; */
-"016-Ll-Lo8.text" = "确认收货";
-
 /* Class = "UILabel"; text = "件数"; ObjectID = "Hfq-0c-SKI"; */
 "Hfq-0c-SKI.text" = "件数";
 
@@ -175,9 +172,6 @@
 
 /* Class = "UIButton"; normalTitle = "添加款式"; ObjectID = "od9-fd-83X"; */
 "od9-fd-83X.normalTitle" = "添加款式";
-
-/* Class = "UILabel"; text = "订单类型*"; ObjectID = "7TM-gR-wQO"; */
-"7TM-gR-wQO.text" = "订单类型*";
 
 /* Class = "UITextField"; placeholder = "输入品牌、单号搜索订单"; ObjectID = "oka-EV-Y9Z"; */
 "oka-EV-Y9Z.placeholder" = "输入品牌、单号搜索订单";

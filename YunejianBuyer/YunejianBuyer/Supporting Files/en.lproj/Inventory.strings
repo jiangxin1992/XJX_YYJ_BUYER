@@ -1,0 +1,30 @@
+
+/* Class = "UITextField"; placeholder = "输入名称搜索"; ObjectID = "4aZ-wK-SKX"; */
+"4aZ-wK-SKX.placeholder" = "Search by name";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Y25-RD-MGp"; */
+"Y25-RD-MGp.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "YDF-hP-y37"; */
+"YDF-hP-y37.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "YHb-g9-BYk"; */
+"YHb-g9-BYk.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "YYs-n1-ue4"; */
+"YYs-n1-ue4.text" = "Label";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "ZBh-u4-dpG"; */
+"ZBh-u4-dpG.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "取消"; ObjectID = "iYI-52-qZd"; */
+"iYI-52-qZd.normalTitle" = "Cancel";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "pe1-qs-0A2"; */
+"pe1-qs-0A2.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = " 赶紧去提交 我要补货"; ObjectID = "wtO-mH-Ae9"; */
+"wtO-mH-Ae9.normalTitle" = "Apply to Re-Order";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "NIU-M9-psZ"; */
+"NIU-M9-psZ.text" = "Stock";

@@ -12,11 +12,11 @@
 
 @interface YYAccountUserInfoViewController : UIViewController
 
-@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
+@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
 
-@property (nonatomic, copy) void (^accountUserInfoCellBlock)(NSString *type);
+@property (nonatomic,copy) void (^accountUserInfoCellBlock)(NSString *type);
 
-@property (nonatomic, strong) YYUserInfo *userInfo;
+@property (nonatomic,strong) YYUserInfo *userInfo;
 
 - (void)reloadTableView;
 @end

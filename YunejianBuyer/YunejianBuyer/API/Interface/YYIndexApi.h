@@ -10,7 +10,11 @@
 
 #import "YYRspStatusAndMessage.h"
 
-@class YYLatestSeriesListModel;
+#import "YYLatestSeriesListModel.h"
+#import "YYRecommendDesignerBrandsModel.h"
+#import "YYDueBrandsModel.h"
+#import "YYHotDesignerBrandsModel.h"
+#import "YYBannerModel.h"
 
 @interface YYIndexApi : NSObject
 

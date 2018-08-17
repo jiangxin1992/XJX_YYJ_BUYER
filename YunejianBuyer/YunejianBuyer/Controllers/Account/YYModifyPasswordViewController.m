@@ -6,23 +6,16 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
-// c文件 —> 系统文件（c文件在前）
-
-// 控制器
 #import "YYModifyPasswordViewController.h"
 
-// 自定义视图
-#import "YYNavView.h"
-
-// 接口
 #import "YYUserApi.h"
-
-// 分类
-
-// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import "YYRspStatusAndMessage.h"
+#import "YYNavigationBarViewController.h"
+
+//static CGFloat yellowView_default_constant = 140;
 
 @interface YYModifyPasswordViewController ()<UITextFieldDelegate>
+
 
 @property (weak, nonatomic) IBOutlet UITextField *oldPasswordField;
 @property (weak, nonatomic) IBOutlet UITextField *nowPasswordField;
@@ -34,7 +27,6 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *newstPwdWidthLayout1;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *confirmPwdWidthLayout;
 
-@property (nonatomic, strong) YYNavView *navView;
 
 @end
 
@@ -54,11 +46,30 @@
     }
     
     // Do any additional setup after loading the view.
-    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"密码",nil) WithSuperView:self.view haveStatusView:YES];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
+    navigationBarViewController.previousTitle = @"";
+    //self.navigationBarViewController = navigationBarViewController;
+    navigationBarViewController.nowTitle = NSLocalizedString(@"密码",nil);
+    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
+    //[_containerView addSubview:navigationBarViewController.view];
+    __weak UIView *_weakContainerView = _containerView;
+    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(_weakContainerView.mas_top);
+        make.left.equalTo(_weakContainerView.mas_left);
+        make.bottom.equalTo(_weakContainerView.mas_bottom);
+        make.right.equalTo(_weakContainerView.mas_right);
+    }];
+    
     WeakSelf(ws);
-    self.navView.goBackBlock = ^{
-        [ws goBack];
-    };
+    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
+    
+    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
+        if (buttonType == NavigationButtonTypeGoBack) {
+            [ws cancelClicked:nil];
+            blockVc = nil;
+        }
+    }];
     
     _saveBtn.layer.cornerRadius = 2.5;
     _saveBtn.layer.masksToBounds = YES;
@@ -76,12 +87,6 @@
     [super viewWillAppear:animated];
     // 进入埋点
     [MobClick beginLogPageView:kYYPageModifyPassword];
-}
-
-#pragma mark - 自定义响应
-
-- (void)goBack {
-    [self cancelClicked:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -124,7 +129,7 @@
     }
     
     [YYUserApi passwdUpdateWithOldPassword:md5(old) nowPassword:md5(now) andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100) {
+        if (rspStatusAndMessage.status == kCode100) {
             [YYToast showToastWithTitle:NSLocalizedString(@"密码修改成功！",nil) andDuration:kAlertToastDuration];
             if (_modifySuccess) {
                 _modifySuccess();
@@ -139,4 +144,8 @@
 
 #pragma mark - Other
 
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 @end

@@ -14,6 +14,9 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "YYNavigationBarViewController.h"
+#import "YYBrandModifyInfoViewController.h"
+#import "YYBrandSeriesViewController.h"
 #import "YYMessageDetailViewController.h"
 
 #import "YYBrandInfoHeadViewNew.h"
@@ -41,8 +44,6 @@
 #import "YYMenuPopView.h"
 #import "SCLoopScrollView.h"
 #import "YYOrderingApi.h"
-#import "YYOpusSeriesListModel.h"
-#import "YYSeriesInfoDetailModel.h"
 
 @interface YYBrandHomePageViewController ()<UITableViewDelegate,UITableViewDataSource,MFMailComposeViewControllerDelegate>
 
@@ -54,6 +55,9 @@
 @property (nonatomic,assign) NSInteger currentPage;
 @property (nonatomic,assign) NSInteger pageIndex;
 @property (nonatomic, strong) UITableView *tableview;
+
+//@property (nonatomic, strong) UIView *editReadView;//编辑按钮new  已去除  在版本（19）中体现
+//@property (nonatomic, strong) UIImageView *editTechImg;//买手主页 新手引导页  已去除  在版本（19）中体现
 
 @property (nonatomic, strong) YYNavView *navView;
 
@@ -130,12 +134,12 @@
 
 -(void)CreateTableView
 {
-    _tableview = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableview=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     [self.view addSubview:_tableview];
     //    消除分割线
-    _tableview.separatorStyle = UITableViewCellSeparatorStyleNone;
-    _tableview.delegate = self;
-    _tableview.dataSource = self;
+    _tableview.separatorStyle=UITableViewCellSeparatorStyleNone;
+    _tableview.delegate=self;
+    _tableview.dataSource=self;
     [_tableview mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(0);
         make.top.mas_equalTo(kIPhoneX?(kStatusBarHeight):(-20));
@@ -162,8 +166,7 @@
 
 -(void)CreateNavView{
     
-    _navView = [[YYNavView alloc] initWithTitle:_previousTitle WithSuperView:self.view haveStatusView:YES];
-    [self.navView hidesBackButton];
+    _navView = [[YYNavView alloc] initWithTitle:_previousTitle WithSuperView:self.view haveStatusView:NO];
     _navView.hidden = YES;
     
     _operationBtn = [UIButton getCustomImgBtnWithImageStr:@"operation_circle_icon" WithSelectedImageStr:nil];
@@ -195,21 +198,21 @@
 {
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     WeakSelf(ws);
-    NSString *designerID = [[NSString alloc] initWithFormat:@"%ld",_designerId];
+    NSString *designerID = _isHomePage?@"":[[NSString alloc] initWithFormat:@"%ld",_designerId];
     [YYUserApi getDesignerHomeInfo:designerID andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBrandHomeInfoModel *infoModel, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             
             ws.homeInfoModel = infoModel;
             
-            if(ws.homeInfoModel && [ws.homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+            if(ws.isHomePage || (ws.homeInfoModel && [ws.homeInfoModel.connectStatus integerValue] == kConnStatus1)){
                 _operationBtn.hidden = NO;
             }else{
                 _operationBtn.hidden = YES;
             }
             
             _aboutHeight = [YYBrandInfoAboutCell getHeightWithHomeInfoModel:_homeInfoModel];
-            _contactHeight = [YYBrandInfoContactCell getHeightWithHomeInfoModel:_homeInfoModel IsHomePage:NO];
+            _contactHeight = [YYBrandInfoContactCell getHeightWithHomeInfoModel:_homeInfoModel IsHomePage:_isHomePage];
             
             [ws loadAllSeries];
             
@@ -223,7 +226,7 @@
 - (void)loadAllSeries{
     WeakSelf(ws);
     [YYOpusApi getConnSeriesListWithId:(int)_designerId pageIndex:(int)_pageIndex pageSize:20 andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOpusSeriesListModel *opusSeriesListModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100
+        if (rspStatusAndMessage.status == kCode100
             && opusSeriesListModel.result) {
             if(opusSeriesListModel.result.count)
             {
@@ -280,10 +283,10 @@
         
     }
     _aboutHeight = [YYBrandInfoAboutCell getHeightWithHomeInfoModel:_homeInfoModel];
-    _contactHeight = [YYBrandInfoContactCell getHeightWithHomeInfoModel:_homeInfoModel IsHomePage:NO];
-    CGRect rect = CGRectMake(0, 0, SCREEN_WIDTH, 190 + 120 + 11 + 50);
+    _contactHeight = [YYBrandInfoContactCell getHeightWithHomeInfoModel:_homeInfoModel IsHomePage:_isHomePage];
+    CGRect rect = CGRectMake(0, 0, SCREEN_WIDTH, 190 + (_isHomePage?76:120) + 11 + 50);
     _headView.frame = rect;
-    _headView.isHomePage = NO;
+    _headView.isHomePage = _isHomePage;
     _headView.infoModel = self.homeInfoModel;
     _tableview.tableHeaderView = _headView;
     [_headView SetData];
@@ -350,7 +353,7 @@
             }];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
-        cell.isHomePage = NO;
+        cell.isHomePage = _isHomePage;
         cell.aboutHeight = _aboutHeight;
         cell.contactHeight = _contactHeight;
         cell.homePageModel = _homeInfoModel;
@@ -368,7 +371,7 @@
                 YYOpusSeriesModel *seriesModel = _seriesArray[idx];
 
                 [YYOpusApi getConnSeriesInfoWithId:[seriesModel.designerId integerValue] seriesId:[seriesModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-                    if (rspStatusAndMessage.status == YYReqStatusCode100) {
+                    if (rspStatusAndMessage.status == kCode100) {
 
                         NSString *brandName = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandName]?@"":infoDetailModel.series.designerBrandName;
                         NSString *brandLogo = [NSString isNilOrEmpty:infoDetailModel.series.designerBrandLogo]?@"":infoDetailModel.series.designerBrandLogo;
@@ -381,7 +384,7 @@
             }
         }];
     }
-    cell.isHomePage = NO;
+    cell.isHomePage = _isHomePage;
     cell.seriesArray = _seriesArray;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
@@ -450,13 +453,15 @@
 }
 -(void)operationAction:(UIButton *)btn{
     
-    if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+    if(_isHomePage || (_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1)){
         NSInteger menuUIWidth = 137;
         NSInteger menuUIHeight = 58;
         NSArray *menuData = @[@""];
         NSArray *menuIconData = @[@""];
         
-        if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+        if(_isHomePage){
+            menuData = @[NSLocalizedString(@"编辑",nil)];
+        }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1){
             menuData = @[NSLocalizedString(@"解除合作",nil)];
         }
         
@@ -464,8 +469,12 @@
         WeakSelf(ws);
         [YYMenuPopView addPellTableViewSelectWithWindowFrame:CGRectMake(p.x-menuUIWidth, p.y, menuUIWidth, menuUIHeight) selectData:menuData images:menuIconData action:^(NSInteger index) {
             if(index > -1){
+                //编辑
                 //取消合作
-                if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+                if(_isHomePage){
+                    //编辑
+                    [self editAction];
+                }else if(_homeInfoModel && [_homeInfoModel.connectStatus integerValue] == kConnStatus1){
                     
                     CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"解除合作关系吗？",nil) message:NSLocalizedString(@"与品牌解除合作后，将不能浏览该品牌作品",nil) needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"继续合作_no",nil) otherButtonTitles:@[NSLocalizedString(@"解除合作_yes",nil)]];
                     alertView.specialParentView = self.view;
@@ -480,7 +489,28 @@
         } animated:YES];
     }
 }
-
+//编辑
+-(void)editAction
+{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Brand" bundle:[NSBundle mainBundle]];
+    YYBrandModifyInfoViewController *buyerModifyInfoController = [storyboard instantiateViewControllerWithIdentifier:@"YYBrandModifyInfoViewController"];
+    buyerModifyInfoController.homeInfoModel = _homeInfoModel;
+    WeakSelf(ws);
+    [buyerModifyInfoController setBlock:^(NSString * type) {
+        if([type isEqualToString:@"readEdit"]){
+            //            [self updateEditReadView];
+            //更新编辑按钮
+            if(_block){
+                _block(@"reload",_homeInfoModel.connectStatus);
+            }
+        }
+    }];
+    [buyerModifyInfoController setCancelButtonClicked:^(){
+        [ws.navigationController popViewControllerAnimated:YES];
+        [self updateUI];
+    }];
+    [self.navigationController pushViewController:buyerModifyInfoController animated:YES];
+}
 -(void)showChatView
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Message" bundle:[NSBundle mainBundle]];
@@ -503,15 +533,15 @@
     if(_homeInfoModel == nil){
         return;
     }
-    if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusConnected){
+    if([_homeInfoModel.connectStatus integerValue] == kConnStatus1){
         [self showChatView];
     }else{
         if(_designerId ){
-            if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusInvite || [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusNone){
-                if([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusNone){
+            if([_homeInfoModel.connectStatus integerValue] == kConnStatus0 || [_homeInfoModel.connectStatus integerValue] == kConnStatus){
+                if([_homeInfoModel.connectStatus integerValue] == kConnStatus){
                     [YYConnApi invite:_designerId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                        if(rspStatusAndMessage.status == YYReqStatusCode100){
-                            _homeInfoModel.connectStatus = @(YYUserConnStatusInvite);
+                        if(rspStatusAndMessage.status == kCode100){
+                            _homeInfoModel.connectStatus = @(kConnStatus0);
                             [_headView.oprateBtn setImage:[UIImage imageNamed:@"addbrand_icon"] forState:UIControlStateNormal];
                             [_tableview reloadData];
                             [_headView reloadData];
@@ -526,13 +556,13 @@
                     CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"取消对此品牌的合作邀请吗？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"继续邀请",nil) otherButtonTitles:@[NSLocalizedString(@"取消邀请",nil)]];
                     alertView.specialParentView = self.view;
                     [alertView setAlertViewBlock:^(NSInteger selectedIndex){
-                        if(selectedIndex == 1 && [_homeInfoModel.connectStatus integerValue] == YYUserConnStatusInvite){
+                        if(selectedIndex == 1 && [_homeInfoModel.connectStatus integerValue] == kConnStatus0){
                             [ws oprateConnWithDesigner:_designerId status:4];
                         }
                     }];
                     [alertView show];
                 }
-            }else if ([_homeInfoModel.connectStatus integerValue] == YYUserConnStatusBeInvited){
+            }else if ([_homeInfoModel.connectStatus integerValue] == kConnStatus2){
                 CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"确定品牌的合作邀请吗？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"同意邀请",nil) otherButtonTitles:@[NSLocalizedString(@"拒绝邀请",nil)]];
                 alertView.specialParentView = self.view;
                 [alertView setAlertViewBlock:^(NSInteger selectedIndex){
@@ -551,13 +581,13 @@
 - (void)oprateConnWithDesigner:(NSInteger)designerId status:(NSInteger)status{
     __block NSInteger blockStatus = status;
     [YYConnApi OprateConnWithDesignerBrand:designerId status:status andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if(rspStatusAndMessage.status == YYReqStatusCode100){
+        if(rspStatusAndMessage.status == kCode100){
             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
             if(blockStatus == 2 || blockStatus == 3 || blockStatus == 4){
-                _homeInfoModel.connectStatus = @(YYUserConnStatusNone);
+                _homeInfoModel.connectStatus = @(kConnStatus);
                 [_headView.oprateBtn setImage:[UIImage imageNamed:@"addbrand_icon"] forState:UIControlStateNormal];
             }else{
-                _homeInfoModel.connectStatus = @(YYUserConnStatusConnected);
+                _homeInfoModel.connectStatus = @(kConnStatus1);
                 [_headView.oprateBtn setImage:[UIImage imageNamed:@"topmore_icon"] forState:UIControlStateNormal];
             }
             [_headView reloadData];
@@ -739,4 +769,42 @@
     [super didReceiveMemoryWarning];
 }
 
+//-(void)updateEditReadView
+//{
+//    NSString *CFBundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+//    if([CFBundleVersion integerValue] == 17)
+//    {
+//        _editReadView.hidden = [YYUser getNewsReadStateWithType:2];
+//    }else
+//    {
+//        _editReadView.hidden = YES;
+//    }
+//}
+//#pragma mark - 新手引导页／new相关
+//-(void)showNewTechView
+//{
+//    if(_isHomePage)
+//    {
+//        NSString *CFBundleVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+//        if([CFBundleVersion integerValue] == 17)
+//        {
+//            if(![YYUser getNewsReadStateWithType:1])
+//            {
+//                NSString *imageStr = [LanguageManager isEnglishLanguage]?@"new_edit_mengban_brand_en":@"new_edit_mengban_brand";
+//                _editTechImg = [UIImageView getImgWithImageStr:imageStr];
+//                _editTechImg.contentMode = UIViewContentModeScaleAspectFill;
+//                [self.view.window addSubview:_editTechImg];
+//                _editTechImg.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+//                [_editTechImg addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeEditTechImgAction)]];
+//                [YYUser saveNewsReadStateWithType:1];
+//
+//            }
+//        }
+//    }
+//}
+//-(void)closeEditTechImgAction
+//{
+//    [_editTechImg removeFromSuperview];
+//    _editTechImg = nil;
+//}
 @end

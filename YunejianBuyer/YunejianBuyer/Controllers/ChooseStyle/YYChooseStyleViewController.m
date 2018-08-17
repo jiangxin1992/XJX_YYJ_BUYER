@@ -36,7 +36,7 @@
 #import "YYChooseStyleApi.h"
 #import "YYConnApi.h"
 #import "YYUserApi.h"
-#import "YYStyleOneColorModel.h"
+#import "YYInventoryBoardModel.h"
 
 #define YY_TABBAR_HEIGHT 78
 #define YY_NAVBAR_HEIGHT 20
@@ -333,7 +333,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
 
     [YYChooseStyleApi getOrderingListWithReqModel:_reqModel pageIndex:pageIndex pageSize:YY_COLLECTION_PAGESZIE andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYChooseStyleListModel *chooseStyleListModel, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100 && chooseStyleListModel.result
+        if (rspStatusAndMessage.status == kCode100 && chooseStyleListModel.result
             && [chooseStyleListModel.result count] > 0) {
             ws.currentPageInfo = chooseStyleListModel.pageInfo;
             if (ws.currentPageInfo== nil || ws.currentPageInfo.isFirstPage) {
@@ -352,7 +352,7 @@
             }
         }
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadCollectionViewData];
@@ -362,12 +362,12 @@
 -(void)RequestClassData{
     WeakSelf(ws);
     [YYConnApi getConBrandClassWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYConClass *connClass, NSError *error) {
-        if (rspStatusAndMessage.status == YYReqStatusCode100){
+        if (rspStatusAndMessage.status == kCode100){
             ws.connClass = connClass;
             [self removeAllSuitTypes];
         }
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != YYReqStatusCode100) {
+        if (rspStatusAndMessage.status != kCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
     }];
@@ -752,12 +752,12 @@
     //跳转对应页面
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     
-    YYStyleOneColorModel *infoModel = [self modelTransformByChooseStyleModel:chooseStyleModel];
+    YYInventoryBoardModel *infoModel = [self modelTransformByChooseStyleModel:chooseStyleModel];
     [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
 }
 
--(YYStyleOneColorModel *)modelTransformByChooseStyleModel:(YYChooseStyleModel *)chooseStyleModel{
-    YYStyleOneColorModel *infoModel = [[YYStyleOneColorModel alloc] init];
+-(YYInventoryBoardModel *)modelTransformByChooseStyleModel:(YYChooseStyleModel *)chooseStyleModel{
+    YYInventoryBoardModel *infoModel = [[YYInventoryBoardModel alloc] init];
     infoModel.designerId = chooseStyleModel.designerId;
     infoModel.brandName = chooseStyleModel.brandName;
     infoModel.brandLogo = chooseStyleModel.brandLogo;

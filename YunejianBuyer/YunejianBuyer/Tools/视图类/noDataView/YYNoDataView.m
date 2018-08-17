@@ -29,22 +29,13 @@
         
         __weak UIView *weakSelf = self;
         [label mas_makeConstraints:^(MASConstraintMaker *make) {
+            
+            make.width.mas_equalTo(100);
+            make.height.mas_equalTo(40);
             make.center.mas_equalTo(weakSelf.center);
+            //make.left.mas_equalTo(weakSelf.mas_left).with.offset(100);
+            //make.top.mas_equalTo(weakSelf.mas_top).with.offset(200);
         }];
-        
-        self.tipLabel = [[UILabel alloc] init];
-        self.tipLabel.textColor = [UIColor colorWithHex:@"919191"];
-        self.tipLabel.backgroundColor = [UIColor clearColor];
-        self.tipLabel.textAlignment = NSTextAlignmentCenter;
-        self.tipLabel.font = [UIFont systemFontOfSize:13];
-        self.tipLabel.text = @"";
-        self.tipLabel.numberOfLines = 0;
-        [self addSubview:self.tipLabel];
-        [self.tipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.centerX.mas_equalTo(label.mas_centerX);
-            make.top.mas_equalTo(label.mas_bottom).with.offset(11);
-        }];
-        
     }
     return self;
 }

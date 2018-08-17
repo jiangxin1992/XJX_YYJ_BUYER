@@ -108,7 +108,7 @@
         }
         [ws reloadTableData];
         
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+        [MBProgressHUD hideHUDForView:ws.view animated:YES];
     }];
     
 }
@@ -273,7 +273,7 @@
     WeakSelf(ws);
 
         [YYInventoryApi addStore:modelData adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
 
             if(rspStatusAndMessage.status == kCode100){
                 [ws clearStyleInfo];

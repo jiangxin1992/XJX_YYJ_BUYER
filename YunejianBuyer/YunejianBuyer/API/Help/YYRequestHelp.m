@@ -242,7 +242,7 @@ typedef NS_ENUM(NSInteger, RequestType)
                 rspStatusAndMessage.message = [NSString stringWithFormat:@"错误码为: %i",status.intValue];
             }
             //需要重新登录
-            if (rspStatusAndMessage.status == kCode402) {
+            if (rspStatusAndMessage.status == YYReqStatusCode402) {
                 if(requestGet402Count != 0){//重新获取toke
                     block(nil,nil, currentError, response);
                     return ;
@@ -262,13 +262,13 @@ typedef NS_ENUM(NSInteger, RequestType)
                 YYUser *user = [YYUser currentUser];
                 if (user.email && user.password) {
                     [YYUserApi loginWithUsername:user.email password:md5(user.password) verificationCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUserModel *userModel, NSError *error) {
-                        if (rspStatusAndMessage && (rspStatusAndMessage.status == kCode100 || rspStatusAndMessage.status == kCode1000)) {
-                            YYUser *user = [YYUser currentUser];
-                            NSString *checkStatus = nil;
-                            if(userModel.checkStatus){
-                                checkStatus = [userModel.checkStatus stringValue];
+                        if (rspStatusAndMessage && (rspStatusAndMessage.status == YYReqStatusCode100 || rspStatusAndMessage.status == YYReqStatusCode1000)) {
+                            if([userModel.type integerValue] != YYUserTypeRetailer && [userModel.type integerValue] != YYUserTypeProductManager){
+                                [YYToast showToastWithTitle:NSLocalizedString(@"该账号没有APP登录权限，请在WEB端登录",nil) andDuration:kAlertToastDuration];
+                                return ;
                             }
-                            [user saveUserWithEmail:user.email username:userModel.name password:user.password userType:[userModel.type intValue] userId:userModel.id logo:userModel.logo status:[userModel.authStatus stringValue] checkStatus:checkStatus];
+                            YYUser *user = [YYUser currentUser];
+                            [user saveUserWithEmail:user.email password:user.password userInfo:userModel];
                             [YYRequestHelp increaseOrDecreaseRequestGet402Count:NO];
                             NSMutableDictionary *headDic = [[NSMutableDictionary alloc] initWithDictionary:headers];
                             NSString *tokenValue = [userDefaults objectForKey:kUserLoginTokenKey];
@@ -313,14 +313,14 @@ typedef NS_ENUM(NSInteger, RequestType)
                 //审核功能 老版本(1.2)没
                 if ([requestUrl rangeOfString:kLogin].location != NSNotFound) {
                     //登录接口
-                    if(rspStatusAndMessage.status == kCode100 &&[dataDic objectForKey:@"toMainPage"] != nil){
+                    if(rspStatusAndMessage.status == YYReqStatusCode100 &&[dataDic objectForKey:@"toMainPage"] != nil){
                         NSString *toMainPage = (NSString *)[dataDic objectForKey:@"toMainPage"];
                         if([toMainPage intValue]>0){
                             id expireDate = [dataDic objectForKey:@"expireDate"];
                             if(expireDate == 0 ||(NSNull *)expireDate == [NSNull null]){
-                                rspStatusAndMessage.status = kCode100;
+                                rspStatusAndMessage.status = YYReqStatusCode100;
                             }else{
-                                rspStatusAndMessage.status = kCode1000;
+                                rspStatusAndMessage.status = YYReqStatusCode1000;
                                 rspStatusAndMessage.message = getShowDateByFormatAndTimeInterval(NSLocalizedString(@"请在30天内完成品牌信息，未验证的品牌账号将被锁定（yyyy/MM/dd）",nil),[NSString stringWithFormat:@"%@",expireDate]);
                             }
                         }
@@ -370,8 +370,6 @@ typedef NS_ENUM(NSInteger, RequestType)
     if ([requestUrl rangeOfString:kOrderCreate].location != NSNotFound ||
         [requestUrl rangeOfString:kOrderModify].location != NSNotFound ||
         [requestUrl rangeOfString:kOrderAppend].location != NSNotFound ||
-        [YYRequestHelp checkRequestUrlContain:requestUrl urlkey:kInventoryDemand]  ||
-        [YYRequestHelp checkRequestUrlContain:requestUrl urlkey:kInventoryStore] ||
         [requestUrl rangeOfString:kUploadCertInfo].location != NSNotFound  ||
         [requestUrl rangeOfString:kUpdateCertInfo].location != NSNotFound ||
         [requestUrl rangeOfString:KPostInvisibleInfo].location != NSNotFound
@@ -405,8 +403,6 @@ typedef NS_ENUM(NSInteger, RequestType)
     if ([requestUrl rangeOfString:kOrderCreate].location != NSNotFound ||
         [requestUrl rangeOfString:kOrderModify].location != NSNotFound ||
         [requestUrl rangeOfString:kOrderAppend].location != NSNotFound ||
-        [YYRequestHelp checkRequestUrlContain:requestUrl urlkey:kInventoryDemand]  ||
-        [YYRequestHelp checkRequestUrlContain:requestUrl urlkey:kInventoryStore] ||
         [requestUrl rangeOfString:kUploadCertInfo].location != NSNotFound  ||
         [requestUrl rangeOfString:kUpdateCertInfo].location != NSNotFound ||
         [requestUrl rangeOfString:KPostInvisibleInfo].location != NSNotFound

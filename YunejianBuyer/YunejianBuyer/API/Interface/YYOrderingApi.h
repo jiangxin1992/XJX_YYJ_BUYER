@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "YYOrderingListModel.h"
-#import "YYOrderingHistoryListModel.h"
 #import "YYRspStatusAndMessage.h"
+
+@class YYOrderingListModel,YYOrderingHistoryListModel;
 
 @interface YYOrderingApi : NSObject
 

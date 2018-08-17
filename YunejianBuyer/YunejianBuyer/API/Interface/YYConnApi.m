@@ -7,10 +7,29 @@
 //
 
 #import "YYConnApi.h"
-#import "YYRequestHelp.h"
+
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
+
+// 自定义视图
+
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import "RequestMacro.h"
-#import "UserDefaultsMacro.h"
+#import "YYRequestHelp.h"
 #import "YYHttpHeaderManager.h"
+
+#import "YYConClass.h"
+#import "YYBuyerListModel.h"
+#import "YYConNewBrandModel.h"
+#import "YYConnBuyerListModel.h"
+#import "YYConnBrandInfoListModel.h"
+#import "YYNewConnDesignerListModel.h"
+
 @implementation YYConnApi
 //设计师添加买手店(买手添加设计师)
 + (void)invite:(NSInteger )guestId andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
@@ -137,33 +156,6 @@
             NSLog(@"111");
         }else{
             NSLog(@"111");
-        }
-    }];
-}
-//买手店按条件查询所有设计师(带分页,)
-+ (void)queryDesignerWithQueryStr:(NSString *)queryStr pageIndex:(int)pageIndex pageSize:(int)pageSize andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYConnDesignerListModel *designerListModel,NSError *error))block{
-    // get URL
-    NSString *requestURL = [[[NSUserDefaults standardUserDefaults] objectForKey:kLastYYServerURL] stringByAppendingString:kConnQueryDesignerWithPage];
-    NSDictionary *dic = [YYHttpHeaderManager buildHeadderWithAction:kConnQueryDesignerWithPage params:nil];
-
-    NSMutableDictionary *mutParameters = [[NSMutableDictionary alloc] init];
-    [mutParameters setObject:@(pageIndex) forKey:@"pageIndex"];
-    [mutParameters setObject:@(pageSize) forKey:@"pageSize"];
-
-    if(![NSString isNilOrEmpty:queryStr]){
-        [mutParameters setObject:queryStr forKey:@"queryStr"];
-    }
-    NSDictionary *parameters = [mutParameters copy];
-    NSData *body = [parameters mj_JSONData];
-
-    [YYRequestHelp POST:dic requestUrl:requestURL requestCount:0 requestBody:body andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage,id responseObject, NSError *error, id httpResponse) {
-        if (!error
-            && responseObject) {
-            YYConnDesignerListModel *listModel = [[YYConnDesignerListModel alloc] initWithDictionary:responseObject error:nil];
-            block(rspStatusAndMessage,listModel,error);
-            
-        }else{
-            block(rspStatusAndMessage,nil,error);
         }
     }];
 }

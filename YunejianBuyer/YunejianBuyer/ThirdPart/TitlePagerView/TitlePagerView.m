@@ -75,14 +75,12 @@ static CGFloat TitlePagerViewTitleSpace = 40;
             textLabel.textAlignment = NSTextAlignmentCenter;
             textLabel.font = self.font;
             textLabel.userInteractionEnabled = YES;
-//            textLabel.backgroundColor = [UIColor redColor];
 
             UITapGestureRecognizer *tapTextLabel = [[UITapGestureRecognizer alloc] initWithTarget:weakself action:@selector(didTapTextLabel:)];
             [textLabel addGestureRecognizer:tapTextLabel];
 
             [weakself addSubview:textLabel];
             [weakself.views addObject:textLabel];
-
         }
     }];
 }
@@ -118,6 +116,7 @@ static CGFloat TitlePagerViewTitleSpace = 40;
     CGFloat pageIndicatorXPosition = (((xPosition - SCREEN_WIDTH)/SCREEN_WIDTH) * (self.width - self.pageIndicator.width))/(self.titleArray.count - 1);
     self.pageIndicator.x = pageIndicatorXPosition;
 }
+
 - (void)adjustTitleViewByIndexNew:(NSInteger)index {
     for (UILabel *textLabel in self.subviews) {
         if ([textLabel isKindOfClass:[UILabel class]]) {

@@ -12,9 +12,9 @@
 // 控制器
 #import "YYProtocolViewController.h"
 #import "YYPerfectAuditingViewController.h"
-#import "YYNavigationBarViewController.h"
 
 // 自定义视图
+#import "YYNavView.h"
 #import "YYVisibleUploadImageView.h"
 #import "YYVisibleShopInfoView.h"
 #import "YYMoneyAndBrandView.h"
@@ -34,7 +34,7 @@
 
 @interface YYVisibleShopInfoViewController ()<YYVisibleUploadImageViewDelegate, YYVisibleShopInfoViewDelegate, JRPhotoImageDelegate, YYMoneyAndBrandViewDelegate, YYVisibleSocialContactDelegate>
 /** 导航栏 */
-@property (nonatomic, strong) YYNavigationBarViewController *navigationBarViewController;
+@property (nonatomic, strong) YYNavView *navView;
 
 /** scrollview */
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -120,7 +120,7 @@
     // 展示图片的高度，需要动态计算
     CGFloat buttonW = ([UIScreen mainScreen].bounds.size.width - 52)/3;
     // 三个一行。所以在第2和第5个的时候，重新计算高度
-    if (self.shopInfoView.photoDataArray.count >= 5) {
+    if (self.shopShowPhotoArray.count > 5) {
 
         [self.shopInfoView mas_updateConstraints:^(MASConstraintMaker *make) {
             make.height.mas_equalTo(240 + buttonW*3 + 15);
@@ -129,9 +129,8 @@
         // 动态计算高度
         [self.view layoutIfNeeded];
         CGFloat height = CGRectGetMaxY(self.socialContact.frame);
-        self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height+58);
-
-    }else if (self.shopInfoView.photoDataArray.count >= 2){
+        self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
+    }else if (self.shopShowPhotoArray.count > 2){
 
         [self.shopInfoView mas_updateConstraints:^(MASConstraintMaker *make) {
             make.height.mas_equalTo(240 + buttonW*2 + 15);
@@ -140,7 +139,16 @@
         // 动态计算高度
         [self.view layoutIfNeeded];
         CGFloat height = CGRectGetMaxY(self.socialContact.frame);
-        self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height+58);
+        self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
+    }else {
+        [self.shopInfoView mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(240 + buttonW + 15);
+        }];
+        
+        // 动态计算高度
+        [self.view layoutIfNeeded];
+        CGFloat height = CGRectGetMaxY(self.socialContact.frame);
+        self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
     }
 }
 
@@ -162,8 +170,6 @@
                         // 店铺营业执照
                         self.model.licenceFile = imageUrl;
                         self.uploadImage.shopPhoto = data;
-
-
                     }else if([sign isEqualToString:@"man"]){
                         // 法人身份证照片
                         self.model.legalPersonFiles = imageUrl;
@@ -185,7 +191,7 @@
                             // 动态计算高度
                             [self.view layoutIfNeeded];
                             CGFloat height = CGRectGetMaxY(self.socialContact.frame);
-                            self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height+58);
+                            self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
 
                         }else if (self.posterView.tag == 5){
                             [self.shopInfoView mas_updateConstraints:^(MASConstraintMaker *make) {
@@ -195,7 +201,7 @@
                             // 动态计算高度
                             [self.view layoutIfNeeded];
                             CGFloat height = CGRectGetMaxY(self.socialContact.frame);
-                            self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height+58);
+                            self.scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
                         }
                     }
                 }
@@ -319,22 +325,21 @@
     NSString *fb = self.contactInfoArray[3];
 
     NSMutableArray *infos = [NSMutableArray array];
-    if (![wechat isNilOrEmpty]) {
+    if (![NSString isNilOrEmpty:wechat]) {
         NSDictionary *dict = @{@"socialType":@1, @"socialName": wechat};
         [infos addObject:dict];
     }
-
-    if (![xinlang isNilOrEmpty]) {
+    if (![NSString isNilOrEmpty:xinlang]) {
         NSDictionary *dict = @{@"socialType":@0, @"socialName": xinlang};
         [infos addObject:dict];
     }
 
-    if (![ins isNilOrEmpty]) {
+    if (![NSString isNilOrEmpty:ins]) {
         NSDictionary *dict = @{@"socialType":@3, @"socialName": ins};
         [infos addObject:dict];
     }
 
-    if (![fb isNilOrEmpty]) {
+    if (![NSString isNilOrEmpty:fb]) {
         NSDictionary *dict = @{@"socialType":@2, @"socialName": fb};
         [infos addObject:dict];
     }
@@ -342,7 +347,7 @@
     self.model.userSocialInfos = infos;
 
     [YYAuditingApi postInvisibleWithModel:self.model AndBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             YYPerfectAuditingViewController *audit = [[YYPerfectAuditingViewController alloc] init];
             [self.navigationController pushViewController:audit animated:YES];
         }else{
@@ -373,22 +378,8 @@
 // 创建子控件
 - (void)PrepareUI{
     self.view.backgroundColor =_define_white_color;
-
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    self.navigationBarViewController = navigationBarViewController;
-    navigationBarViewController.previousTitle = @"";
-    navigationBarViewController.nowTitle = NSLocalizedString(@"买手店入驻",nil);
-    [self.view addSubview:navigationBarViewController.view];
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.mas_topLayoutGuideBottom).with.offset(0);
-        make.left.right.mas_equalTo(0);
-        make.height.mas_equalTo(45);
-    }];
     
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"买手店入驻",nil) WithSuperView:self.view haveStatusView:YES];
 
     // 提交按钮
     UIButton *submitButton  = [[UIButton alloc] init];
@@ -408,9 +399,10 @@
     self.scrollView = scrollView;
     scrollView.backgroundColor = [UIColor colorWithHex:@"EFEFEF"];
     [self.view addSubview:scrollView];
+    WeakSelf(ws);
     [scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.mas_equalTo(0);
-        make.top.mas_equalTo(navigationBarViewController.view.mas_bottom).with.offset(0);
+        make.top.mas_equalTo(ws.navView.mas_bottom).with.offset(0);
         make.bottom.mas_equalTo(submitButton.mas_top).with.offset(0);
     }];
 
@@ -476,7 +468,7 @@
     // 动态计算高度
     [self.view layoutIfNeeded];
     CGFloat height = CGRectGetMaxY(socialContact.frame);
-    scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height+58);
+    scrollView.contentSize = CGSizeMake(self.view.bounds.size.width, height);
 
     self.view.shiftHeightAsDodgeViewForMLInputDodger = 40.0f;
     [self.view registerAsDodgeViewForMLInputDodger];

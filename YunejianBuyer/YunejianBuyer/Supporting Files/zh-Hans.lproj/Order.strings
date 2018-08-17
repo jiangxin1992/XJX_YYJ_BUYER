@@ -1,6 +1,6 @@
 
-/* Class = "UILabel"; text = "本次付款"; ObjectID = "1WX-rK-lua"; */
-"1WX-rK-lua.text" = "本次付款";
+/* Class = "UILabel"; text = "本次支付"; ObjectID = "1WX-rK-lua"; */
+"1WX-rK-lua.text" = "本次支付";
 
 /* Class = "UILabel"; text = "订单号"; ObjectID = "1h2-gZ-JBI"; */
 "1h2-gZ-JBI.text" = "订单号";
@@ -23,6 +23,9 @@
 /* Class = "UILabel"; text = "已经支付"; ObjectID = "ARX-Gc-cVX"; */
 "ARX-Gc-cVX.text" = "已经支付";
 
+/* Class = "UILabel"; text = "待审核"; ObjectID = "D8c-wZ-YId"; */
+"D8c-wZ-YId.text" = "待审核";
+
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Dbn-EL-erM"; */
 "Dbn-EL-erM.normalTitle" = "Button";
 
@@ -38,14 +41,17 @@
 /* Class = "UIButton"; normalTitle = "税制"; ObjectID = "Kbb-Y1-Yni"; */
 "Kbb-Y1-Yni.normalTitle" = "税制";
 
-/* Class = "UILabel"; text = "本次付款"; ObjectID = "M2V-6f-QOz"; */
-"M2V-6f-QOz.text" = "本次付款";
+/* Class = "UILabel"; text = "本次支付"; ObjectID = "M2V-6f-QOz"; */
+"M2V-6f-QOz.text" = "本次支付";
 
 /* Class = "UILabel"; text = "已成功付款"; ObjectID = "NFV-qM-mSk"; */
 "NFV-qM-mSk.text" = "已成功付款";
 
 /* Class = "UILabel"; text = "尚未支付"; ObjectID = "P1V-97-sIv"; */
 "P1V-97-sIv.text" = "尚未支付";
+
+/* Class = "UILabel"; text = "待对方退款给您"; ObjectID = "z2G-Kb-rMI"; */
+"z2G-Kb-rMI.text" = "待对方退款给您";
 
 /* Class = "UIButton"; normalTitle = "完成"; ObjectID = "Sh8-1F-cvr"; */
 "Sh8-1F-cvr.normalTitle" = "完成";
@@ -59,8 +65,8 @@
 /* Class = "UILabel"; text = "Label"; ObjectID = "Vrd-fF-hYn"; */
 "Vrd-fF-hYn.text" = "Label";
 
-/* Class = "UILabel"; text = "付款方式"; ObjectID = "W3K-jS-Emv"; */
-"W3K-jS-Emv.text" = "付款方式";
+/* Class = "UILabel"; text = "支付方式"; ObjectID = "W3K-jS-Emv"; */
+"W3K-jS-Emv.text" = "支付方式";
 
 /* Class = "UIButton"; normalTitle = "确认添加"; ObjectID = "YKr-1s-w0R"; */
 "YKr-1s-w0R.normalTitle" = "确认添加";
@@ -109,9 +115,6 @@
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "vgP-lc-AvE"; */
 "vgP-lc-AvE.text" = "Label";
-
-/* Class = "UIButton"; normalTitle = "填写的比例需小于余款的比例"; ObjectID = "wIt-w3-RHt"; */
-"wIt-w3-RHt.normalTitle" = "填写的比例需小于余款的比例";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "yk2-qW-GqN"; */
 "yk2-qW-GqN.text" = "Label";

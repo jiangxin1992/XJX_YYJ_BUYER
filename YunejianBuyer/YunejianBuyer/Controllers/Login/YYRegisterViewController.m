@@ -14,13 +14,14 @@
 
 // 自定义视图
 #import "YYPickView.h"
+#import "MLInputDodger.h"
 #import "YYStepViewCell.h"
+#import "YYCountryPickView.h"
+#import "YYProtocolViewController.h"
 #import "YYRegisterTableTitleCell.h"
 #import "YYRegisterTableInputCell.h"
 #import "YYRegisterTableSubmitCell.h"
-#import "YYProtocolViewController.h"
 #import "YYRegisterTableEmailVerifyCell.h"
-#import "YYCountryPickView.h"
 
 // 接口
 #import "YYUserApi.h"
@@ -29,10 +30,10 @@
 
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import <MBProgressHUD.h>
-#import "MLInputDodger.h"
 #import "YYTableViewCellData.h"
 #import "YYTableViewCellInfoModel.h"
 #import "YYStepInfoModel.h"
+#import "YYCountryListModel.h"
 #import "Header.h"
 #import "regular.h"
 #import "YYYellowPanelManage.h"
@@ -76,7 +77,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if (self.registerType == kBuyerStorUserType) {
+    if (self.registerType == YYUserTypeRetailer) {
         [MobClick beginLogPageView:kYYPageRegisterBuyerStorUser];
     } else if (self.registerType == kEmailRegisterType) {
         [MobClick beginLogPageView:kYYPageRegisterEmailRegister];
@@ -85,7 +86,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    if (self.registerType == kBuyerStorUserType) {
+    if (self.registerType == YYUserTypeRetailer) {
         [MobClick endLogPageView:kYYPageRegisterBuyerStorUser];
     } else if (self.registerType == kEmailRegisterType) {
         [MobClick endLogPageView:kYYPageRegisterEmailRegister];
@@ -114,17 +115,7 @@
 
 - (void)PrepareUI{
     self.view.backgroundColor = _define_white_color;
-    
     self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"买手店入驻",nil) WithSuperView: self.view haveStatusView:YES];
-    
-    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
-    [self.navView addSubview:backBtn];
-    [backBtn addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
-    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.left.mas_equalTo(0);
-        make.width.mas_equalTo(40);
-        make.bottom.mas_equalTo(-1);
-    }];
 }
 
 #pragma mark - --------------UIConfig----------------------
@@ -150,12 +141,12 @@
 }
 
 - (void)reloadUI {
-    if (self.registerType == kBuyerStorUserType) {
-        self.tableView.frame = CGRectMake(0, kStatusBarAndNavigationBarHeight, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - kStatusBarAndNavigationBarHeight - 58 - (kIPhoneX?34.f:0.f));
+    if (self.registerType == YYUserTypeRetailer) {
+        self.tableView.frame = CGRectMake(0, kStatusBarAndNavigationBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - kStatusBarAndNavigationBarHeight - kTabbarAndBottomSafeAreaHeight);
         self.submitButton.hidden = NO;
-        self.submitButton.frame = CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds) - 58 - (kIPhoneX?34.f:0.f), CGRectGetWidth([UIScreen mainScreen].bounds), 58);
+        self.submitButton.frame = CGRectMake(0, SCREEN_HEIGHT - kTabbarAndBottomSafeAreaHeight, SCREEN_WIDTH, 58);
     } else if (self.registerType == kEmailRegisterType) {
-        self.tableView.frame = CGRectMake(0, kStatusBarAndNavigationBarHeight, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - kStatusBarAndNavigationBarHeight);
+        self.tableView.frame = CGRectMake(0, kStatusBarAndNavigationBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - kStatusBarAndNavigationBarHeight);
         self.submitButton.hidden = YES;
         self.submitButton.frame = CGRectZero;
     }
@@ -170,7 +161,7 @@
     __block NSString *blockEmailstr = infoModel.value;
     [YYUserApi registerBuyerWithData:paramsArr andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if( rspStatusAndMessage.status == kCode100){
+        if( rspStatusAndMessage.status == YYReqStatusCode100){
             //直接请求登录接口？
             [YYToast showToastWithView:self.view title:NSLocalizedString(@"注册成功！",nil) andDuration:kAlertToastDuration];
             self.registerType = kEmailRegisterType;
@@ -189,7 +180,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:NO];
     [YYUserApi getCountryInfoWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             if (block) {
                 block(countryListModel);
             }
@@ -308,7 +299,7 @@
     NSArray *data = [self.cellDataArrays objectAtIndex:indexPath.section];
     YYTableViewCellData *cellData = [data objectAtIndex:indexPath.row];
     if (cellData.selectedCellBlock) {
-        cellData.selectedCellBlock(indexPath);
+        cellData.selectedCellBlock(tableView, indexPath);
     }
 }
 
@@ -405,10 +396,6 @@
 }
 
 #pragma mark - --------------自定义响应----------------------
-- (void)goBack {
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
 -(void)countryCodeButtonClicked{
     if(self.countryCodePickerView == nil){
         NSArray *pickData = getContactLocalData();
@@ -453,7 +440,7 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [YYUserApi getSubCountryInfoWithCountryID:[self.currentNationID integerValue] WithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSInteger impId,NSError *error) {
             [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 if(countryListModel.result.count){
                     self.provinceInfo = countryListModel;
                 }else{
@@ -535,7 +522,7 @@
             verifyRow ++;
         }
     }
-    if(self.registerType == kBuyerStorUserType){
+    if(self.registerType == YYUserTypeRetailer){
         [self registerBuyerWithParams:paramsArr];
     }else if (self.registerType == kEmailRegisterType) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
@@ -547,7 +534,7 @@
 - (void)buildTableViewDataSource {
     WeakSelf(ws);
     NSMutableArray *arrays = [NSMutableArray array];
-    if (self.registerType == kBuyerStorUserType) {
+    if (self.registerType == YYUserTypeRetailer) {
         if (YES) {
             NSMutableArray *array = [NSMutableArray array];
             if (YES) {
@@ -601,7 +588,7 @@
                 info.tipStr = @"infoposition_icon";
                 info.value = [[NSString alloc] initWithFormat:@"%@/721", NSLocalizedString(@"中国",nil)];
                 data.object = info;
-                [data setSelectedCellBlock:^(NSIndexPath *indexPath) {
+                [data setSelectedCellBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
                     [ws countryButtonClicked];
                 }];
                 [array addObject:data];
@@ -615,7 +602,7 @@
                 info.ismust = 1;
                 info.title = NSLocalizedString(@"所在省/市/区",nil);
                 data.object = info;
-                [data setSelectedCellBlock:^(NSIndexPath *indexPath) {
+                [data setSelectedCellBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
                     [ws provinecesAndCityButtonClicked];
                 }];
                 [array addObject:data];
@@ -655,7 +642,7 @@
                 info.tipStr = @"infophone_icon";
                 info.value = NSLocalizedString(@"+86 中国",nil);
                 data.object = info;
-                [data setSelectedCellBlock:^(NSIndexPath *indexPath) {
+                [data setSelectedCellBlock:^(UITableView *tableView, NSIndexPath *indexPath) {
                     [ws countryCodeButtonClicked];
                 }];
                 [array addObject:data];

@@ -11,12 +11,11 @@
 // c文件 —> 系统文件（c文件在前）
 
 // 控制器
-#import "YYNavigationBarViewController.h"
-#import "YYBrandSeriesListViewController.h"
 #import "YYStyleDetailViewController.h"
 #import "YYCartDetailViewController.h"
 
 // 自定义视图
+#import "YYNavView.h"
 #import "MBProgressHUD.h"
 #import "YYDateRangeItemCell.h"
 #import "YYSeriesInfoViewCell.h"
@@ -32,8 +31,12 @@
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import <MJRefresh.h>
 
+#import "YYPageInfoModel.h"
 #import "YYOrderInfoModel.h"
 #import "YYSeriesInfoModel.h"
+#import "YYOpusSeriesModel.h"
+#import "YYOpusStyleListModel.h"
+#import "YYSeriesInfoDetailModel.h"
 #import "YYStylesAndTotalPriceModel.h"
 #import "YYBrandSeriesToCartTempModel.h"
 
@@ -46,20 +49,18 @@
 @interface YYBrandSeriesViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UIScrollViewDelegate,UITextFieldDelegate,YYTableCellDelegate,UITableViewDelegate,UITableViewDataSource>
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (weak, nonatomic) IBOutlet UIView *searchBackView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (strong, nonatomic) YYNavigationBarViewController *navigationBarViewController;
-@property (weak, nonatomic) IBOutlet UIButton *searchButton;
-@property (weak, nonatomic) IBOutlet UITextField *searchField;
-@property (weak, nonatomic) IBOutlet UIView *searchView;
+@property (strong, nonatomic) YYNavView *navView;
+@property (strong, nonatomic) UIButton *searchButton;
+@property (strong, nonatomic) UITextField *searchField;
+@property (strong, nonatomic) UIView *searchView;
 
-@property (weak, nonatomic) IBOutlet YYTopBarShoppingCarButton *topBarShoppingCarButton;
+@property (strong, nonatomic) YYTopBarShoppingCarButton *topBarShoppingCarButton;
 @property (nonatomic,strong) YYPageInfoModel *currentPageInfo;
 @property (nonatomic,strong) NSMutableArray *stylesListArray;
 @property(nonatomic,strong) YYSeriesInfoDetailModel *seriesInfoDetailModel;
 
 //查询结果
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *searchViewTopLayoutConstraint;
 @property (nonatomic,assign) BOOL isSearchView;
 @property (nonatomic,copy) NSString *searchFieldStr;
 @property (nonatomic,strong) NSMutableArray *searchResultArray;
@@ -79,7 +80,6 @@
 @property (assign, nonatomic) NSInteger selectListDataType;//0波段 1selectTaxType
 @property (strong, nonatomic) CMAlertView *selectListAlert;
 @property (nonatomic,strong) UITableView *selectListTableView;
-@property (nonatomic,strong) YYBrandSeriesListViewController *seriesListViewController;
 
 @property (nonatomic)BOOL isDetail;
 
@@ -153,49 +153,13 @@ static NSInteger headViewHeight = 37;
     [self updateShoppingCar];
 }
 - (void)PrepareUI{
-    _searchButton.layer.masksToBounds = YES;
-    _searchButton.layer.cornerRadius = 3.0f;
-
-    _searchBackView.layer.masksToBounds = YES;
-    _searchBackView.layer.cornerRadius = 3.0f;
-
-    if(IsPhone6_gt){
-        [_searchButton.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
-    }else{
-        [_searchButton.titleLabel setFont:[UIFont systemFontOfSize:12.0f]];
-    }
-
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    self.navigationBarViewController = navigationBarViewController;
-    navigationBarViewController.nowTitle = @"";
-    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-
-    }];
-
-    WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            [ws.navigationController popViewControllerAnimated:YES];
-            blockVc = nil;
-        }
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
+    [self initShoppingCartButton];
+    self.searchButton = [self createSearchButton];
+    [self.navView setNavCustomView:self.searchButton];
+    [self initSearchView];
 
     _dateRangeFilterView.hidden = YES;
-    _searchField.delegate = self;
-
-    self.topBarShoppingCarButton.isRight = NO;
-    [self.topBarShoppingCarButton initButton];
-    [self updateShoppingCar];
-    [self.topBarShoppingCarButton addTarget:self action:@selector(shoppingCarButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
 
     [self addHeader];
     [self addFooter];
@@ -205,7 +169,6 @@ static NSInteger headViewHeight = 37;
     RBCollectionViewBalancedColumnLayout * layout = (id)self.collectionView.collectionViewLayout;
     layout.interItemSpacingY = 15;
     layout.stickyHeader = NO;
-
 }
 
 #pragma mark - --------------UIConfig----------------------
@@ -235,7 +198,7 @@ static NSInteger headViewHeight = 37;
 -(void)loadSeriesInfo{
     WeakSelf(ws);
     [YYOpusApi getConnSeriesInfoWithId:_designerId seriesId:_seriesId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100){
+        if (rspStatusAndMessage.status == YYReqStatusCode100){
             ws.seriesInfoDetailModel = infoDetailModel;
             NSComparisonResult compareResult = NSOrderedDescending;
             if(ws.seriesInfoDetailModel.series.orderDueTime !=nil){
@@ -244,7 +207,7 @@ static NSInteger headViewHeight = 37;
             self.orderDueCompareResult = compareResult;
         }
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != kCode100) {
+        if (rspStatusAndMessage.status != YYReqStatusCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadCollectionViewData];
@@ -254,7 +217,7 @@ static NSInteger headViewHeight = 37;
 - (void)loadDataByPageIndex:(int)pageIndex queryStr:(NSString*)queryStr{
     WeakSelf(ws);
     [YYOpusApi getConnStyleListWithDesignerId:_designerId seriesId:_seriesId orderBy:nil queryStr:queryStr pageIndex:pageIndex pageSize:8 andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOpusStyleListModel *opusStyleListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100 && opusStyleListModel.result
+        if (rspStatusAndMessage.status == YYReqStatusCode100 && opusStyleListModel.result
             ) {
             if(!_isSearchView){
                 ws.currentPageInfo = opusStyleListModel.pageInfo;
@@ -273,7 +236,7 @@ static NSInteger headViewHeight = 37;
         }
 
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != kCode100) {
+        if (rspStatusAndMessage.status != YYReqStatusCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadCollectionViewData];
@@ -285,7 +248,7 @@ static NSInteger headViewHeight = 37;
     WeakSelf(ws);
     [YYOpusApi getStyleInfoByStyleId:styleId orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYStyleInfoModel *styleInfoModel, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (!error && rspStatusAndMessage.status == kCode100) {
+        if (!error && rspStatusAndMessage.status == YYReqStatusCode100) {
             if (successBlock) {
                 successBlock(styleInfoModel);
             }
@@ -422,7 +385,7 @@ static NSInteger headViewHeight = 37;
 }
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(indexPath.section == 0 || ([_searchResultArray isNilOrEmpty]&&[_filterResultArray isNilOrEmpty]&&[_stylesListArray isNilOrEmpty]) || !self.seriesInfoDetailModel){
+    if(indexPath.section == 0 || ([NSMutableArray isNilOrEmpty:_searchResultArray]&&[NSMutableArray isNilOrEmpty:_filterResultArray]&&[NSMutableArray isNilOrEmpty:_stylesListArray]) || !self.seriesInfoDetailModel){
         return;
     }
 
@@ -589,7 +552,7 @@ static NSInteger headViewHeight = 37;
 
     if(_isSearchView){
         //显示
-        if([_searchResultArray isNilOrEmpty]){
+        if([NSMutableArray isNilOrEmpty:_searchResultArray]){
             _tempHeadView.hidden = YES;
         }else{
             _tempHeadView.hidden = NO;
@@ -1007,6 +970,7 @@ static NSInteger headViewHeight = 37;
         [ws showShoppingView:styleInfoModel];
     }];
 }
+
 #pragma mark - --------------自定义响应----------------------
 //进入购物车
 - (void)shoppingCarButtonClicked:(id)sender{
@@ -1037,7 +1001,7 @@ static NSInteger headViewHeight = 37;
 
     [self presentViewController:nav animated:YES completion:nil];
 }
-- (IBAction)shoppingCarClicked:(id)sender{}
+
 - (IBAction)filterDateRangHandler:(id)sender {
     if(_seriesInfoDetailModel == nil || [_seriesInfoDetailModel.dateRanges count] == 0){
         return;
@@ -1054,18 +1018,16 @@ static NSInteger headViewHeight = 37;
     [_selectListAlert show];
 }
 //search
-- (IBAction)showSearchView:(id)sender {
+- (void)showSearchView:(id)sender {
     if (_searchView.hidden == YES) {
         _searchView.hidden = NO;
         _searchField.text = nil;
         _searchFieldStr = @"";
         _searchView.alpha = 0.0;
         self.searchResultArray = [[NSMutableArray alloc] init];
-        _searchViewTopLayoutConstraint.constant = -44;
         [_searchView layoutIfNeeded];
         [UIView animateWithDuration:0.3 animations:^{
             _searchView.alpha = 1.0;
-            _searchViewTopLayoutConstraint.constant = 0;
             [_searchView layoutIfNeeded];
         } completion:^(BOOL finished) {
             [_searchField becomeFirstResponder];
@@ -1075,14 +1037,12 @@ static NSInteger headViewHeight = 37;
         }];
     }
 }
-- (IBAction)hideSearchView:(id)sender {
+- (void)hideSearchView:(id)sender {
     if ( _searchView.hidden == NO) {
         _searchFieldStr = @"";
         _searchView.alpha = 1.0;
-        _searchViewTopLayoutConstraint.constant = 0;
         [_searchView layoutIfNeeded];
         [UIView animateWithDuration:0.3 animations:^{
-            _searchViewTopLayoutConstraint.constant = -44;
             _searchView.alpha = 0.0;
             [_searchView layoutIfNeeded];
         } completion:^(BOOL finished) {
@@ -1098,6 +1058,109 @@ static NSInteger headViewHeight = 37;
 }
 
 #pragma mark - --------------自定义方法----------------------
+- (void)initShoppingCartButton {
+    self.topBarShoppingCarButton = [[YYTopBarShoppingCarButton alloc] init];
+    self.topBarShoppingCarButton.isRight = NO;
+    [self.topBarShoppingCarButton initButton];
+    [self updateShoppingCar];
+    [self.topBarShoppingCarButton addTarget:self action:@selector(shoppingCarButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.navView addSubview:self.topBarShoppingCarButton];
+    [self.topBarShoppingCarButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(50);
+        make.height.mas_equalTo(45);
+        make.top.mas_equalTo(kStatusBarHeight);
+        make.bottom.mas_equalTo(-1);
+        make.right.mas_equalTo(0);
+    }];
+}
+
+- (UIButton *)createSearchButton {
+    UIButton * searchButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [searchButton setFrame:CGRectMake(0, 0, CGRectGetWidth([UIScreen mainScreen].bounds) - 50 * 2, 30)];
+    [searchButton setTitle:NSLocalizedString(@"输入款式名称/款号/颜色搜索", nil) forState:UIControlStateNormal];
+    [searchButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+    if(IsPhone6_gt){
+        [searchButton.titleLabel setFont:[UIFont systemFontOfSize:14.0f]];
+    }else{
+        [searchButton.titleLabel setFont:[UIFont systemFontOfSize:12.0f]];
+    }
+    searchButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [searchButton setTitleEdgeInsets:UIEdgeInsetsMake(0, 14, 0, 0)];
+    [searchButton setImage:[UIImage imageNamed:@"search_Img"] forState:UIControlStateNormal];
+    [searchButton setImageEdgeInsets:UIEdgeInsetsMake(0, 8, 0, 0)];
+    searchButton.layer.masksToBounds = YES;
+    searchButton.layer.cornerRadius = 3.0f;
+    searchButton.backgroundColor = [UIColor colorWithHex:@"efefef"];
+    [searchButton addTarget:self action:@selector(showSearchView:) forControlEvents:UIControlEventTouchUpInside];
+    return searchButton;
+}
+
+- (void)initSearchView {
+    self.searchView = [[UIView alloc] init];
+    self.searchView.backgroundColor = _define_white_color;
+    self.searchView.hidden = YES;
+    [self.navView addSubview:self.searchView];
+    [self.searchView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(44);
+        make.top.mas_equalTo(kStatusBarHeight);
+        make.left.right.mas_equalTo(0);
+    }];
+    
+    UIView *searchBackView = [[UIView alloc] init];
+    searchBackView.backgroundColor = [UIColor colorWithHex:@"efefef"];
+    searchBackView.layer.masksToBounds = YES;
+    searchBackView.layer.cornerRadius = 3.0f;
+    [self.searchView addSubview:searchBackView];
+    [searchBackView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(30);
+        make.centerY.mas_equalTo(0);
+        make.left.mas_equalTo(13);
+    }];
+    
+    UIButton *iconButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [iconButton setImage:[UIImage imageNamed:@"search_Img"] forState:UIControlStateNormal];
+    iconButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    [searchBackView addSubview:iconButton];
+    [iconButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(18);
+        make.height.mas_equalTo(22);
+        make.centerY.mas_equalTo(0);
+        make.left.mas_equalTo(10);
+    }];
+    
+    self.searchField = [[UITextField alloc] init];
+    self.searchField.delegate = self;
+    self.searchField.borderStyle = UITextBorderStyleNone;
+    self.searchField.returnKeyType = UIReturnKeySearch;
+    self.searchField.backgroundColor = [UIColor colorWithHex:@"efefef"];
+    self.searchField.placeholder = NSLocalizedString(@"输入款式名称/款号/颜色搜索", nil);
+    if (IsPhone6_gt) {
+        self.searchField.font = [UIFont systemFontOfSize:14];
+    }else {
+        self.searchField.font = [UIFont systemFontOfSize:12];
+    }
+    self.searchField.clearButtonMode = UITextFieldViewModeAlways;
+    [searchBackView addSubview:self.searchField];
+    [self.searchField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.bottom.right.mas_equalTo(0);
+        make.left.mas_equalTo(iconButton.mas_right);
+    }];
+    
+    UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [cancelButton setTitle:NSLocalizedString(@"取消", nil) forState:UIControlStateNormal];
+    [cancelButton setTitleColor:[UIColor colorWithHex:@"919191"] forState:UIControlStateNormal];
+    cancelButton.titleLabel.font = [UIFont systemFontOfSize:18];
+    cancelButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+    [cancelButton addTarget:self action:@selector(hideSearchView:) forControlEvents:UIControlEventTouchUpInside];
+    [self.searchView addSubview:cancelButton];
+    [cancelButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(60);
+        make.height.mas_equalTo(44);
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(searchBackView.mas_right);
+        make.right.mas_equalTo(-13);
+    }];
+}
 
 - (void)updateShoppingCar{
     WeakSelf(ws);
@@ -1105,7 +1168,7 @@ static NSInteger headViewHeight = 37;
         dispatch_async(dispatch_get_main_queue(), ^{
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             ws.stylesAndTotalPriceModel = getLocalShoppingCartStyleCount(appdelegate.cartDesignerIdArray);
-            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%i", self.stylesAndTotalPriceModel.totalStyles]];
+            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%li", self.stylesAndTotalPriceModel.totalStyles]];
         });
     });
 }
@@ -1114,7 +1177,7 @@ static NSInteger headViewHeight = 37;
     [self.collectionView.mj_header endRefreshing];
     [self.collectionView.mj_footer endRefreshing];
     if(_isSearchView){
-        if([_searchResultArray isNilOrEmpty]){
+        if([NSMutableArray isNilOrEmpty:_searchResultArray]){
             _collectionViewTopLayout.constant = 0;
         }else{
             _collectionViewTopLayout.constant = YY_COLLECTION_HEADERVIEW_HEIGHT;
@@ -1190,7 +1253,7 @@ static NSInteger headViewHeight = 37;
     BOOL iscollect = [type isEqualToString:@"go_collect"];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYOpusApi updateSeriesCollectStateBySeriesId:_seriesId isCollect:iscollect andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             self.seriesInfoDetailModel.series.collect = @(iscollect);
             NSString *alertStr = @"";
             if([self.seriesInfoDetailModel.series.collect boolValue]){
@@ -1212,7 +1275,7 @@ static NSInteger headViewHeight = 37;
             _dateRangeTitleLabel.text = [NSString stringWithFormat:NSLocalizedString(@"共分%lu个波段",nil),(unsigned long)[_seriesInfoDetailModel.dateRanges count]];
             _dateRangeValueLabel.text = [NSString stringWithFormat:@"%@-%@",getShowDateByFormatAndTimeInterval(@"yyyy/MM/dd",[_seriesInfoDetailModel.series.supplyStartTime stringValue]),getShowDateByFormatAndTimeInterval(@"yyyy/MM/dd",[_seriesInfoDetailModel.series.supplyEndTime stringValue])];
         }else{
-            _dateRangeTitleLabel.text =  [NSString stringWithFormat:@"%@：%@",NSLocalizedString(@"波段",nil),dateRange.name];
+            _dateRangeTitleLabel.text =  [NSString stringWithFormat:@"%@%@%@",NSLocalizedString(@"波段",nil),NSLocalizedString(@"：",nil),dateRange.name];
             _dateRangeValueLabel.text = [NSString stringWithFormat:@"%@-%@",getShowDateByFormatAndTimeInterval(@"yyyy/MM/dd",[dateRange.start stringValue]),getShowDateByFormatAndTimeInterval(@"yyyy/MM/dd",[dateRange.end stringValue])];
         }
     }

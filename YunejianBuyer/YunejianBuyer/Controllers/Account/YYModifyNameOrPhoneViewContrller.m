@@ -6,17 +6,26 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYModifyNameOrPhoneViewContrller.h"
 
+// 自定义视图
+#import "YYNavView.h"
+#import "YYPickView.h"
+
+// 接口
 #import "YYUserApi.h"
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import "YYRspStatusAndMessage.h"
 #import "RegexKitLite.h"
-#import "YYNavigationBarViewController.h"
-#import "YYPickView.h"
 #import "regular.h"
 #import "YYVerifyTool.h"
 
-//static CGFloat yellowView_default_constant = 233;
 
 @interface YYModifyNameOrPhoneViewContrller ()<UITextFieldDelegate,YYPickViewDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *chooseCountryCodeButton;
@@ -35,6 +44,7 @@
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UIButton *saveBtn;
 
+@property (nonatomic, strong) YYNavView *navView;
 @property(nonatomic,strong) YYPickView *countryCodePickerView;
 
 @end
@@ -70,9 +80,12 @@
 -(void)PrepareData{}
 -(void)PrepareUI{
     _phoneTipButton.hidden = YES;
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
+    
+    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
+    WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
     _countryCodeTitleLabel.text = NSLocalizedString(@"地区/区号",nil);
     _countryCodeLabel.text = @"";
@@ -80,7 +93,7 @@
     if (_currentShowType == AccountUserInfoTypeUsername) {
         _titleLabel.text = NSLocalizedString(@"用户名", nil);
         _textField.keyboardType = UIKeyboardTypeDefault;
-        navigationBarViewController.nowTitle = NSLocalizedString(@"修改用户名",nil);
+        [self.navView setNavTitle:NSLocalizedString(@"修改用户名",nil)];
         _chooseCountryCodeButton.hidden = YES;
         _countryCodeTitleLabel.hidden = YES;
         _countryCodeLabel.hidden = YES;
@@ -92,7 +105,7 @@
     }else if (_currentShowType == AccountUserInfoTypePhone) {
         _titleLabel.text = NSLocalizedString(@"手机号", nil);
         _textField.keyboardType = UIKeyboardTypePhonePad;
-        navigationBarViewController.nowTitle = NSLocalizedString(@"修改电话",nil);
+        [self.navView setNavTitle:NSLocalizedString(@"修改电话",nil)];
         _chooseCountryCodeButton.hidden = NO;
         _countryCodeTitleLabel.hidden = NO;
         _countryCodeLabel.hidden = NO;
@@ -103,25 +116,6 @@
         _downLabelTopLayout.constant = 56;
     }
     
-    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    //[_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
-    
-    WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            [ws cancelClicked:nil];
-            blockVc = nil;
-        }
-    }];
     _saveBtn.layer.cornerRadius = 2.5;
     _saveBtn.layer.masksToBounds = YES;
     
@@ -148,16 +142,22 @@
             _countryCodeLabel.text = getCountryCodeDetailDes(_userInfo.phone);
         }
     }
-    
 }
+
 -(void)toobarDonBtnHaveClick:(YYPickView *)pickView resultString:(NSString *)resultString{
     //    +44 英国
     _countryCodeLabel.text = resultString;
 }
+
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [regular dismissKeyborad];
 }
+
 #pragma mark - SomeAction
+- (void)goBack {
+    [self cancelClicked:nil];
+}
+
 -(NSInteger )getCountryCode{
     NSInteger countryCode = 86;
     NSArray *getCodeArr = [_countryCodeLabel.text componentsSeparatedByString:@" "];
@@ -247,7 +247,7 @@
         phone = textFiedlValue;
     }
     
-    if (_userInfo.userType == kBuyerStorUserType){
+    if (_userInfo.userType == YYUserTypeRetailer){
         NSString *_province = [LanguageManager isEnglishLanguage]?self.userInfo.provinceEn:self.userInfo.province;
         NSString *_city = [LanguageManager isEnglishLanguage]?self.userInfo.cityEn:self.userInfo.city;
         
@@ -269,7 +269,7 @@
             }
         }
         [YYUserApi updateBuyerUsername:username phone:phone  province:province city:city andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 [YYToast showToastWithTitle:NSLocalizedString(@"修改成功！",nil) andDuration:kAlertToastDuration];
                 if (_modifySuccess) {
                     _modifySuccess();

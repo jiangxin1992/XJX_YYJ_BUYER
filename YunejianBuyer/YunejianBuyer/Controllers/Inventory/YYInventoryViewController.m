@@ -2,652 +2,230 @@
 //  YYInventoryViewController.m
 //  YunejianBuyer
 //
-//  Created by Apple on 16/8/29.
-//  Copyright © 2016年 Apple. All rights reserved.
+//  Created by Victor on 2018/6/19.
+//  Copyright © 2018年 Apple. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYInventoryViewController.h"
+#import "YYWarehousingViewController.h"
+#import "YYMerchandiseInventoryViewController.h"
 
-#import "UIImage+Tint.h"
-#import "TitlePagerView.h"
+// 自定义视图
+#import "YYNavView.h"
 #import "YYMessageButton.h"
-#import "YYInventoryApi.h"
+#import "TitlePagerView.h"
+#import "YYNoDataView.h"
+
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "YYUntreatedMsgAmountModel.h"
 #import "AppDelegate.h"
-#import "MBProgressHUD.h"
-#import "YYInventoryTableViewController.h"
-#import "YYOrderHelpViewController.h"
-#import "YYInventorySelectBrandViewController.h"
-#import <MJRefresh.h>
-#import "YYInventoryBoardViewCell.h"
-#import "YYInventoryLineCell.h"
-#import "YYInventoryStyleListViewCell.h"
-#import "YYInventoryStoreStyleInfoViewController.h"
-#import "YYOpusApi.h"
 
-@interface YYInventoryViewController ()<UITableViewDataSource,UITableViewDelegate,YYTableCellDelegate,UITextFieldDelegate,TitlePagerViewDelegate,ViewPagerDataSource, ViewPagerDelegate>
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UITextField *searchField;
-@property (weak, nonatomic) IBOutlet UIView *searchView;
-@property (nonatomic,assign)BOOL isSearchView;
-@property (nonatomic,copy) NSString *searchFieldStr;
-@property (weak, nonatomic) IBOutlet UIButton *searchBtn;
+@interface YYInventoryViewController () <TitlePagerViewDelegate, ViewPagerDataSource, ViewPagerDelegate, UITextFieldDelegate>
 
-@property (weak, nonatomic) IBOutlet UIView *tabBarView;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *searchViewTopLayoutConstraint;
-@property (weak, nonatomic) IBOutlet UIView *pagingView;
-@property (strong, nonatomic) TitlePagerView *pagingTitleView;
+@property (nonatomic, strong) YYNavView *navView;
+@property (nonatomic, strong) YYMessageButton *messageButton;
+@property (nonatomic, strong) UIView *searchView;
+@property (nonatomic, strong) UITextField *searchField;
+@property (nonatomic, strong) TitlePagerView *titlePagerView;
+@property (nonatomic, strong) YYMerchandiseInventoryViewController *merchandiseInventoryVC;
+@property (nonatomic, strong) YYWarehousingViewController *warehousingVC;
+@property (nonatomic, strong) YYWarehousingViewController *EXwarehouseVC;
 
-@property (weak, nonatomic) IBOutlet YYMessageButton *messageButton;
-
-@property (nonatomic,strong)YYPageInfoModel *currentPageInfo;
-@property (strong, nonatomic)NSMutableArray *listArray;
-
-@property (strong, nonatomic)NSMutableArray *localNoteArray;
-@property (strong, nonatomic)NSMutableArray *searchNoteArray;//搜索历史记录
-
-@property (nonatomic,strong) UIView *noDataView;
-@property(nonatomic,assign) NSInteger currentType;
-
-@property (strong, nonatomic)NSMutableArray *editRowArray;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tableViewTopLayout;
+@property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 
 @end
 
 @implementation YYInventoryViewController
 
+#pragma mark - --------------生命周期--------------
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    _searchField.delegate = self;
-    _searchFieldStr = @"";
-    self.listArray = [[NSMutableArray alloc] initWithCapacity:0];
+    [self SomePrepare];
+    [self UIConfig];
+    [self RequestData];
+}
+
+#pragma mark - --------------SomePrepare--------------
+- (void)SomePrepare {
+    [self PrepareData];
+    [self PrepareUI];
+}
+
+- (void)PrepareData {
+    self.merchandiseInventoryVC = [[YYMerchandiseInventoryViewController alloc] init];
+    self.merchandiseInventoryVC.navigationController = self.navigationController;
     
-    [_messageButton initButton:@""];
-    [self messageCountChanged:nil];
-    [_messageButton addTarget:self action:@selector(messageButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageCountChanged:) name:UnreadMsgAmountChangeNotification object:nil];
-
-    if (!_pagingTitleView) {
-        self.pagingTitleView = [[TitlePagerView alloc] init];
-        self.pagingTitleView.frame = CGRectMake(50, 4, SCREEN_WIDTH-50-50, 40);
-        self.pagingTitleView.font = [UIFont systemFontOfSize:14];
-        NSArray *titleArray = @[NSLocalizedString(@"补货公告",nil),NSLocalizedString(@"我的补货",nil),NSLocalizedString(@"我的库存",nil)];
-        float titleViewWidth = SCREEN_WIDTH-50-50;//[TitlePagerView calculateTitleWidth:titleArray withFont:self.pagingTitleView.font];
-        float titleViewOffsetX  = (titleViewWidth -  [TitlePagerView getMaxTitleWidthFromArray:titleArray withFont:self.pagingTitleView.font]*[titleArray count])/2;
-        
-        if(titleViewOffsetX < 10){//
-            self.pagingTitleView.dynamicTitlePagerViewTitleSpace = 10;
-            titleViewOffsetX = (100+titleViewOffsetX*2-20)/2;
-            
-            self.pagingTitleView.width = [TitlePagerView getMaxTitleWidthFromArray:titleArray withFont:self.pagingTitleView.font]*[titleArray count] +self.pagingTitleView.dynamicTitlePagerViewTitleSpace * ([titleArray count] -1);
-            self.pagingTitleView.x =  MAX(0, titleViewOffsetX);
-
-        }else{
-            if(titleViewOffsetX > 40){
-                self.pagingTitleView.width = titleViewWidth -(titleViewOffsetX-40)*([titleArray count]-1);
-                self.pagingTitleView.dynamicTitlePagerViewTitleSpace = 40;
-                self.pagingTitleView.x = 50 + titleViewOffsetX-40;
-            }else{
-                self.pagingTitleView.width = titleViewWidth;
-                self.pagingTitleView.dynamicTitlePagerViewTitleSpace = titleViewOffsetX;
-                self.pagingTitleView.x = 50;
-            }
-        }
-        [self.pagingTitleView addObjects:titleArray];
-        self.pagingTitleView.delegate = self;
-    }
-    self.pagingTitleView.backgroundColor = [UIColor clearColor];
-    [self.pagingView addSubview:self.pagingTitleView];
+    self.warehousingVC = [[YYWarehousingViewController alloc] init];
+    self.warehousingVC.navigationController = self.navigationController;
+    self.warehousingVC.isEXwarehouse = NO;
     
-    self.noDataView = addNoDataView_phone(self.view, [NSString stringWithFormat:@"%@|icon:noinventory_icon",NSLocalizedString(@"暂无补货公告/n库存调拨可以让商品在不同的买手店之间流动起来~",)],nil,nil);
-    _noDataView.hidden = YES;
-    _tableView.hidden = YES;
-    
-    [self.tableView registerNib:[UINib nibWithNibName:@"YYInventoryBoardViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"YYInventoryBoardViewCell"];
-    [self.tableView registerNib:[UINib nibWithNibName:@"YYInventoryStyleListViewCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"YYInventoryStyleListViewCell"];
-    [self.tableView registerNib:[UINib nibWithNibName:@"YYInventoryLineCell" bundle:[NSBundle mainBundle]] forCellReuseIdentifier:@"YYInventoryLineCell"];
+    self.EXwarehouseVC = [[YYWarehousingViewController alloc] init];
+    self.EXwarehouseVC.navigationController = self.navigationController;
+    self.EXwarehouseVC.isEXwarehouse = YES;
+}
 
-    [self addHeader];
-    [self addFooter];
-
+- (void)PrepareUI {
     self.dataSource = self;
     self.delegate = self;
-    
-    // Do not auto load data
-    self.manualLoadData = YES;
-    self.currentIndex = 0;
-    [self reloadData];
+    self.view.backgroundColor = _define_white_color;
+
+    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView: self.view haveStatusView:YES];
+    [self.navView hidesBackButton];
+    [self initMessageButton];
+    [self initSearchField];
+
+    [self reloadDataWithIndex:_currentIndex];
+    [self viewControllerAtIndex:_currentIndex];
 }
 
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    //    if(self.currentPageInfo != nil){
-    //        [self loadOrderListFromServerByPageIndex:1 endRefreshing:NO];
-    //    }
-    [self reloadCurrentTableData:YES];
-    // 进入埋点
-    [MobClick beginLogPageView:kYYPageInventory];
-}
-
-- (void)viewWillDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
-    // 退出埋点
-    [MobClick endLogPageView:kYYPageInventory];
-}
-
--(void)reloadCurrentTableData:(BOOL)newData{
-    YYInventoryTableViewController *tableViewController = (YYInventoryTableViewController *)[self viewControllerAtIndex:_currentType];
-    if(tableViewController != nil){
-        [tableViewController relaodTableData:newData];
-    }
-}
-
-#pragma msseage
-- (void)messageButtonClicked:(id)sender {
-    [YYInventoryApi markAsReadOnMsg:nil adnBlock:nil];
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    [appDelegate showMessageView:nil parentViewController:self];
-
-}
-- (void)messageCountChanged:(NSNotification *)notification{
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
-    
-    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
-        if(msgAmount > 0 ){
-            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
-        }else{
-            [_messageButton updateButtonNumber:@"dot"];
-        }
-    }else{
-        [_messageButton updateButtonNumber:@""];
-    }
-}
-
-- (void)loadListFromServerByPageIndex:(int)pageIndex endRefreshing:(BOOL)endrefreshing{
+#pragma mark - --------------UIConfig----------------------
+-(void)UIConfig {
+    UIView *lineView = [[UIView alloc] init];
+    lineView.backgroundColor = [UIColor colorWithHex:@"d3d3d3"];
+    [self.view addSubview:lineView];
     WeakSelf(ws);
-    __block BOOL blockEndrefreshing = endrefreshing;
-    if(_currentType == 0){
-        [YYInventoryApi getBoardList:nil month:3 pageIndex:pageIndex pageSize:8 queryStr:_searchFieldStr adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYInventoryBoardListModel *boardsModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
-                if(pageIndex == 1) {
-                    [ws.listArray removeAllObjects];
-                }
-                ws.currentPageInfo = boardsModel.pageInfo;
-                
-                if (boardsModel && boardsModel.result
-                    && [boardsModel.result count] > 0){
-                    [ws.listArray addObjectsFromArray:boardsModel.result];
-                    
-                }
-            }
-            
-            if(blockEndrefreshing){
-                [self.tableView.mj_header endRefreshing];
-                [self.tableView.mj_footer endRefreshing];
-            }
-            [ws reloadTableData];
-            //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-            
-        }];
-    }else if(_currentType == 1){
-        [YYInventoryApi getDemandList:nil month:0 pageIndex:pageIndex pageSize:8 queryStr:_searchFieldStr adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYInventoryStyleListModel *listModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
-                if(pageIndex == 1) {
-                    [ws.listArray removeAllObjects];
-                }
-                ws.currentPageInfo = listModel.pageInfo;
-                
-                if (listModel && listModel.result
-                    && [listModel.result count] > 0){
-                    [ws.listArray addObjectsFromArray:listModel.result];
-                    
-                }
-            }
-            
-            if(blockEndrefreshing){
-                [self.tableView.mj_header endRefreshing];
-                [self.tableView.mj_footer endRefreshing];
-            }
-            [ws reloadTableData];
-            //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        }];
-    }else if(_currentType == 2){
-        [YYInventoryApi getStoreList:nil month:0 pageIndex:pageIndex pageSize:8 queryStr:_searchFieldStr adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYInventoryStyleListModel *listModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
-                if(pageIndex == 1) {
-                    [ws.listArray removeAllObjects];
-                }
-                ws.currentPageInfo = listModel.pageInfo;
-                
-                if (listModel && listModel.result
-                    && [listModel.result count] > 0){
-                    [ws.listArray addObjectsFromArray:listModel.result];
-                    
-                }
-            }
-            
-            if(blockEndrefreshing){
-                [self.tableView.mj_header endRefreshing];
-                [self.tableView.mj_footer endRefreshing];
-            }
-            [ws reloadTableData];
-            //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        }];
-    }else{
-        
-        if(blockEndrefreshing){
-            [self.tableView.mj_header endRefreshing];
-            [self.tableView.mj_footer endRefreshing];
-        }
-        [ws reloadTableData];
-        
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        
-    }
-}
-
-#pragma mark - UITableViewDataSource
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if(self.isSearchView){
-        return [_searchNoteArray count];
-    }else{
-        return [_listArray count]*2;
-    }
-}
-
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = nil;
-    if(self.isSearchView){
-        static NSString *CellIdentifier = @"YYListSearchNoteCell";
-        UITableViewCell *noteCell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if(noteCell == nil){
-            noteCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-        UIImageView *flagImg = [noteCell.contentView viewWithTag:10002];
-        UIImage *img = [[UIImage imageNamed:@"searchflag_img"] imageWithTintColor:[UIColor colorWithHex:@"919191"] ];
-        flagImg.image = img;
-        NSArray *obj = [_searchNoteArray objectAtIndex:indexPath.row];
-        UILabel *titleLabel = [noteCell.contentView viewWithTag:10001];
-        titleLabel.text = [obj objectAtIndex:0];
-        if(indexPath.row % 2 == 0){
-            noteCell.contentView.backgroundColor = [UIColor whiteColor];
-        }else{
-            noteCell.contentView.backgroundColor = [UIColor colorWithHex:@"f8f8f8"];
-        }
-        UIButton *deleteBtn = [noteCell.contentView viewWithTag:10003];
-        deleteBtn.alpha = 1000+indexPath.row;
-        [deleteBtn addTarget:self action:@selector(deleteSearchNote:) forControlEvents:UIControlEventTouchUpInside];
-        cell = noteCell;
-    }else{
-        if(indexPath.row%2 == 1){
-            YYInventoryLineCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YYInventoryLineCell"];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            return cell;
-        }
-        
-        if(_currentType == 0){
-            YYInventoryBoardModel *boardModel = [_listArray objectAtIndex:indexPath.row/2];
-            YYInventoryBoardViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YYInventoryBoardViewCell"];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            cell.boardModel = boardModel;
-            cell.delegate = self;
-            cell.indexPath = indexPath;
-            [cell updateUI];
-            return cell;
-        }else{
-            YYInventoryStyleDetailModel *styleModel= [_listArray objectAtIndex:indexPath.row/2];
-            YYInventoryStyleListViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YYInventoryStyleListViewCell"];
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            cell.styleModel = styleModel;
-            NSString *key = [NSString stringWithFormat:@"%ld_%ld",(long)self.currentType,indexPath.row];
-            if([self.editRowArray containsObject:key]){
-                cell.isModifyNow = YES;
-            }else{
-                cell.isModifyNow = NO;
-            }
-            cell.delegate = self;
-            cell.indexPath = indexPath;
-            [cell updateUI];
-            return cell;
-        }
-    }
-    return cell;
-}
-
-
-#pragma mark - UITableViewDelegate
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(self.isSearchView){
-        return 50;
-    }else{
-        if(indexPath.row%2 == 1){
-            if((indexPath.row+1) == [_listArray count]*2){
-                return 1;
-            }
-            return 11;
-        }
-        if(_currentType == 0){
-            YYInventoryBoardModel *boardModel = [_listArray objectAtIndex:indexPath.row/2];
-            return [YYInventoryBoardViewCell cellHeigh:[boardModel.sizes count]];
-        }
-        return 196;
-    }
-}
-
-
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(self.isSearchView){
-        NSArray *obj = [_searchNoteArray objectAtIndex:indexPath.row];
-        self.searchFieldStr =  [obj objectAtIndex:0];
-        self.searchField.text = self.searchFieldStr;
-        _isSearchView = NO;
-    }
-}
-
-
--(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(self.isSearchView){
-        return;
-    }
-
-}
-
--(void)reloadTableData{
-    if(self.isSearchView){
-        self.noDataView.hidden = YES;
-    }else{
-        if ([self.listArray count] <= 0) {
-            self.noDataView.hidden = NO;
-        }else{
-            self.noDataView.hidden = YES;
-        }
-    }
-    [self.tableView reloadData];
-    
-}
-
-- (void)addHeader{
-    WeakSelf(ws);
-    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        if (![YYCurrentNetworkSpace isNetwork]) {
-            [YYToast showToastWithTitle:kNetworkIsOfflineTips andDuration:kAlertToastDuration];
-            [ws.tableView.mj_header endRefreshing];
-            return;
-        }
-        [ws loadListFromServerByPageIndex:1 endRefreshing:YES];
+    [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(1);
+        make.top.equalTo(ws.navView.mas_bottom).with.mas_offset(43);
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
     }];
-    self.tableView.mj_header = header;
-    self.tableView.mj_header.automaticallyChangeAlpha = YES;
-    header.lastUpdatedTimeLabel.hidden = YES;
+
+    [self createPagingTitleView];
 }
 
-- (void)addFooter{
-    WeakSelf(ws);
-    self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
-        if (![YYCurrentNetworkSpace isNetwork]) {
-            [YYToast showToastWithTitle:kNetworkIsOfflineTips andDuration:kAlertToastDuration];
-            [ws.tableView.mj_footer endRefreshing];
-            return;
-        }
-        if (!ws.currentPageInfo.isLastPage) {
-            [ws loadListFromServerByPageIndex:[ws.currentPageInfo.pageIndex intValue]+1 endRefreshing:YES];
-        }else{
-            //弹出提示
-            [ws.tableView.mj_footer endRefreshing];
-        }
-    }];
-}
-
-#pragma YYTableCellDelegate
--(void)btnClick:(NSInteger)row section:(NSInteger)section andParmas:(NSArray *)parmas{
-    NSString *type = [parmas objectAtIndex:0];
-    if([type isEqualToString:@"newHelpOrAdd"]){
-        if(_currentType == 0){//帮助
-            [self showHelp];
-        }else if(_currentType == 1){//我要补货
-            [self showSelectBrandView:1];
-        }else if(_currentType == 2){//我有库存
-            [self showSelectBrandView:2];
-        }
-    }else if([type isEqualToString:@"editStyleNum"]){
-        YYInventoryStyleDetailModel *styleModel= [_listArray objectAtIndex:row/2];
-        NSInteger num = [[parmas objectAtIndex:1] integerValue];
-        if(num == 0){
-            if(_currentType == 1){//我要补货
-                [YYToast showToastWithView:self.view title:NSLocalizedString(@"已提交的需求件数不可改为0",nil) andDuration:kAlertToastDuration];
-            }else if(_currentType == 2){//我有库存
-                [YYToast showToastWithView:self.view title:NSLocalizedString(@"已提交的库存件数不可改为0",nil) andDuration:kAlertToastDuration];
-            }
-            [self.tableView reloadData];
-        }else{
-            styleModel.amount = [NSNumber numberWithInteger:num];
-        }
-    }else if([type isEqualToString:@"editStatus"]){
-        YYInventoryStyleDetailModel *styleModel = nil;
-        if([parmas count]== 3){
-            styleModel = [parmas objectAtIndex:2];
-            if(_currentType == 1){//我要补货
-                [self editDemandStyleNum:styleModel];
-            }else if(_currentType == 2){//我有库存
-                [self editStoreStyleNum:styleModel];
-            }
-        }else{
-            NSString *key = [NSString stringWithFormat:@"%ld_%ld",(long)self.currentType,row];
-            if([self.editRowArray containsObject:key]){
-                [self.editRowArray removeObject:key];
+-(void)createPagingTitleView{
+    NSArray *titleArray = @[NSLocalizedString(@"商品库存",nil),NSLocalizedString(@"入库记录",nil),NSLocalizedString(@"出库记录",nil)];
+    if (!self.titlePagerView) {
+        CGFloat titleFont = 0.0;
+        if([LanguageManager isEnglishLanguage]){
+            if(kIPhone6Plus){
+                titleFont = 14.0f;
+            }else if(IsPhone6_gt){
+                titleFont = 13.0f;
             }else{
-                [self.editRowArray addObject:key];
+                titleFont = 11.0f;
             }
-            NSString *dealStr = [parmas objectAtIndex:1];
-            if([dealStr isEqualToString:@"update"]){//完成
-                YYInventoryStyleDetailModel *styleModel= [_listArray objectAtIndex:row/2];
-                if(_currentType == 1){//我要补货
-                    [self editDemandStyleNum:styleModel];
-                }else if(_currentType == 2){//我有库存
-                    [self editStoreStyleNum:styleModel];
-                }
-            }
-            [self reloadTableData];
+        }else{
+            titleFont = 14.0f;
         }
-        
 
-    }else if([type isEqualToString:@"deleteStyle"]){
-        YYInventoryStyleDetailModel *styleModel = nil;
-        if([parmas count]== 2){
-            styleModel = [parmas objectAtIndex:1];
-        }else{
-            styleModel = [_listArray objectAtIndex:row/2];
-        }
-        if(_currentType == 1){//我要补货
-            [self deleteDemandStyle:styleModel];
-        }else if(_currentType == 2){//我有库存
-            [self deleteStoreStyle:styleModel];
-        }
-    }else if([type isEqualToString:@"styleStore"]){
-        YYInventoryBoardModel *boardModel = nil;
-        if([parmas count]== 2){
-            boardModel = [parmas objectAtIndex:1];
-        }else{
-            boardModel = [_listArray objectAtIndex:row/2];
-        }
-        [self showStyleStore:boardModel];
-    }else if([type isEqualToString:@"styleInfo"]){
-        YYInventoryBoardModel *boardModel = nil;
-        if([parmas count]== 2){
-            boardModel = [parmas objectAtIndex:1];
-        }else{
-            boardModel = [_listArray objectAtIndex:row/2];
-        }
-        [self showStyleInfo:boardModel];
-    }else if([type isEqualToString:@"showInventory"]){
-        [self showSelectBrandView:1];
-    }
-}
+        self.titlePagerView = [[TitlePagerView alloc] init];
+        [self.view addSubview:self.titlePagerView];
+        self.titlePagerView.dynamicTitlePagerViewTitleSpace = 5;
+        self.titlePagerView.font = [UIFont systemFontOfSize:titleFont];
+        [self.titlePagerView addObjects:titleArray];
+        self.titlePagerView.delegate = self;
+        self.titlePagerView.isInAnimation = NO;
 
-#pragma search
-- (IBAction)showSearchView:(id)sender {
-    if (_searchView.hidden == YES) {
-        _pagingView.hidden = YES;
-        _tableViewTopLayout.constant = -44;
-        _searchView.hidden = NO;
-        _searchField.text = nil;
-        _searchFieldStr = @"";
-        _searchView.alpha = 0.0;
-        _searchViewTopLayoutConstraint.constant = -44;
-        [_searchView layoutIfNeeded];
-        self.tableView.hidden = NO;
-        [UIView animateWithDuration:0.3 animations:^{
-            _searchView.alpha = 1.0;
-            _searchViewTopLayoutConstraint.constant = 0;
-            [_searchView layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            [_searchField becomeFirstResponder];
-            self.isSearchView = YES;
-            self.tableView.hidden = NO;
-            self.noDataView.hidden = YES;
-            _searchNoteArray = [NSKeyedUnarchiver unarchiveObjectWithFile:getInventorySearchNoteStorePath()];
-            [self.tableView reloadData];
-            [YYInventoryApi markAsReadOnMsg:nil adnBlock:nil];
+        WeakSelf(ws);
+        [self.titlePagerView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(40);
+            make.top.equalTo(ws.navView.mas_bottom).with.mas_offset(4);
+            make.left.mas_equalTo(0);
+            make.right.mas_equalTo(0);
         }];
     }
-}
-- (IBAction)hideSearchView:(id)sender {
-    if ( _searchView.hidden == NO) {
-        _pagingView.hidden = NO;
-        _tableViewTopLayout.constant = 0;
-        _searchFieldStr = @"";
-        _searchView.alpha = 1.0;
-        _searchViewTopLayoutConstraint.constant = 0;
-        [_searchView layoutIfNeeded];
-        [UIView animateWithDuration:0.3 animations:^{
-            _searchViewTopLayoutConstraint.constant = -44;
-            _searchView.alpha = 0.0;
-            [_searchView layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            _searchView.hidden = YES;
-            [_searchField resignFirstResponder];
-            self.isSearchView = NO;
-            self.searchNoteArray = nil;
-            self.tableView.hidden = YES;
-            [self.listArray removeAllObjects];
-            [self.editRowArray removeAllObjects];
-            self.noDataView.hidden = YES;
-        }];
-    }
+    [self.titlePagerView adjustTitleViewByIndexNew:0];
 }
 
+#pragma mark - --------------请求数据----------------------
+-(void)RequestData{}
+
+#pragma mark - --------------系统代理----------------------
+#pragma mark -UIScrollViewDelegate
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if ([self.searchField isFirstResponder]) {
+        [self deselectedTextField];
+    }
+    
+    CGFloat contentOffsetX = scrollView.contentOffset.x;
+    if (self.currentIndex != 0 && contentOffsetX <= SCREEN_WIDTH * 3) {
+        contentOffsetX += SCREEN_WIDTH * self.currentIndex;
+    }
+    [self.titlePagerView updatePageIndicatorPosition:contentOffsetX];
+}
+
+#pragma mark -UITextFieldDelegate
 - (void)textFieldDidEndEditing:(UITextField *)textField{
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:UITextFieldTextDidChangeNotification object:_searchField];
-    
+    [self.view removeGestureRecognizer:self.tapGestureRecognizer];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidChangeNotification object:self.searchField];
 }
 
--(void) textFieldDidBeginEditing:(UITextField *)textField{
-    _isSearchView = YES;
-    [self reloadTableData];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:_searchField];
+- (void)textFieldDidBeginEditing:(UITextField *)textField{
+    [self.view addGestureRecognizer:self.tapGestureRecognizer];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldDidChange:) name:UITextFieldTextDidChangeNotification object:self.searchField];
 }
 
 - (void)textFieldDidChange:(NSNotification *)note{
-    NSString *toBeString = _searchField.text;
-    NSString *lang = [[UIApplication sharedApplication] textInputMode].primaryLanguage; // 键盘输入模式
-    NSString *str = @"";
-    if ([lang isEqualToString:@"zh-Hans"]) { // 简体中文输入，包括简体拼音，健体五笔，简体手写
-        UITextRange *selectedRange = [_searchField markedTextRange];
-        //高亮部分
-        UITextPosition *position = [_searchField positionFromPosition:selectedRange.start offset:0];
-        //已输入的文字进行字数统计和限制
-        if (!position) {
-            str = toBeString;
-        }else{
-            return ;
-        }
-    }
-    else{
-        str = toBeString;
-    }
-    //    NSString *str = _textNameInput.text;
-    //  self.currentYYOrderInfoModel.buyerName = str;
-    if(![str isEqualToString:@""]){
-        _searchFieldStr = str;
-        _isSearchView = YES;
-        
-        _localNoteArray = [NSKeyedUnarchiver unarchiveObjectWithFile:getInventorySearchNoteStorePath()];
-        _searchNoteArray = [[NSMutableArray alloc] init];
-        for (NSArray *note in _localNoteArray) {
-            if([note[0] containsString:str]){
-                [_searchNoteArray addObject:note];
-            }
-        }
-        [self reloadTableData];
-        //[self loadOrderListFromServerByPageIndex:1 endRefreshing:NO ];
+    NSString *toBeString = self.searchField.text;
+    if([toBeString isEqualToString:@""]){
     }else{
-        _searchFieldStr = @"";
     }
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField {
+    self.warehousingVC.searchFieldText = nil;
+    [self.warehousingVC getWarehouseRecord];
+    
+    self.EXwarehouseVC.searchFieldText = nil;
+    [self.EXwarehouseVC getWarehouseRecord];
+    
+    return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if(![NSString isNilOrEmpty:_searchFieldStr]){
-        _isSearchView = NO;
-        [_searchField resignFirstResponder];
-        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-        [self loadListFromServerByPageIndex:1 endRefreshing:NO ];
-        return YES;
-    }
-    return NO;
+    [self.searchField resignFirstResponder];
+    
+    self.warehousingVC.searchFieldText = self.searchField.text;
+    [self.warehousingVC getWarehouseRecord];
+    
+    self.EXwarehouseVC.searchFieldText = self.searchField.text;
+    [self.EXwarehouseVC getWarehouseRecord];
+    
+    return YES;
 }
 
--(void)addSearchNote{
-    if(![NSString isNilOrEmpty:self.searchFieldStr]){
-        if(self.localNoteArray ==nil){
-            self.localNoteArray = [[NSMutableArray alloc] init];
-        }
-        
-        BOOL isContains = YES;
-        for (NSArray *note in self.localNoteArray) {
-            if([note[0] isEqualToString:self.searchFieldStr]){
-                isContains = NO;
-                break;
+#pragma mark - --------------自定义代理/block----------------------
+#pragma mark - TitlePagerViewDelegate
+- (void)didTouchBWTitle:(NSUInteger)index {
+    if (self.titlePagerView) {
+        if (!self.titlePagerView.isInAnimation) {
+            UIPageViewControllerNavigationDirection direction;
+
+            if (self.currentIndex == index) {
+                return;
+            }
+
+            self.titlePagerView.isInAnimation = YES;
+
+            if (index > self.currentIndex) {
+                direction = UIPageViewControllerNavigationDirectionForward;
+            } else {
+                direction = UIPageViewControllerNavigationDirectionReverse;
+            }
+
+            UIViewController *viewController = [self viewControllerAtIndex:index];
+
+            if (viewController) {
+                __weak typeof(self) weakself = self;
+                [self.pageViewController setViewControllers:@[viewController] direction:direction animated:YES completion:^(BOOL finished) {
+                    weakself.titlePagerView.isInAnimation = NO;
+                    weakself.currentIndex = index;
+                }];
+            }else{
+                self.titlePagerView.isInAnimation = NO;
             }
         }
-        if(isContains){
-            if([self.localNoteArray count] > 20){
-                [self.localNoteArray removeObjectAtIndex:0];
-            }
-            [self.localNoteArray addObject:@[self.searchFieldStr,@"ordercode"]];
-        }
-        BOOL iskeyedarchiver= [NSKeyedArchiver archiveRootObject:self.localNoteArray toFile:getInventorySearchNoteStorePath()];
-        if(iskeyedarchiver){
-            NSLog(@"archive success ");
-        }
     }
 }
-
--(void)deleteSearchNote:(id)sender{
-    UIButton *btn = sender;
-    NSInteger row = btn.alpha - 1000;
-    NSString *date = [[_searchNoteArray objectAtIndex:row] objectAtIndex:0];
-    for (NSArray *note in self.localNoteArray) {
-        if([note[0] isEqualToString:date]){
-            [self.localNoteArray removeObject:note];
-            break;
-        }
-    }
-    BOOL iskeyedarchiver= [NSKeyedArchiver archiveRootObject:self.localNoteArray toFile:getInventorySearchNoteStorePath()];
-    if(iskeyedarchiver){
-        NSLog(@"archive success ");
-        [_searchNoteArray removeObjectAtIndex:row];
-        [self.tableView reloadData];
-    }
-}
-
-
 
 #pragma mark - ViewPagerDataSource
 - (NSUInteger)numberOfTabsForViewPager:(ViewPagerController *)viewPager {
@@ -656,267 +234,153 @@
 
 - (UIViewController *)viewPager:(ViewPagerController *)viewPager contentViewControllerForTabAtIndex:(NSUInteger)index {
     if (index == 0) {
-        return [self createBoradTableVC];
+        return [self createCommodityStocksViewController];
     } else if (index == 1) {
-        return [self createInventoryTableVC];
-    } else {
-        return [self createStoreTableVC];
+        return [self createWarehousingViewController];
+    } else if (index == 2) {
+        return [self createEXwarehouseViewController];
     }
+    return nil;
 }
 
-- (UIViewController *)createBoradTableVC {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
-    YYInventoryTableViewController *tableViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYInventoryTableViewController"];
-    tableViewController.currentType = 0;
-    tableViewController.delegate = self;
-    return tableViewController;
+#pragma mark - --------------自定义响应----------------------
+- (void)messageButtonClicked:(id)sender {
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate showMessageView:nil parentViewController:self];
 }
 
-- (UIViewController *)createInventoryTableVC {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
-    YYInventoryTableViewController *tableViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYInventoryTableViewController"];
-    tableViewController.currentType = 1;
-    tableViewController.delegate = self;
-    return tableViewController;
+#pragma mark - --------------自定义方法----------------------
+- (void)initMessageButton {
+    self.messageButton = [[YYMessageButton alloc] init];
+    [self.messageButton initButton:@""];
+    [self messageCountChanged:nil];
+    [_messageButton addTarget:self action:@selector(messageButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageCountChanged:) name:UnreadMsgAmountChangeNotification object:nil];
+    [self.navView addSubview:self.messageButton];
+    [self.messageButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(50);
+        make.height.mas_equalTo(44);
+        make.top.mas_equalTo(kStatusBarHeight);
+        make.right.mas_equalTo(0);
+    }];
 }
 
-- (UIViewController *)createStoreTableVC {
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
-    YYInventoryTableViewController *tableViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYInventoryTableViewController"];
-    tableViewController.currentType = 2;
-    tableViewController.delegate = self;
-    return tableViewController;
-}
+- (void)initSearchField {
+    self.searchView = [[UIView alloc] init];
+    self.searchView.backgroundColor = [UIColor colorWithHex:@"efefef"];
 
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn setImage:[UIImage imageNamed:@"search_Img"] forState:UIControlStateNormal];
+    btn.backgroundColor = [UIColor colorWithHex:@"efefef"];
+    [self.searchView addSubview:btn];
+    [btn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.width.mas_equalTo(18);
+        make.height.mas_equalTo(22);
+        make.centerY.mas_equalTo(0);
+        make.left.mas_equalTo(7);
+    }];
 
-
-#pragma TitlePagerViewDelegate
-- (void)didTouchBWTitle:(NSUInteger)index {
-
-    UIPageViewControllerNavigationDirection direction;
-    
-    if (self.currentType == index) {
-        return;
+    self.searchField = [[UITextField alloc] init];
+    self.searchField.delegate = self;
+    self.searchField.borderStyle = UITextBorderStyleNone;
+    self.searchField.returnKeyType = UIReturnKeySearch;
+    self.searchField.backgroundColor = [UIColor colorWithHex:@"efefef"];
+    self.searchField.placeholder = NSLocalizedString(@"搜索款式名称", nil);
+    self.searchView.layer.masksToBounds = YES;
+    self.searchView.layer.cornerRadius = 3.0f;
+    if (IsPhone6_gt) {
+        self.searchField.font = [UIFont systemFontOfSize:14];
+    }else {
+        self.searchField.font = [UIFont systemFontOfSize:12];
     }
-    
-    if (index > self.currentType) {
-        direction = UIPageViewControllerNavigationDirectionForward;
-    } else {
-        direction = UIPageViewControllerNavigationDirectionReverse;
-    }
-    
-    UIViewController *viewController = [self viewControllerAtIndex:index];
-    
-    if (viewController) {
-        __weak typeof(self) weakself = self;
-        [self.pageViewController setViewControllers:@[viewController] direction:direction animated:YES completion:^(BOOL finished) {
-            weakself.currentIndex = index;
-        }];
-    }
+    self.searchField.clearButtonMode = UITextFieldViewModeAlways;
+    [self.searchView addSubview:self.searchField];
+    [self.searchField mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(30);
+        make.centerY.mas_equalTo(0);
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(btn.mas_right).with.mas_offset(2);
+        make.bottom.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+    }];
+
+    [self.navView addSubview:self.searchView];
+    WeakSelf(ws);
+    [self.searchView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(13);
+        make.bottom.mas_equalTo(-7);
+        make.right.mas_equalTo(ws.messageButton.mas_left).with.mas_offset(-17);
+    }];
+
+    self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(deselectedTextField)];
 }
+
+- (UIViewController *)createCommodityStocksViewController {
+    if (!self.merchandiseInventoryVC) {
+        self.merchandiseInventoryVC = [[YYMerchandiseInventoryViewController alloc] init];
+        self.merchandiseInventoryVC.navigationController = self.navigationController;
+    }
+    return self.merchandiseInventoryVC;
+}
+
+- (UIViewController *)createWarehousingViewController {
+    if (!self.warehousingVC) {
+        self.warehousingVC = [[YYWarehousingViewController alloc] init];
+        self.warehousingVC.navigationController = self.navigationController;
+        self.warehousingVC.isEXwarehouse = NO;
+    }
+    return self.warehousingVC;
+}
+
+- (UIViewController *)createEXwarehouseViewController {
+    if (!self.EXwarehouseVC) {
+        self.EXwarehouseVC = [[YYWarehousingViewController alloc] init];
+        self.EXwarehouseVC.navigationController = self.navigationController;
+        self.EXwarehouseVC.isEXwarehouse = YES;
+    }
+    return self.EXwarehouseVC;
+}
+
+#pragma mark - --------------自定义通知----------------------
+- (void)messageCountChanged:(NSNotification *)notification{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
+}
+
+#pragma mark - --------------other----------------------
 
 - (void)setCurrentIndex:(NSInteger)index {
-    if(index == 0){
-        _searchBtn.hidden = NO;
-    }else{
-        _searchBtn.hidden = YES;
+    if(self.titlePagerView){
+        [self.titlePagerView adjustTitleViewByIndexNew:index];
     }
-    if(_currentType ==0 && index >0){//公告页
-        [YYInventoryApi markAsReadOnMsg:nil adnBlock:nil];
+    _currentIndex = index;
+}
+
+- (void)deselectedTextField {
+    if ([self.searchField.text isEqualToString:@""]) {
+        self.warehousingVC.searchFieldText = nil;
+        [self.warehousingVC getWarehouseRecord];
         
-    }
-    _currentType = index;
-
-    [self reloadCurrentTableData:YES];
-
-    [self.pagingTitleView adjustTitleViewByIndex:index];
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(self.tableView.hidden == NO){
-        return;
-    }
-    CGFloat contentOffsetX = scrollView.contentOffset.x;
-    
-    if (self.currentType != 0 && contentOffsetX <= SCREEN_WIDTH * 3) {
-        contentOffsetX += SCREEN_WIDTH * self.currentType;
-    }
-    
-    [self.pagingTitleView updatePageIndicatorPosition:contentOffsetX];
-}
-
-- (void)scrollEnabled:(BOOL)enabled {
-    self.scrollingLocked = !enabled;
-    
-    for (UIScrollView *view in self.pageViewController.view.subviews) {
-        if ([view isKindOfClass:[UIScrollView class]]) {
-            view.scrollEnabled = enabled;
-            view.bounces = enabled;
-        }
-    }
-}
-
--(void)showHelp{
-    [YYInventoryApi markAsReadOnMsg:nil adnBlock:nil];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Order" bundle:[NSBundle mainBundle]];
-    YYOrderHelpViewController *orderHelpViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYOrderHelpViewController"];
-    orderHelpViewController.helpType = 1;
-    [self.navigationController pushViewController:orderHelpViewController animated:YES];
-    
-    WeakSelf(ws);
-    [orderHelpViewController setCancelButtonClicked:^(){
-        [ws.navigationController popViewControllerAnimated:YES];
-    }];
-}
-
--(void)showSelectBrandView:(NSInteger)type{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
-    YYInventorySelectBrandViewController *selectBrandViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYInventorySelectBrandViewController"];
-    selectBrandViewController.viewType = type;
-    [self.navigationController pushViewController:selectBrandViewController animated:YES];
-    
-    WeakSelf(ws);
-    [selectBrandViewController setCancelButtonClicked:^(){
-        [ws.navigationController popViewControllerAnimated:YES];
-        [ws reloadCurrentTableData:YES];
-    }];
-}
-- (IBAction)backAction:(id)sender {
-    if(_cancelButtonClicked){
-        _cancelButtonClicked();
-    }
-}
--(void)deleteDemandStyle :(YYInventoryStyleDetailModel *)styleModel{
-    WeakSelf(ws);
-    CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"确定要删除此条目？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"取消",nil) otherButtonTitles:@[NSLocalizedString(@"删除",nil)]];
-    //alertView.specialParentView = self.view;
-    __block NSInteger demandId = [styleModel.id integerValue];
-    [alertView setAlertViewBlock:^(NSInteger selectedIndex){
-        if (selectedIndex == 1) {
-            [YYInventoryApi deleteDemand:demandId adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                if (rspStatusAndMessage.status == kCode100) {
-                    [YYToast showToastWithTitle:NSLocalizedString(@"删除成功",nil)  andDuration:kAlertToastDuration];
-                    if(ws.tableView.hidden){
-                        [ws reloadCurrentTableData:YES];
-                    }else{
-                        [ws loadListFromServerByPageIndex:1 endRefreshing:NO];
-                    }
-                }
-            }];
-        }
-    }];
-    
-    [alertView show];
-
-}
-
--(void)deleteStoreStyle :(YYInventoryStyleDetailModel *)styleModel{
-    [YYInventoryApi deleteStore:0 adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        
-    }];
-    WeakSelf(ws);
-    CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"确定要删除此条目？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"取消",nil) otherButtonTitles:@[NSLocalizedString(@"删除",nil)]];
-    //alertView.specialParentView = self.view;
-    __block NSInteger storeId = [styleModel.id integerValue];
-    [alertView setAlertViewBlock:^(NSInteger selectedIndex){
-        if (selectedIndex == 1) {
-            [YYInventoryApi deleteStore:storeId adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                if (rspStatusAndMessage.status == kCode100) {
-                    [YYToast showToastWithTitle:NSLocalizedString(@"删除成功",nil)  andDuration:kAlertToastDuration];
-                    if(ws.tableView.hidden){
-                        [ws reloadCurrentTableData:YES];
-                    }else{
-                        [ws loadListFromServerByPageIndex:1 endRefreshing:NO];
-                    }
-                }
-            }];
-        }
-    }];
-    
-    [alertView show];
-}
-
--(void)editDemandStyleNum :(YYInventoryStyleDetailModel *)styleModel{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    WeakSelf(ws);
-
-    [YYInventoryApi modifyDemand:[styleModel.id integerValue] amount:[styleModel.amount integerValue] adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
-            if(ws.tableView.hidden){
-                [ws reloadCurrentTableData:YES];
-            }else{
-                [ws loadListFromServerByPageIndex:1 endRefreshing:NO];
+        self.EXwarehouseVC.searchFieldText = nil;
+        [self.EXwarehouseVC getWarehouseRecord];
+    }else {
+        if (self.currentIndex == 1) {
+            if (self.warehousingVC.searchFieldText) {
+                self.searchField.text = self.warehousingVC.searchFieldText;
+            }else {
+                self.searchField.text = nil;
             }
-        }
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
-    }];
-}
-
--(void)editStoreStyleNum :(YYInventoryStyleDetailModel *)styleModel{
-    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    WeakSelf(ws);
-    
-    [YYInventoryApi modifyStore:[styleModel.id integerValue] amount:[styleModel.amount integerValue] adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
-            if(ws.tableView.hidden){
-                [ws reloadCurrentTableData:YES];
-            }else{
-                [ws loadListFromServerByPageIndex:1 endRefreshing:NO];
+        }else if (self.currentIndex == 2) {
+            if (self.EXwarehouseVC.searchFieldText) {
+                self.searchField.text = self.EXwarehouseVC.searchFieldText;
+            }else {
+                self.searchField.text = nil;
             }
+        }else {
+            self.searchField.text = nil;
         }
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
-    }];
-}
-
--(void)showStyleStore:(YYInventoryBoardModel *)boardModel{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Inventory" bundle:[NSBundle mainBundle]];
-    YYInventoryStoreStyleInfoViewController *storeStyleInfoViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYInventoryStoreStyleInfoViewController"];
-    storeStyleInfoViewController.boardModel = boardModel;
-    [self.navigationController pushViewController:storeStyleInfoViewController animated:YES];
-    
-    WeakSelf(ws);
-    __block YYInventoryBoardModel * blockboardModel = boardModel;
-    [storeStyleInfoViewController setCancelButtonClicked:^(){
-        [ws.navigationController popViewControllerAnimated:YES];
-        blockboardModel.hasRead = [[NSNumber alloc] initWithInt:1];
-        if(ws.tableView.hidden){
-            [ws reloadCurrentTableData:YES];
-        }
-        [YYInventoryApi markAsReadOnMsg:[blockboardModel.msgId stringValue] adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if(rspStatusAndMessage.status == kCode100){
-                AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-                if(appDelegate.unreadInventoryAmount > 0){
-                    appDelegate.unreadInventoryAmount --;
-                    [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
-                }
-            }
-        }];
-    }];
-}
-
--(void)showStyleInfo:(YYInventoryBoardModel *)boardModel{
-    WeakSelf(ws);
-    [YYOpusApi getStyleInfoByStyleId:[boardModel.styleId longValue] orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYStyleInfoModel *styleInfoModel, NSError *error) {
-        if (rspStatusAndMessage.status != kCode100) {
-            [YYToast showToastWithView:ws.view title:rspStatusAndMessage.message andDuration:kAlertToastDuration];
-        }else{
-            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            [appDelegate showStyleInfoViewController:boardModel parentViewController:self];
-        }
-    }];
-}
-#pragma mark - Other
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }
+    [self.searchField resignFirstResponder];
 }
 
 @end

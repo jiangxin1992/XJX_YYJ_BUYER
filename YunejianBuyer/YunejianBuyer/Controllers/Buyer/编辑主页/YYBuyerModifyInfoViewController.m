@@ -6,11 +6,14 @@
 //  Copyright © 2016年 Apple. All rights reserved.
 //
 
-#import "YYBuyerModifyInfoViewController.h"
+// c文件 —> 系统文件（c文件在前）
 
-#import "YYNavigationBarViewController.h"
+// 控制器
+#import "YYBuyerModifyInfoViewController.h"
 #import "YYBuyerModifyInfoCellViewController.h"
 
+// 自定义视图
+#import "YYNavView.h"
 #import "YYBuyerModifyInfoHeadViewCell.h"
 #import "YYBuyerModifyInfoTxtViewCell.h"
 #import "YYBuyerModifyInfoContactViewCell.h"
@@ -18,15 +21,21 @@
 #import "YYBuyerModifyInfoUploadViewCell.h"
 #import "YYPickView.h"
 #import "YYBrandModifyHeadView.h"
-
-#import "UIImage+Tint.h"
-#import "regular.h"
-#import "YYUser.h"
-#import "MBProgressHUD.h"
-#import "YYOrderApi.h"
-#import "YYBuyerHomeUpdateModel.h"
-#import "YYUserApi.h"
 #import "YYCountryPickView.h"
+
+// 接口
+#import "YYOrderApi.h"
+#import "YYUserApi.h"
+
+// 分类
+#import "UIImage+Tint.h"
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "MBProgressHUD.h"
+#import "YYUser.h"
+#import "YYBuyerHomeUpdateModel.h"
+#import "YYCountryListModel.h"
+#import "regular.h"
 
 @interface YYBuyerModifyInfoViewController ()<UITableViewDataSource,UITableViewDelegate,YYCountryPickViewDelegate,YYTableCellDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate>
 
@@ -38,7 +47,7 @@
 
 @property(nonatomic,assign) NSInteger uploadImgType;
 @property(nonatomic,strong) NSMutableArray *uploadImgs;
-//@property(nonatomic,strong) YYPickView *pickerView;
+@property (nonatomic, strong) YYNavView *navView;
 @property(nonatomic,strong) YYCountryPickView *countryPickerView;
 @property(nonatomic,strong) YYCountryPickView *provincePickerView;
 
@@ -92,34 +101,13 @@
         _block(@"readEdit");
     }
 }
--(void)PrepareUI
-{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    
-    navigationBarViewController.previousTitle = @"";
-    navigationBarViewController.nowTitle = NSLocalizedString(@"编辑主页信息",nil);
-    
-    [_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
+-(void)PrepareUI {
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"编辑主页信息",nil) WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            if (ws.cancelButtonClicked) {
-                ws.cancelButtonClicked();
-            }
-            blockVc = nil;
-        }
-    }];
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     self.tableView.backgroundColor = _define_white_color;
@@ -195,6 +183,12 @@
 }
 
 #pragma mark - SomeAction
+- (void)goBack {
+    if (self.cancelButtonClicked) {
+        self.cancelButtonClicked();
+    }
+}
+
 -(void)setHomeInfoModel:(YYBuyerHomeInfoModel *)homeInfoModel{
     _homeInfoModel = homeInfoModel;
     
@@ -290,7 +284,7 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [YYUserApi getSubCountryInfoWithCountryID:[_currentNationID integerValue] WithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSInteger impId,NSError *error) {
             [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 if(countryListModel.result.count){
                     _provinceInfo = countryListModel;
                 }else{
@@ -324,7 +318,7 @@
     
     if(!_countryInfo){
         [YYUserApi getCountryInfoWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 _countryInfo = countryListModel;
                 
                 if(_countryInfo.result.count){
@@ -416,11 +410,11 @@
     WeakSelf(ws);
     NSData *jsondata = [[model toDictionary] mj_JSONData];
     [YYUserApi updateBuyerWithData:jsondata andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if( rspStatusAndMessage.status == kCode100){
+        if( rspStatusAndMessage.status == YYReqStatusCode100){
             //更新处理 重新获取用户数据
             [YYUserApi getBuyerHomeInfo:@"" andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBuyerHomeInfoModel *infoModel, NSError *error) {
                 [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-                if(rspStatusAndMessage.status == kCode100){
+                if(rspStatusAndMessage.status == YYReqStatusCode100){
                     [self updateHomeInfoWithData:infoModel];
                     [ws.tableView reloadData];
                 }else{
@@ -835,9 +829,5 @@
     }];
 }
 #pragma mark - Other
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 @end

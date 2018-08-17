@@ -105,7 +105,7 @@
         }
         [ws reloadTableData];
         
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+        [MBProgressHUD hideHUDForView:ws.view animated:YES];
     }];
     
 }

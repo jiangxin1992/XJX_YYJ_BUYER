@@ -9,7 +9,6 @@
 #import "YYStyleDetailViewController.h"
 
 #import "YYDetailContentViewController.h"
-#import "YYNavigationBarViewController.h"
 #import "YYTopBarShoppingCarButton.h"
 #import "YYOpusStyleModel.h"
 
@@ -27,9 +26,6 @@ static NSInteger tagOffset = 90000;
 @interface YYStyleDetailViewController ()<UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-
-@property (nonatomic,strong) YYNavigationBarViewController *navigationBarViewController;
-
 
 @property (nonatomic,strong) UIView *view1;
 @property (nonatomic,strong) UIView *view2;
@@ -255,9 +251,6 @@ static NSInteger tagOffset = 90000;
         nowTitle = tempStyleModel.name;
     }
     
-    self.navigationBarViewController.nowTitle = nowTitle;
-    [self.navigationBarViewController updateUI];
-    
     [self addView];
     
 }
@@ -359,7 +352,7 @@ static NSInteger tagOffset = 90000;
         dispatch_async(dispatch_get_main_queue(), ^{
             AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
             ws.stylesAndTotalPriceModel = getLocalShoppingCartStyleCount(appdelegate.cartDesignerIdArray);
-            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%i", self.stylesAndTotalPriceModel.totalStyles]];
+            [ws.topBarShoppingCarButton updateButtonNumber:[NSString stringWithFormat:@"%li", self.stylesAndTotalPriceModel.totalStyles]];
         });
     });
 }

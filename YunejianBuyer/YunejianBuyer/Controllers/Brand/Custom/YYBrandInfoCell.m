@@ -124,7 +124,7 @@
         
         _brandNameLabel.text = _designerModel.brandName;
         _designerNameLabel.text = _designerModel.designerName;
-        if([_designerModel.connectStatus integerValue] == kConnStatus){
+        if([_designerModel.connectStatus integerValue] == YYUserConnStatusNone){
             _addBtn.selected = NO;
         }else{
             _addBtn.selected = YES;
@@ -166,7 +166,7 @@
 //
 //        _brandNameLabel.text = _designerModel.brandName;
 //        _designerNameLabel.text = _designerModel.designerName;
-//        if([_designerModel.connectStatus integerValue] == kConnStatus){
+//        if([_designerModel.connectStatus integerValue] == YYUserConnStatusNone){
 //            _addBtn.selected = NO;
 //        }else{
 //            _addBtn.selected = YES;

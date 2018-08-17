@@ -19,6 +19,7 @@
 #import "YYOrderingDetailViewController.h"
 #import "MBProgressHUD.h"
 #import "AppDelegate.h"
+#import "YYOrderingHistoryListModel.h"
 
 @interface YYOrderingHistoryListViewController ()<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate>
 
@@ -40,7 +41,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self loadOrderingHistoryListFromServerByPageIndex:1 endRefreshing:YES];
     [YYOrderingApi DeleteAppointmentStatusChangeMessageWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
             [appDelegate checkAppointmentNoticeCount];
         }
@@ -77,16 +78,10 @@
     self.view.backgroundColor = _define_white_color;
     
     _navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"我的预约",nil) WithSuperView:self.view haveStatusView:YES];
-    
-    
-    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
-    [_navView addSubview:backBtn];
-    [backBtn addTarget:self action:@selector(GoBack:) forControlEvents:UIControlEventTouchUpInside];
-    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.left.mas_equalTo(0);
-        make.width.mas_equalTo(40);
-        make.bottom.mas_equalTo(-1);
-    }];
+    WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws GoBack:nil];
+    };
 }
 #pragma mark - UIConfig
 -(void)UIConfig{
@@ -96,12 +91,12 @@
 }
 -(void)CreateTableView
 {
-    _tableView=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     [self.view addSubview:_tableView];
     //    消除分割线
-    _tableView.separatorStyle=UITableViewCellSeparatorStyleNone;
-    _tableView.delegate=self;
-    _tableView.dataSource=self;
+    _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
     WeakSelf(ws);
     [_tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.bottom.mas_equalTo(0);
@@ -154,7 +149,7 @@
     WeakSelf(ws);
     __block BOOL blockEndrefreshing = endrefreshing;
     [YYOrderingApi getOrderingHistoryListPageIndex:pageIndex pageSize:10 andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOrderingHistoryListModel *orderingListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             if (pageIndex == 1) {
                 [ws.dataArr removeAllObjects];
             }
@@ -341,7 +336,7 @@
                 [MBProgressHUD showHUDAddedTo:self.view animated:YES];
                 YYOrderingHistoryListItemModel *itemModel = [_dataArr objectAtIndex:indexPath.section];
                 [YYOrderingApi CancelOrderingWithID:(int)[itemModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                    if (rspStatusAndMessage.status == kCode100) {
+                    if (rspStatusAndMessage.status == YYReqStatusCode100) {
                         //状态变成已取消
                         itemModel.status = @"CANCELLED";
                     }
@@ -367,7 +362,7 @@
                 [MBProgressHUD showHUDAddedTo:self.view animated:YES];
                 YYOrderingHistoryListItemModel *itemModel = [_dataArr objectAtIndex:indexPath.section];
                 [YYOrderingApi DeleteOrderingWithID:(int)[itemModel.id integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                    if (rspStatusAndMessage.status == kCode100) {
+                    if (rspStatusAndMessage.status == YYReqStatusCode100) {
                         //删除
                         [ws.dataArr removeObjectAtIndex:indexPath.section];
                     }

@@ -83,7 +83,7 @@ static JRPhoneDelegate *phoneDelegate;
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:mediaType];
 
     if(authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied){
-        [[[UIAlertView alloc] initWithTitle:@"提示" message:@"请在设备的“设置-隐私-相机”中允许访问相机" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"提示", nil) message:NSLocalizedString(@"请在设备的“设置-隐私-相机”中允许访问相机", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"确定", nil) otherButtonTitles:nil] show];
         return;
     }else{
         [self.pushController presentViewController:picker animated:YES completion:nil];
@@ -104,7 +104,7 @@ static JRPhoneDelegate *phoneDelegate;
     picker.sourceType=UIImagePickerControllerSourceTypePhotoLibrary;
     ALAuthorizationStatus authStatus = [ALAssetsLibrary authorizationStatus];
     if(authStatus == ALAuthorizationStatusRestricted || authStatus == ALAuthorizationStatusDenied){
-        [[[UIAlertView alloc] initWithTitle:@"提示" message:@"请在设备的“设置-隐私-照片”中允许访问照片" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"提示", nil) message:NSLocalizedString(@"请在设备的“设置-隐私-照片”中允许访问照片", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"确定", nil) otherButtonTitles:nil] show];
 
         return;
     }else{

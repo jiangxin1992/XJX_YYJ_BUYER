@@ -8,12 +8,27 @@
 
 #import "YYOpusApi.h"
 
-#import "YYRequestHelp.h"
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
+
+// 自定义视图
+
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import "RequestMacro.h"
-#import "UserDefaultsMacro.h"
+#import "YYRequestHelp.h"
 #import "YYHttpHeaderManager.h"
-#import "YYUser.h"
-#import "YYSeriesInfoModel.h"
+
+#import "YYStyleInfoModel.h"
+#import "YYUserStyleListModel.h"
+#import "YYOpusStyleListModel.h"
+#import "YYUserSeriesListModel.h"
+#import "YYOpusSeriesListModel.h"
+#import "YYSeriesInfoDetailModel.h"
 
 @implementation YYOpusApi
 
@@ -367,7 +382,7 @@
  * 更改系列权限
  *
  */
-+ (void)updateSeriesAuthType:(long)seriesId authType:(NSInteger)authType  andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
++ (void)updateSeriesAuthType:(long)seriesId authType:(NSInteger)authType andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,NSError *error))block{
     // get URL
     NSString *requestURL = [[[NSUserDefaults standardUserDefaults] objectForKey:kLastYYServerURL] stringByAppendingString:kUpdateSeriesAuthType_buyer];
     NSDictionary *dic = [YYHttpHeaderManager buildHeadderWithAction:kUpdateSeriesAuthType_buyer params:nil];
@@ -393,7 +408,7 @@
  *设计师系列详情
  *
  */
-+ (void)getSeriesInfo:(NSInteger )seriesId  andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block{
++ (void)getSeriesInfo:(NSInteger )seriesId andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYSeriesInfoDetailModel *infoDetailModel,NSError *error))block{
     // get URL
     NSString *requestURL = [[[NSUserDefaults standardUserDefaults] objectForKey:kLastYYServerURL] stringByAppendingString:kSeriesInfo_buyer];
     NSDictionary *dic = [YYHttpHeaderManager buildHeadderWithAction:kSeriesInfo_buyer params:nil];

@@ -7,8 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+
 #import "YYRspStatusAndMessage.h"
-#import "YYPerfectInfoModel.h"
+
+@class YYPerfectInfoModel;
 
 @interface YYAuditingApi : NSObject
 
@@ -26,4 +28,5 @@
  @param block 返回
  */
 + (void)postInvisibleWithModel:(YYPerfectInfoModel *)model AndBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error))block;
+
 @end

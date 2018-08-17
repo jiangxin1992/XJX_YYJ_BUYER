@@ -1,0 +1,15 @@
+
+/* Class = "UILabel"; text = "发货"; ObjectID = "6M4-9m-N7Q"; */
+"6M4-9m-N7Q.text" = "Delivery";
+
+/* Class = "UILabel"; text = "结算"; ObjectID = "bLD-mW-JsG"; */
+"bLD-mW-JsG.text" = "Payment";
+
+/* Class = "UILabel"; text = "类型"; ObjectID = "fhn-32-uJ7"; */
+"fhn-32-uJ7.text" = "Type";
+
+/* Class = "UIButton"; normalTitle = "联系品牌"; ObjectID = "g84-IC-5iJ"; */
+"g84-IC-5iJ.normalTitle" = "Contact";
+
+/* Class = "UILabel"; text = "收件"; ObjectID = "jyu-VK-lGG"; */
+"jyu-VK-lGG.text" = "Recipient";

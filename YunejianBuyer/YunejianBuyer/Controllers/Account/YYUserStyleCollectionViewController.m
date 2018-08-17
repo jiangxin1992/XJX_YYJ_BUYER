@@ -196,7 +196,7 @@
     WeakSelf(ws);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYOpusApi getStyleCollectListByPageIndex:pageIndex pageSize:YY_TABLEVIEW_PAGESZIE andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUserStyleListModel *styleListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100 && styleListModel.result
+        if (rspStatusAndMessage.status == YYReqStatusCode100 && styleListModel.result
             && [styleListModel.result count] > 0) {
             ws.currentPageInfo = styleListModel.pageInfo;
             if (ws.currentPageInfo== nil || ws.currentPageInfo.isFirstPage) {
@@ -215,7 +215,7 @@
         }
 
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != kCode100) {
+        if (rspStatusAndMessage.status != YYReqStatusCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadTabeleViewData];
@@ -251,13 +251,13 @@
     [self addFooter];
 }
 -(void)CreateTableView{
-    _tableview=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableview = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     [self.view addSubview:_tableview];
     //    消除分割线
     _tableview.backgroundColor = [UIColor colorWithHex:@"f8f8f8"];
-    _tableview.separatorStyle=UITableViewCellSeparatorStyleNone;
-    _tableview.delegate=self;
-    _tableview.dataSource=self;
+    _tableview.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _tableview.delegate = self;
+    _tableview.dataSource = self;
     [_tableview mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
     }];

@@ -7,7 +7,6 @@
 //
 
 #import "YYPerfectAuditingViewController.h"
-#import "YYNavigationBarViewController.h"
 
 @interface YYPerfectAuditingViewController ()<UIGestureRecognizerDelegate>
 

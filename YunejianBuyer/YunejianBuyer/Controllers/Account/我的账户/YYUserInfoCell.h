@@ -21,7 +21,6 @@ typedef NS_ENUM(NSInteger, ShowType) {
     ShowTypeOrdering = 60009,
     ShowTypeCollection = 60010,
     ShowTypeSetting = 60011,
-    ShowTypeInventory = 60012,
     ShowTypeCopBrands = 60013
 };
 

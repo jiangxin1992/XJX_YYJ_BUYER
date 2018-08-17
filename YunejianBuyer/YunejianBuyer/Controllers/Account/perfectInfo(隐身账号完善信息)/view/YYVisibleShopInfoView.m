@@ -137,7 +137,7 @@
         nextPhotoButton.imageData = self.photoDataArray[x];
     }
 
-    if (dataCount>=0 && dataCount<7) {
+    if (dataCount>=0 && dataCount<=7) {
         YYVisibleUploadPhotoButton *nextPhotoButton = (YYVisibleUploadPhotoButton *)self.photoButtonArray[dataCount];
         nextPhotoButton.imageData = nil;
         nextPhotoButton.hidden = NO;

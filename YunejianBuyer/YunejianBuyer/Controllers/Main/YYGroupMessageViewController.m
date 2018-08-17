@@ -5,28 +5,38 @@
 //  Created by Apple on 16/8/25.
 //  Copyright © 2016年 Apple. All rights reserved.
 //
+// c文件 —> 系统文件（c文件在前）
 
+// 控制器
 #import "YYGroupMessageViewController.h"
-
-#import "YYInventoryViewController.h"
 #import "YYOrderingListViewController.h"
-#import "YYNavigationBarViewController.h"
 #import "YYOrderMessageViewController.h"
 #import "YYConnMsgListController.h"
 #import "YYMessageDetailViewController.h"
-
-#import "AppDelegate.h"
-#import "UIView+UpdateAutoLayoutConstraints.h"
 #import "YYNewsViewController.h"
+
+// 自定义视图
+#import "YYNavView.h"
 #import "YYMessagePersonalCell.h"
-#import <MJRefresh.h>
-#import "YYPageInfoModel.h"
+
+// 接口
 #import "YYMessageApi.h"
+
+// 分类
+#import "UIView+UpdateAutoLayoutConstraints.h"
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import <MJRefresh.h>
 #import "MBProgressHUD.h"
+#import "YYPageInfoModel.h"
+#import "YYMessageUserChatListModel.h"
+#import "YYUntreatedMsgAmountModel.h"
+#import "AppDelegate.h"
 
 @interface YYGroupMessageViewController ()<UITableViewDataSource,UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *containerView;
+@property (nonatomic, strong) YYNavView *navView;
 @property (strong, nonatomic)NSMutableArray *personalMessageList;
 @property (nonatomic,strong)YYPageInfoModel *currentPageInfo;
 
@@ -42,33 +52,11 @@
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(messageCountChanged:) name:UnreadMsgAmountChangeNotification object:nil];
     // Do any additional setup after loading the view.
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    //self.navigationBarViewController = navigationBarViewController;
-    navigationBarViewController.nowTitle =  NSLocalizedString(@"消息中心",nil);
-    //[_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    [_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
-    //
     WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            if(_cancelButtonClicked){
-                [blockVc.view removeFromSuperview];
-                blockVc = nil;
-                ws.cancelButtonClicked();
-                [self.navigationController popViewControllerAnimated:YES];
-            }
-        }
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"消息中心",nil) WithSuperView:self.view haveStatusView:YES];
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
 
     [self addHeader];
     [self addFooter];
@@ -78,6 +66,13 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self loadListFromServerByPageIndex:1 endRefreshing:NO];
     
+}
+
+- (void)goBack {
+    if(self.cancelButtonClicked){
+        self.cancelButtonClicked();
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)addHeader{
@@ -165,25 +160,25 @@
         if(indexPath.row == 0){
             iconImg.image = [UIImage imageNamed:@"inventoryconn_icon"];
             textLabel.text =  NSLocalizedString(@"合作消息",nil);
-            if(appDelegate.unreadConnNotifyMsgAmount > 0){
+            if(appDelegate.untreatedMsgAmountModel.unreadConnNotifyMsgAmount > 0){
                 numLabel.hidden = NO;
-                [self updateLabelNumber:numLabel nowNumber:appDelegate.unreadConnNotifyMsgAmount];
+                [self updateLabelNumber:numLabel nowNumber:appDelegate.untreatedMsgAmountModel.unreadConnNotifyMsgAmount];
             }else{
                 numLabel.hidden = YES;
             }
         }else if(indexPath.row == 1){
             iconImg.image = [UIImage imageNamed:@"inventoryorder_icon"];
             textLabel.text =  NSLocalizedString(@"订单消息",nil);
-            if(appDelegate.unreadOrderNotifyMsgAmount > 0){
+            if(appDelegate.untreatedMsgAmountModel.unreadOrderNotifyMsgAmount > 0){
                 numLabel.hidden = NO;
-                [self updateLabelNumber:numLabel nowNumber:appDelegate.unreadOrderNotifyMsgAmount];
+                [self updateLabelNumber:numLabel nowNumber:appDelegate.untreatedMsgAmountModel.unreadOrderNotifyMsgAmount];
             }else{
                 numLabel.hidden = YES;
             }
         }else if(indexPath.row == 2){
             iconImg.image = [UIImage imageNamed:@"inventorynews_icon"];
             textLabel.text =  NSLocalizedString(@"YCO新闻",nil);
-            if(appDelegate.unreadNewsAmount > 0 ){
+            if(appDelegate.untreatedMsgAmountModel.unreadNewsAmount > 0 ){
                 [self updateLabelNumber:numLabel nowNumber:0];
             }else{
                 numLabel.hidden = YES;
@@ -366,7 +361,7 @@
                 YYMessageUserChatModel *chatModel = [ws.personalMessageList objectAtIndex:indexPath.row];
                 __block NSInteger row = indexPath.row;
                 [YYMessageApi deleteMessageUserChat:chatModel.oppositeEmail andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-                    if(rspStatusAndMessage.status == kCode100){
+                    if(rspStatusAndMessage.status == YYReqStatusCode100){
                         [ws.personalMessageList removeObjectAtIndex:row];  //删除数组里的数据
                         [ws.tableView reloadData];
                         //[ws.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -387,15 +382,12 @@
     [self.tableView reloadData];
 }
 
-
-
-
 - (void)loadListFromServerByPageIndex:(int)pageIndex endRefreshing:(BOOL)endrefreshing{
     WeakSelf(ws);
     
     __block BOOL blockEndrefreshing = endrefreshing;
     [YYMessageApi getUserChatListPageIndex:pageIndex pageSize:kMaxPageSize andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYMessageUserChatListModel *chatListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             if (pageIndex == 1) {
                 [ws.personalMessageList removeAllObjects];
             }
@@ -423,19 +415,5 @@
         
     }];
 }
-#pragma mark - Other
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 @end

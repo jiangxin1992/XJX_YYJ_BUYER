@@ -26,7 +26,7 @@
 /* Class = "UILabel"; text = "喜欢YCO BUYER，去评分"; ObjectID = "8Xn-Iz-zUB"; */
 "8Xn-Iz-zUB.text" = "Like YCO BUYER? Rate the app!";
 
-/* Class = "UILabel"; text = "设置为默认收货地址"; ObjectID = "96y-gP-BZ1"; */
+/* Class = "UILabel"; text = "设置为默认收件地址"; ObjectID = "96y-gP-BZ1"; */
 "96y-gP-BZ1.text" = "Set Default Address";
 
 /* Class = "UILabel"; text = "隐私协议"; ObjectID = "9mz-Qb-Mmu"; */

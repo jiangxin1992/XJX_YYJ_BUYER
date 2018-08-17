@@ -10,6 +10,6 @@
 
 @interface YYOrderingHistoryListViewController : UIViewController
 
-@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
 
 @end

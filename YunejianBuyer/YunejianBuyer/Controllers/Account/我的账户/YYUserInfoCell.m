@@ -11,6 +11,7 @@
 #import "YYUser.h"
 #import "AppDelegate.h"
 #import "UIView+UpdateAutoLayoutConstraints.h"
+#import "YYUntreatedMsgAmountModel.h"
 
 @interface YYUserInfoCell ()
 
@@ -142,7 +143,7 @@
             _keyLabel.text = NSLocalizedString(@"我的预约",nil);
             _valueLabel.text = @"";
             AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            [self updateLabelNumber:_unreadLabel nowNumber:appDelegate.unreadAppointmentStatusMsgAmount];
+            [self updateLabelNumber:_unreadLabel nowNumber:appDelegate.untreatedMsgAmountModel.unreadAppointmentStatusMsgAmount];
         }
             break;
         case ShowTypeCollection:{
@@ -155,14 +156,6 @@
             [_infoIconImage setImage:[UIImage imageNamed:@"user_copbrands"] forState:UIControlStateNormal];
             _keyLabel.text = NSLocalizedString(@"我的合作品牌",nil);
             _valueLabel.text = @"";
-        }
-            break;
-        case ShowTypeInventory:{
-            [_infoIconImage setImage:[UIImage imageNamed:@"user_inventory"] forState:UIControlStateNormal];
-            _keyLabel.text = NSLocalizedString(@"库存调拨",nil);
-            _valueLabel.text = @"";
-            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            [self updateLabelNumber:_unreadLabel nowNumber:appDelegate.unreadInventoryAmount];
         }
             break;
         case ShowTypeSetting:{

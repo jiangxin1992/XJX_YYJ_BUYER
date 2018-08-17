@@ -111,7 +111,7 @@
         }
         [ws reloadTableData];
         
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+        [MBProgressHUD hideHUDForView:ws.view animated:YES];
     }];
     
 }
@@ -294,7 +294,7 @@
     WeakSelf(ws);
     if(_viewType == 1){
         [YYInventoryApi addDemand:modelData adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
             if(rspStatusAndMessage.status == kCode100){
                 [ws clearStyleInfo];
                 [ws.navigationController popToRootViewControllerAnimated:YES];
@@ -303,7 +303,7 @@
         }];
     }else if(_viewType == 2){
         [YYInventoryApi addStore:modelData adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
 
             if(rspStatusAndMessage.status == kCode100){
                 [ws clearStyleInfo];

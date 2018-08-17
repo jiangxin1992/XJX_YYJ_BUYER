@@ -76,12 +76,14 @@
 
 #import "YYUser.h"
 #import "YYUserModel.h"
+#import "YYOpusStyleModel.h"
 #import "YYOrderInfoModel.h"
 #import "YYStyleInfoModel.h"
 #import "YYOpusSeriesModel.h"
 #import "YYOrderStyleModel.h"
 #import "YYOrderSeriesModel.h"
-#import "YYInventoryBoardModel.h"
+#import "YYStyleOneColorModel.h"
+#import "YYUntreatedMsgAmountModel.h"
 #import "YYBrandSeriesToCartTempModel.h"
 
 #import "UserDefaultsMacro.h"
@@ -112,9 +114,7 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
     }
 
-    [UITableView appearance].estimatedRowHeight = 0;
-    [UITableView appearance].estimatedSectionHeaderHeight = 0;
-    [UITableView appearance].estimatedSectionFooterHeight = 0;
+    [self customsAppearance];
 
     NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
     NSString *_isFirstOpenApp = [userDefault objectForKey:isFirstOpenApp];
@@ -237,6 +237,7 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
     if(_isNeedUpdate){
         [YYUpdateAppStore checkVersion];
     }
+    
     return YES;
 }
 
@@ -403,41 +404,42 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
 - (void)loginByEmail:(NSString *)email password:(NSString *)password verificationCode:(NSString *)verificationCode{
     WeakSelf(ws);
 
-    verificationCode = verificationCode&&[verificationCode length]?verificationCode:nil;
+    verificationCode = verificationCode && [verificationCode length] ? verificationCode : nil;
 
     [YYUserApi loginWithUsername:email password:md5(password) verificationCode:verificationCode andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUserModel *userModel, NSError *error) {
         ws.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] ;
 
-        if (rspStatusAndMessage.status == kCode100 || rspStatusAndMessage.status == kCode1000){
-
-            YYUser *user = [YYUser currentUser];
-            NSString *checkStatus = nil;
-            if(userModel.checkStatus){
-                checkStatus = [userModel.checkStatus stringValue];
+        if (rspStatusAndMessage.status == YYReqStatusCode100 || rspStatusAndMessage.status == YYReqStatusCode1000){
+            if ([userModel.type integerValue] == YYUserTypeRetailer || [userModel.type integerValue] == YYUserTypeProductManager) {
+                YYUser *user = [YYUser currentUser];
+                [user saveUserWithEmail:email password:password userInfo:userModel];
+                //进入首页
+                [ws enterMainIndexPage];
+                if(rspStatusAndMessage.status == YYReqStatusCode1000 || [user.status integerValue] == YYReqStatusCode305){
+                    CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:rspStatusAndMessage.message needwarn:YES delegate:nil cancelButtonTitle:NSLocalizedString(@"下一次再说",nil) otherButtonTitles:@[NSLocalizedString(@"去验证",nil)]];
+                    [alertView setAlertViewBlock:^(NSInteger selectedIndex){
+                        if (selectedIndex == 1) {
+                            [[NSNotificationCenter defaultCenter] postNotificationName:kShowAccountNotification object:nil];
+                        }
+                    }];
+                    alertView.noLongerRemindKey = NoLongerRemindBrand;
+                    [alertView show];
+                }
+                [LanguageManager setLanguageToServer];
+            }else {
+                [ws enterLoginPage];
+                [YYToast showToastWithTitle:NSLocalizedString(@"该账号没有APP登录权限，请在WEB端登录", nil) andDuration:kAlertToastDuration];
             }
-            [user saveUserWithEmail:email username:userModel.name password:password userType:[userModel.type intValue] userId:userModel.id logo:userModel.logo status:[userModel.authStatus stringValue] checkStatus:checkStatus];
-
-            //进入首页
-            [ws enterMainIndexPage];
-            if(rspStatusAndMessage.status == kCode1000 || [user.status integerValue] == kCode305){
-                CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:nil message:rspStatusAndMessage.message needwarn:YES delegate:nil cancelButtonTitle:NSLocalizedString(@"下一次再说",nil) otherButtonTitles:@[NSLocalizedString(@"去验证",nil)]];
-                [alertView setAlertViewBlock:^(NSInteger selectedIndex){
-                    if (selectedIndex == 1) {
-                        [[NSNotificationCenter defaultCenter] postNotificationName:kShowAccountNotification object:nil];
-                    }
-                }];
-                alertView.noLongerRemindKey = NoLongerRemindBrand;
-                [alertView show];
-
-            }
-
-            [LanguageManager setLanguageToServer];
-
         }else{
             //进入登录
             YYUser *user = [YYUser currentUser];
             if (user && user.email && [user.email length] && user.password && [user.password length]){
-                [ws enterMainIndexPage];
+                if (user.userType == YYUserTypeRetailer || user.userType == YYUserTypeProductManager) {
+                    [ws enterMainIndexPage];
+                }else {
+                    [ws enterLoginPage];
+                    [YYToast showToastWithTitle:NSLocalizedString(@"该账号没有APP登录权限，请在WEB端登录", nil) andDuration:kAlertToastDuration];
+                }
             }else{
                 [ws enterLoginPage];
             }
@@ -453,8 +455,8 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
         return;
     }
     [YYOrderingApi getAppointmentStatusChangeMessageCountWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSInteger unreadAppointmentStatusMsgAmount, NSError *error) {
-        if(rspStatusAndMessage.status == kCode100){
-            self.unreadAppointmentStatusMsgAmount = unreadAppointmentStatusMsgAmount;
+        if(rspStatusAndMessage.status == YYReqStatusCode100){
+            self.untreatedMsgAmountModel.unreadAppointmentStatusMsgAmount = unreadAppointmentStatusMsgAmount;
             dispatch_async(dispatch_get_main_queue(), ^{
                 //发一个通知（更新状态的）
                 [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountStatusChangeNotification object:nil userInfo:nil];
@@ -499,60 +501,16 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
         return;
     }
     NSString *type = @"";
-    [YYOrderApi getUnreadNotifyMsgAmount:type andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSInteger orderMsgCount,NSInteger connMsgCount,NSInteger inventoryAmount,NSInteger newsAmount,NSInteger personlMsgAmount,NSInteger appointmentMsgAmount,NSInteger toOrdered,NSInteger toConfirmed,NSInteger toProduced,NSInteger toDelivered,NSInteger toReceived,NSError *error) {
-
-        self.unreadOrderNotifyMsgAmount = orderMsgCount;
-        self.unreadConnNotifyMsgAmount = connMsgCount;
-        self.unreadInventoryAmount = inventoryAmount;
-        self.unreadNewsAmount = newsAmount;
-        self.unreadPersonalMsgAmount = personlMsgAmount;
-        self.unreadAppointmentMsgAmount = appointmentMsgAmount;
-
-        self.unconfirmedOrderedMsgAmount = toOrdered;
-        self.unconfirmedConfirmedMsgAmount = toConfirmed;
-        self.unconfirmedProducedMsgAmount = toProduced;
-        self.unconfirmedDeliveredMsgAmount = toDelivered;
-        self.unconfirmedReceivedMsgAmount = toReceived;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
-        });
-
+    [YYOrderApi getUnreadNotifyMsgAmount:type andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUntreatedMsgAmountModel *untreatedModel, NSError *error) {
+        if (!error && untreatedModel) {
+            self.untreatedMsgAmountModel = untreatedModel;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
+            });
+        }
     }];
 }
 
-- (void)timerAction:(NSTimer *)theTimer {
-    // Show the HUD only if the task is still running
-    NSThread * thread = [NSThread currentThread];
-    if ([thread isCancelled]){
-        [NSThread exit];//执行exit，后边的语句不再执行。所以不用写retur
-    }
-    YYUser *user = [YYUser currentUser];
-    if (![YYCurrentNetworkSpace isNetwork] || self.mainViewController == nil || !user.email ) {
-        return;
-    }
-    NSString *type = @"";
-    [YYOrderApi getUnreadNotifyMsgAmount:type andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSInteger orderMsgCount,NSInteger connMsgCount,NSInteger inventoryAmount,NSInteger newsAmount,NSInteger personlMsgAmount,NSInteger appointmentMsgAmount,NSInteger toOrdered,NSInteger toConfirmed,NSInteger toProduced,NSInteger toDelivered,NSInteger toReceived,NSError *error) {
-
-        self.unreadOrderNotifyMsgAmount = orderMsgCount;
-        self.unreadConnNotifyMsgAmount = connMsgCount;
-        self.unreadInventoryAmount = inventoryAmount;
-        self.unreadNewsAmount = newsAmount;
-        self.unreadPersonalMsgAmount = personlMsgAmount;
-        self.unreadAppointmentMsgAmount = appointmentMsgAmount;
-
-        self.unconfirmedOrderedMsgAmount = toOrdered;
-        self.unconfirmedConfirmedMsgAmount = toConfirmed;
-        self.unconfirmedProducedMsgAmount = toProduced;
-        self.unconfirmedDeliveredMsgAmount = toDelivered;
-        self.unconfirmedReceivedMsgAmount = toReceived;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
-        });
-
-    }];
-}
 #pragma mark - --------------跳转视图----------------------
 //进入产品介绍
 -(void)enterIntroPage{
@@ -667,8 +625,8 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
 -(void)showBrandInfoViewController:(NSNumber*)designerId WithBrandName:(NSString *)brandName WithLogoPath:(NSString *)logoPath parentViewController:(UIViewController*)viewController WithHomePageBlock:(void(^)(NSString *type,NSNumber *connectStatus))homeblock WithSelectedValue:(void(^)(NSArray *value))valueblock{
     if(brandName && designerId && viewController){
         [YYUserApi getUserStatus:[designerId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSInteger status, NSError *error) {
-            if(rspStatusAndMessage.status == kCode100){
-                if(status != kUserStatusStop && status >-1){
+            if(rspStatusAndMessage.status == YYReqStatusCode100){
+                if(status != YYUserStatusStop && status >-1){
 
                     //初始化或更新(brandName和brandLogo)购物车信息
                     NSString *tempBrandName = [NSString isNilOrEmpty:brandName]?@"":brandName;
@@ -799,7 +757,7 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
     [viewController.navigationController pushViewController:styleDetailViewController animated:YES];
 }
 
-- (void)showStyleInfoViewController:(YYInventoryBoardModel *)infoModel parentViewController:(UIViewController*)viewController{
+- (void)showStyleInfoViewController:(YYStyleOneColorModel *)infoModel parentViewController:(UIViewController*)viewController{
 
     //初始化或更新(brandName和brandLogo)购物车信息
     NSString *tempBrandName = [NSString isNilOrEmpty:infoModel.brandName]?@"":infoModel.brandName;
@@ -976,19 +934,7 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
 
 #pragma mark - --------------自定义方法----------------------
 - (void)delegateTempDataClear{
-    self.unreadOrderNotifyMsgAmount = 0;
-    self.unreadConnNotifyMsgAmount = 0;
-    self.unreadInventoryAmount = 0;
-    self.unreadPersonalMsgAmount = 0;
-    self.unreadNewsAmount = 0;
-    self.unreadAppointmentMsgAmount = 0;
-    self.unreadAppointmentStatusMsgAmount = 0;
-    self.unconfirmedOrderedMsgAmount = 0;
-    self.unconfirmedConfirmedMsgAmount = 0;
-    self.unconfirmedProducedMsgAmount = 0;
-    self.unconfirmedDeliveredMsgAmount = 0;
-    self.unconfirmedReceivedMsgAmount = 0;
-
+    [self.untreatedMsgAmountModel clearModel];
     self.connDesignerInfoMap = [[NSMutableDictionary alloc] init];
 }
 - (void)reloadRootViewController:(NSInteger)index{
@@ -1159,6 +1105,14 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
     //3.开始监听
     [manager startMonitoring];
 }
+
+- (void)customsAppearance {
+    [UITableView appearance].estimatedRowHeight = 0;
+    [UITableView appearance].estimatedSectionHeaderHeight = 0;
+    [UITableView appearance].estimatedSectionFooterHeight = 0;
+    [UITableView appearance].sectionIndexColor = [UIColor colorWithHex:@"afafaf"];
+}
+
 #pragma mark - 键盘隐藏
 
 - (void)keyboardWillShow:(NSNotification *)note

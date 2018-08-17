@@ -69,17 +69,7 @@
 
 - (void)PrepareUI{
     self.view.backgroundColor = _define_white_color;
-    
     self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"找回密码",nil) WithSuperView: self.view haveStatusView:YES];
-    
-    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
-    [self.navView addSubview:backBtn];
-    [backBtn addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
-    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.left.mas_equalTo(0);
-        make.width.mas_equalTo(40);
-        make.bottom.mas_equalTo(-1);
-    }];
 }
 
 #pragma mark - --------------UIConfig----------------------
@@ -134,7 +124,7 @@
     __block NSString *blockEmailstr = infoModel.value;
     [YYUserApi forgetPassword:paramsStr andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:NO];
-        if( rspStatusAndMessage.status == kCode100){
+        if( rspStatusAndMessage.status == YYReqStatusCode100){
             //[YYToast showToastWithTitle:@"提交成功！" andDuration:kAlertToastDuration];
             self.viewType = kEmailPasswordType;
             self.userEmail = blockEmailstr;
@@ -211,7 +201,7 @@
     NSArray *data = [self.cellDataArrays objectAtIndex:indexPath.section];
     YYTableViewCellData *cellData = [data objectAtIndex:indexPath.row];
     if (cellData.selectedCellBlock) {
-        cellData.selectedCellBlock(indexPath);
+        cellData.selectedCellBlock(tableView, indexPath);
     }
 }
 
@@ -219,10 +209,6 @@
 
 
 #pragma mark - --------------自定义响应----------------------
-- (void)goBack {
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
 - (void)submitApplication {
     NSArray *data = nil;
     YYTableViewCellData *cellData =nil;

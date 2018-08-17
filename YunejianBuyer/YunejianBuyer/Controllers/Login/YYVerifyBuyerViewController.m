@@ -88,22 +88,12 @@
 
 - (void)PrepareUI{
     self.view.backgroundColor = _define_white_color;
-    
     self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"买手店身份审核",nil) WithSuperView: self.view haveStatusView:YES];
-    
-    UIButton *backBtn = [UIButton getCustomImgBtnWithImageStr:@"goBack_normal" WithSelectedImageStr:nil];
-    [self.navView addSubview:backBtn];
-    [backBtn addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
-    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.left.mas_equalTo(0);
-        make.width.mas_equalTo(40);
-        make.bottom.mas_equalTo(-1);
-    }];
 }
 
 #pragma mark - --------------UIConfig----------------------
 -(void)UIConfig{
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, kStatusBarAndNavigationBarHeight, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - kStatusBarAndNavigationBarHeight - 58 - (kIPhoneX?34.f:0.f)) style:UITableViewStyleGrouped];
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, kStatusBarAndNavigationBarHeight, SCREEN_WIDTH, SCREEN_HEIGHT - kStatusBarAndNavigationBarHeight - kTabbarAndBottomSafeAreaHeight) style:UITableViewStyleGrouped];
     [self.view addSubview:self.tableView];
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -119,7 +109,7 @@
     [self.tableView registerAsDodgeViewForMLInputDodger];
     
     self.submitButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.submitButton.frame = CGRectMake(0, CGRectGetHeight([UIScreen mainScreen].bounds) - 58 - (kIPhoneX?34.f:0.f), CGRectGetWidth([UIScreen mainScreen].bounds), 58);
+    self.submitButton.frame = CGRectMake(0, SCREEN_HEIGHT - kTabbarAndBottomSafeAreaHeight, SCREEN_WIDTH, 58);
     self.submitButton.backgroundColor = _define_black_color;
     [self.submitButton setTitle:NSLocalizedString(@"保存",nil) forState:UIControlStateNormal];
     self.submitButton.titleLabel.font = [UIFont systemFontOfSize:15];
@@ -133,7 +123,7 @@
     NSLog(@"[model toJSONString] %@",[model toJSONString]);
     [YYUserApi checkBuyerWithData:[[model toDictionary] mj_JSONData] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        if( rspStatusAndMessage.status == kCode100){
+        if( rspStatusAndMessage.status == YYReqStatusCode100){
             [self showYellowUserCheckAlert];
         }else{
             [YYToast showToastWithView:self.view title:rspStatusAndMessage.message andDuration:kAlertToastDuration];
@@ -284,7 +274,7 @@
     NSArray *data = [self.cellDataArrays objectAtIndex:indexPath.section];
     YYTableViewCellData *cellData = [data objectAtIndex:indexPath.row];
     if (cellData.selectedCellBlock) {
-        cellData.selectedCellBlock(indexPath);
+        cellData.selectedCellBlock(tableView, indexPath);
     }
 }
 
@@ -456,10 +446,6 @@
 }
 
 #pragma mark - --------------自定义响应----------------------
-- (void)goBack {
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
 - (void)submitApplication {
     NSArray *data = nil;
     NSInteger total=[self.cellDataArrays count];
@@ -859,7 +845,7 @@
         [self.navigationController popViewControllerAnimated:YES];
     }];
     YYUser *user = [YYUser currentUser];
-    user.status = [NSString stringWithFormat:@"%d",kCode300];
+    user.status = [NSString stringWithFormat:@"%ld",YYReqStatusCode300];
     [user saveUserData];
 }
 

@@ -6,18 +6,31 @@
 //  Copyright © 2015年 yyj. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYConnMsgListController.h"
 
-#import "YYUserApi.h"
-#import "YYNavigationBarViewController.h"
-#import <MJRefresh.h>
-#import "MBProgressHUD.h"
+// 自定义视图
+#import "YYNavView.h"
 #import "YYConnMsgListCell.h"
+
+// 接口
+#import "YYUserApi.h"
 #import "YYOrderApi.h"
 #import "YYConnApi.h"
+
+// 分类
+#import "UINavigationController+YRBackGesture.h"
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import <MJRefresh.h>
+#import "MBProgressHUD.h"
+#import "YYOrderMessageInfoModel.h"
+#import "YYUntreatedMsgAmountModel.h"
+#import "YYOrderMessageInfoListModel.h"
 #import "YYUser.h"
 #import "AppDelegate.h"
-#import "UINavigationController+YRBackGesture.h"
 
 @interface YYConnMsgListController ()<UITableViewDataSource,UITableViewDelegate,YYTableCellDelegate>
 @property (weak, nonatomic) IBOutlet UIView *containerView;
@@ -25,6 +38,7 @@
 @property (nonatomic,strong)YYPageInfoModel *currentPageInfo;
 @property (strong, nonatomic) NSMutableArray *msgListArray;
 
+@property (nonatomic, strong) YYNavView *navView;
 @property (nonatomic,strong) UIView *noDataView;
 @end
 
@@ -36,37 +50,12 @@
 
     // 禁用返回手势
     self.navigationController.enableBackGesture = NO;
-
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    
-    NSString *title = NSLocalizedString(@"合作消息",nil);
-    navigationBarViewController.nowTitle = title;
-    
-    [_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-        
-    }];
-    
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"合作消息",nil) WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            if(ws.markAsReadHandler){
-                ws.markAsReadHandler();
-            }
-            [ws.navigationController popViewControllerAnimated:YES];
-            blockVc = nil;
-        }
-    }];
     self.noDataView =addNoDataView_phone(self.view,[NSString stringWithFormat:@"%@|icon:nomsg_icon",NSLocalizedString(@"暂无合作消息",nil)],nil,nil);
     _noDataView.hidden = YES;
     _tableView.separatorColor = [UIColor colorWithHex:kDefaultImageColor];
@@ -100,7 +89,7 @@
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YYOrderMessageInfoModel* infoModel = [self.msgListArray objectAtIndex:indexPath.row];
+    YYOrderMessageInfoModel *infoModel = [self.msgListArray objectAtIndex:indexPath.row];
     static NSString* reuseIdentifier = @"YYConnMsgListCell";
     YYConnMsgListCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
     cell.msgInfoModel = infoModel;
@@ -120,7 +109,7 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    YYOrderMessageInfoModel* infoModel = [self.msgListArray objectAtIndex:indexPath.row];
+    YYOrderMessageInfoModel *infoModel = [self.msgListArray objectAtIndex:indexPath.row];
     if(infoModel && infoModel.msgContent){
         
         AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -133,7 +122,7 @@
 //设置可删除
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
     if(self.msgListArray.count){
-        YYOrderMessageInfoModel* infoModel = [self.msgListArray objectAtIndex:indexPath.row];
+        YYOrderMessageInfoModel *infoModel = [self.msgListArray objectAtIndex:indexPath.row];
         if(infoModel.isPlainMsg == NO){
             if([infoModel.dealStatus integerValue] == -1){
                 return YES;
@@ -149,7 +138,7 @@
                                                                          title:NSLocalizedString(@"拒绝",nil) handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
 
                                                                              if(self.msgListArray.count > 0){
-                                                                                 YYOrderMessageInfoModel* infoModel = self.msgListArray[indexPath.row];
+                                                                                 YYOrderMessageInfoModel *infoModel = self.msgListArray[indexPath.row];
                                                                                  [self oprateConnWithMsgInfoModel:infoModel status:2 indexPath:indexPath];
                                                                              }
                                                                          }];
@@ -164,7 +153,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYConnApi OprateConnWithDesignerBrand:[infoModel.msgContent.fromId integerValue] status:status andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-        if(rspStatusAndMessage.status == kCode100){
+        if(rspStatusAndMessage.status == YYReqStatusCode100){
             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
             //移除并刷新
             if(_tableView){
@@ -213,7 +202,7 @@
     }];
 }
 
-//请求买家地址列表
+//请求买手地址列表
 -(void)loadMsgListWithpageIndex:(NSInteger)pageIndex{
     WeakSelf(ws);
     NSString *type = @"0";
@@ -223,7 +212,7 @@
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     
     [YYOrderApi getNotifyMsgList:type pageIndex:pageIndex pageSize:pageSize andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOrderMessageInfoListModel *msgListModel, NSError *error) {
-        if(rspStatusAndMessage.status == kCode100){
+        if(rspStatusAndMessage.status == YYReqStatusCode100){
             ws.currentPageInfo = msgListModel.pageInfo;
             if(ws.currentPageInfo.isFirstPage){
                 ws.msgListArray =  [[NSMutableArray alloc] init];//;
@@ -249,7 +238,7 @@
 #pragma YYTableCellDelegate
 -(void)btnClick:(NSInteger)row section:(NSInteger)section andParmas:(NSArray *)parmas{
     WeakSelf(ws);
-    YYOrderMessageInfoModel* infoModel = [self.msgListArray objectAtIndex:row];
+    YYOrderMessageInfoModel *infoModel = [self.msgListArray objectAtIndex:row];
     if([[parmas objectAtIndex:0] integerValue] == 1){
         CMAlertView *alertView = [[CMAlertView alloc] initWithTitle:NSLocalizedString(@"同意邀请吗？",nil) message:nil needwarn:NO delegate:nil cancelButtonTitle:NSLocalizedString(@"取消",nil) otherButtonTitles:@[NSLocalizedString(@"确定",nil)]];
         //alertView.specialParentView = self.view;
@@ -278,11 +267,11 @@
     __block NSInteger blockStatus = status;
     __block NSInteger blockRow = row;
     YYUser *user = [YYUser currentUser];
-    if(user.userType != kBuyerStorUserType){
+    if(user.userType != YYUserTypeRetailer){
         [YYConnApi OprateConnWithBuyer:buyerId status:status andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if(rspStatusAndMessage.status == kCode100){
+            if(rspStatusAndMessage.status == YYReqStatusCode100){
                 [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
-                YYOrderMessageInfoModel* infoModel = [ws.msgListArray objectAtIndex:blockRow];
+                YYOrderMessageInfoModel *infoModel = [ws.msgListArray objectAtIndex:blockRow];
                 
                 infoModel.dealStatus = [[NSNumber alloc] initWithInteger:blockStatus];
                 [ws.tableView reloadData];
@@ -291,9 +280,9 @@
         }];
     }else{
         [YYConnApi OprateConnWithDesignerBrand: buyerId status:status andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if(rspStatusAndMessage.status == kCode100){
+            if(rspStatusAndMessage.status == YYReqStatusCode100){
                 [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
-                YYOrderMessageInfoModel* infoModel = [ws.msgListArray objectAtIndex:blockRow];
+                YYOrderMessageInfoModel *infoModel = [ws.msgListArray objectAtIndex:blockRow];
                 
                 infoModel.dealStatus = [[NSNumber alloc] initWithInteger:blockStatus];
                 [ws.tableView reloadData];
@@ -308,26 +297,17 @@
         
     }];
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    if(appDelegate.unreadConnNotifyMsgAmount > 0){
-        appDelegate.unreadConnNotifyMsgAmount = 0;
+    if(appDelegate.untreatedMsgAmountModel.unreadConnNotifyMsgAmount > 0){
+        appDelegate.untreatedMsgAmountModel.unreadConnNotifyMsgAmount = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
     }
 }
 #pragma mark - Other
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)goBack {
+    if(self.markAsReadHandler){
+        self.markAsReadHandler();
+    }
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 @end

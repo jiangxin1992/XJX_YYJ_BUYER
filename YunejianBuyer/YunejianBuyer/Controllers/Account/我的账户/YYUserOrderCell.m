@@ -6,24 +6,37 @@
 //  Copyright © 2017年 Apple. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
+
+// 自定义视图
 #import "YYUserOrderCell.h"
 
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "YYUser.h"
+#import "YYUntreatedMsgAmountModel.h"
 #import "AppDelegate.h"
 
 @interface YYUserOrderCell()
 
-@property (nonatomic,copy) void (^userOrderBlock)(NSString *type);
-@property (nonatomic,copy) NSMutableArray *numLabelArr;
+@property (nonatomic,copy) void (^userOrderBlock)(kOrderCode type);
+@property (nonatomic,strong) NSMutableArray *numLabelArr;
+@property (nonatomic, strong) NSArray *orderCodes;
 
 @end
 
 @implementation YYUserOrderCell
 
 #pragma mark - --------------生命周期--------------
--(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier WithBlock:(void(^)(NSString *type))block{
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier WithActionBlock:(void(^)(NSInteger pageIndex))block{
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self){
-        _userOrderBlock = block;
+        self.userOrderBlock = block;
         [self SomePrepare];
         [self UIConfig];
     }
@@ -37,7 +50,8 @@
     [self PrepareUI];
 }
 - (void)PrepareData{
-    _numLabelArr = [[NSMutableArray alloc] init];
+    self.numLabelArr = [[NSMutableArray alloc] init];
+    self.orderCodes = @[@(YYOrderCode_NEGOTIATION), @(YYOrderCode_CONTRACT_DONE), @(YYOrderCode_MANUFACTURE), @(YYOrderCode_DELIVERING), @(YYOrderCode_DELIVERY), @(YYOrderCode_RECEIVED)];
 }
 - (void)PrepareUI{}
 
@@ -47,8 +61,8 @@
 }
 -(void)CreateView{
 
-    NSArray *imgArr = @[@"user_order_ordered",@"user_order_confirmed",@"user_order_produced",@"user_order_delivered",@"user_order_received"];
-    NSArray *titleArr = @[NSLocalizedString(@"已下单",nil),NSLocalizedString(@"已确认",nil),NSLocalizedString(@"已生产",nil),NSLocalizedString(@"已发货",nil),NSLocalizedString(@"已收货",nil)];
+    NSArray *imgArr = [self orderTypeImageForOrderCodes:self.orderCodes];
+    NSArray *titleArr = [self orderTypeNamesForOrderCodes:self.orderCodes];
     UIView *lastView = nil;
     for (int i = 0; i < imgArr.count; i++) {
 
@@ -68,7 +82,7 @@
             make.bottom.mas_equalTo(0);
         }];
         [button addTarget:self action:@selector(orderAction:) forControlEvents:UIControlEventTouchUpInside];
-        button.tag = 100 + i;
+        button.tag = [self.orderCodes[i] integerValue];
 
         UIImageView *btnImg = [UIImageView getImgWithImageStr:imgArr[i]];
         [button addSubview:btnImg];
@@ -101,7 +115,7 @@
         numLabel.layer.cornerRadius = 7;
         numLabel.hidden = YES;
 
-        [_numLabelArr addObject:numLabel];
+        [self.numLabelArr addObject:numLabel];
 
         lastView = button;
     }
@@ -112,32 +126,15 @@
 -(void)RequestData{}
 
 #pragma mark - --------------自定义响应----------------------
--(void)orderAction:(UIButton *)btn{
-    if(_userOrderBlock){
-        NSInteger index = btn.tag - 100;
-        if(index == 0){
-            //已下单
-            _userOrderBlock(@"order_ordered");
-        }else if(index == 1){
-            //已确认
-            _userOrderBlock(@"order_confirmed");
-        }else if(index == 2){
-            //已生产
-            _userOrderBlock(@"order_produced");
-        }else if(index == 3){
-            //已收货
-            _userOrderBlock(@"order_delivered");
-        }else if(index == 4){
-            //已收货
-            _userOrderBlock(@"order_received");
-        }
+-(void)orderAction:(UIButton *)sender{
+    if(self.userOrderBlock){
+        self.userOrderBlock([self orderPageIndexForOrderCode:sender.tag]);
     }
 }
 
 #pragma mark - --------------自定义方法----------------------
 -(void)updateUI{
-    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSArray *numArr = @[@(appDelegate.unconfirmedOrderedMsgAmount),@(appDelegate.unconfirmedConfirmedMsgAmount),@(appDelegate.unconfirmedProducedMsgAmount),@(appDelegate.unconfirmedDeliveredMsgAmount),@(appDelegate.unconfirmedReceivedMsgAmount)];
+    NSArray *numArr = [self unreadMsgCountsForOrderCodes:self.orderCodes];
     for (int i = 0; i < _numLabelArr.count; i++) {
         UIButton *tempLabel = _numLabelArr[i];
         NSInteger num = [numArr[i] integerValue];
@@ -174,4 +171,119 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 }
+
+#pragma mark - 订单类型配置
+- (NSArray *)orderTypeNamesForOrderCodes:(NSArray *)orderCodes {
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSNumber *orderCode in orderCodes) {
+        switch ([orderCode integerValue]) {
+            case YYOrderCode_NEGOTIATION:
+                [array addObject:NSLocalizedString(@"已下单", nil)];
+                break;
+            case YYOrderCode_CONTRACT_DONE:
+                [array addObject:NSLocalizedString(@"已确认", nil)];
+                break;
+            case YYOrderCode_MANUFACTURE:
+                [array addObject:NSLocalizedString(@"已生产", nil)];
+                break;
+            case YYOrderCode_DELIVERING:
+                [array addObject:NSLocalizedString(@"发货中", nil)];
+                break;
+            case YYOrderCode_DELIVERY:
+                [array addObject:NSLocalizedString(@"已发货", nil)];
+                break;
+            case YYOrderCode_RECEIVED:
+                [array addObject:NSLocalizedString(@"已收货", nil)];
+                break;
+            default:
+                break;
+        }
+    }
+    return [NSArray arrayWithArray:array];
+}
+
+- (NSArray *)orderTypeImageForOrderCodes:(NSArray *)orderCodes {
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSNumber *orderCode in orderCodes) {
+        switch ([orderCode integerValue]) {
+            case YYOrderCode_NEGOTIATION:
+                [array addObject:@"user_order_ordered"];
+                break;
+            case YYOrderCode_CONTRACT_DONE:
+                [array addObject:@"user_order_confirmed"];
+                break;
+            case YYOrderCode_MANUFACTURE:
+                [array addObject:@"user_order_produced"];
+                break;
+            case YYOrderCode_DELIVERING:
+                [array addObject:@"user_order_delivering"];
+                break;
+            case YYOrderCode_DELIVERY:
+                [array addObject:@"user_order_delivered"];
+                break;
+            case YYOrderCode_RECEIVED:
+                [array addObject:@"user_order_received"];
+                break;
+            default:
+                break;
+        }
+    }
+    return [NSArray arrayWithArray:array];
+}
+
+- (NSArray *)unreadMsgCountsForOrderCodes:(NSArray *)orderCodes {
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    NSMutableArray *array = [NSMutableArray array];
+    for (NSNumber *orderCode in orderCodes) {
+        switch ([orderCode integerValue]) {
+            case YYOrderCode_NEGOTIATION:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedOrderedMsgAmount)];
+                break;
+            case YYOrderCode_CONTRACT_DONE:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedConfirmedMsgAmount)];
+                break;
+            case YYOrderCode_MANUFACTURE:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedProducedMsgAmount)];
+                break;
+            case YYOrderCode_DELIVERING:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedDeliveringMsgAmount)];
+                break;
+            case YYOrderCode_DELIVERY:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedDeliveredMsgAmount)];
+                break;
+            case YYOrderCode_RECEIVED:
+                [array addObject:@(appDelegate.untreatedMsgAmountModel.unconfirmedReceivedMsgAmount)];
+                break;
+            default:
+                break;
+        }
+    }
+    return [NSArray arrayWithArray:array];
+}
+
+- (NSInteger)orderPageIndexForOrderCode:(kOrderCode)orderCode {
+    switch (orderCode) {
+        case YYOrderCode_NEGOTIATION:
+            //  已下单
+            return 1;
+        case YYOrderCode_CONTRACT_DONE:
+            //  已确认
+            return 2;
+        case YYOrderCode_MANUFACTURE:
+            //  已生产
+            return 3;
+        case YYOrderCode_DELIVERING:
+            //  发货中
+            return 4;
+        case YYOrderCode_DELIVERY:
+            //  已发货
+            return 5;
+        case YYOrderCode_RECEIVED:
+            //  已收货
+            return 6;
+        default:
+            return 0;
+    }
+}
+
 @end

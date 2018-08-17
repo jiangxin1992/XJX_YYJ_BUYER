@@ -77,7 +77,7 @@
             [self.tableView.mj_footer endRefreshing];
         }
         [ws reloadTableData];
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+        [MBProgressHUD hideHUDForView:ws.view animated:YES];
         return;
     }
     __block BOOL blockEndrefreshing = endrefreshing;
@@ -102,7 +102,7 @@
             }
             [ws reloadTableData];
             //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
 
         }];
     }else if(_currentType == 1){
@@ -126,7 +126,7 @@
             }
             [ws reloadTableData];
             //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
         }];
     }else if(_currentType == 2){
         [YYInventoryApi getStoreList:nil month:0 pageIndex:pageIndex pageSize:8 queryStr:nil adnBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYInventoryStyleListModel *listModel, NSError *error) {
@@ -149,7 +149,7 @@
             }
             [ws reloadTableData];
             //
-            [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+            [MBProgressHUD hideHUDForView:ws.view animated:YES];
         }];
     }else{
         
@@ -159,7 +159,7 @@
         }
         [ws reloadTableData];
 
-        [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
+        [MBProgressHUD hideHUDForView:ws.view animated:YES];
 
     }
 }

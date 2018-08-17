@@ -39,6 +39,6 @@
 
 ////格式错误
 -(BOOL)checkWarn;
--(BOOL)checkPhoneWarnWithPhoneCode:(NSInteger )phoneCode;
+-(BOOL)checkPhoneWarnWithPhoneCode:(NSInteger)phoneCode;
 -(NSString *)getParamStr;
 @end

@@ -21,6 +21,8 @@
 #import "MBProgressHUD.h"
 #import "YYSeriesInfoModel.h"
 #import "YYOrderInfoModel.h"
+#import "YYOpusSeriesModel.h"
+#import "YYSeriesInfoDetailModel.h"
 
 @interface YYDetailContentViewController ()<YYTableCellDelegate,UITableViewDataSource,UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *MyTableView;
@@ -81,7 +83,7 @@
     WeakSelf(ws);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYOpusApi getStyleInfoByStyleId:[_currentOpusStyleModel.id longValue] orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYStyleInfoModel *styleInfoModel, NSError *error) {
-       if (rspStatusAndMessage.status == kCode100) {
+       if (rspStatusAndMessage.status == YYReqStatusCode100) {
            ws.styleInfoModel = styleInfoModel;
            ws.desHeight = [YYDetailContentParamsViewCellNew getHeightWithColorModel:_styleInfoModel atColorIndex:self.currentColorIndexToShow];
            [ws updateCollectionButtonEdgeInsets];
@@ -101,7 +103,7 @@
     if(_opusSeriesModel.designerId && _styleInfoModel.style.seriesId){
         WeakSelf(ws);
         [YYOpusApi getConnSeriesInfoWithId:[_opusSeriesModel.designerId integerValue] seriesId:[_styleInfoModel.style.seriesId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 
                 ws.opusSeriesModel.id = infoDetailModel.series.id;
                 ws.opusSeriesModel.orderDueTime = infoDetailModel.series.orderDueTime;
@@ -151,7 +153,7 @@
     WeakSelf(ws);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYOpusApi updateStyleCollectStateByStyleId:[_currentOpusStyleModel.id longValue] isCollect:!_collectionButton.selected andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             ws.styleInfoModel.style.collect = @(!_collectionButton.selected);
             [ws updateCollectionButtonEdgeInsets];
             NSString *alertStr = @"";

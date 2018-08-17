@@ -10,8 +10,8 @@
 
 @interface YYConnAddViewController : UIViewController
 
-@property (nonatomic,strong) CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
 
-@property (nonatomic,assign) BOOL isMainView;
+@property (nonatomic, assign) BOOL isMainView;
 
 @end

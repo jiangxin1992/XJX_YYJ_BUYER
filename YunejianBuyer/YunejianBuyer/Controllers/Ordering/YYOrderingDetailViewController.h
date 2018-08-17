@@ -12,8 +12,8 @@
 
 @interface YYOrderingDetailViewController : UIViewController
 
-@property (nonatomic,strong)YYOrderingListItemModel *orderingModel;
+@property (nonatomic, strong) YYOrderingListItemModel *orderingModel;
 
-@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
 
 @end

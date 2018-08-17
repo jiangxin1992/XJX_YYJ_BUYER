@@ -15,11 +15,10 @@
 /** 回调block*/
 @property (nonatomic,copy) void (^block)(NSString *type,NSNumber *connectStatus);
 
-@property (nonatomic,assign) NSInteger designerId;
-@property (nonatomic,strong) NSString *previousTitle;
-@property (nonatomic,assign) BOOL isHomePage;
+@property (nonatomic, assign) NSInteger designerId;
+@property (nonatomic, strong) NSString *previousTitle;
 
-@property (nonatomic,strong) CancelButtonClicked cancelButtonClicked;
-@property (nonatomic,strong) YellowPabelCallBack selectedValue;
+@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, strong) YellowPabelCallBack selectedValue;
 
 @end

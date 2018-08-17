@@ -6,26 +6,40 @@
 //  Copyright © 2016年 Apple. All rights reserved.
 //
 
-#import "YYMessageDetailViewController.h"
+// c文件 —> 系统文件（c文件在前）
 
-#import "YYNavigationBarViewController.h"
-#import <MJRefresh.h>
-#import "YYMessageChatCell.h"
-#import "YYMessageChatModel.h"
-#import "YYUser.h"
-#import "YYMessageApi.h"
-#import "MBProgressHUD.h"
-#import "AppDelegate.h"
-#import "JPUSHService.h"
-#import "NSTimer+eocBlockSupports.h"
-#import "YYUserApi.h"
-#import "YYOrderApi.h"
-#import "UIView+UpdateAutoLayoutConstraints.h"
-#import "UIActionSheet+JRPhoto.h"
+// 控制器
+#import "YYMessageDetailViewController.h"
 #import "JRShowImageViewController.h"
 #import "YYShowMessageUrlViewController.h"
 
+// 自定义视图
+#import "YYNavView.h"
+#import "YYMessageChatCell.h"
+
+// 接口
+#import "YYMessageApi.h"
+#import "YYUserApi.h"
+#import "YYOrderApi.h"
+
+// 分类
+#import "NSTimer+eocBlockSupports.h"
+#import "UIView+UpdateAutoLayoutConstraints.h"
+#import "UIActionSheet+JRPhoto.h"
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import <MJRefresh.h>
+#import "MBProgressHUD.h"
+#import "JPUSHService.h"
+#import "YYMessageChatModel.h"
+#import "YYUntreatedMsgAmountModel.h"
+#import "YYMessageTalkListModel.h"
+#import "YYUser.h"
+#import "AppDelegate.h"
+
 @interface YYMessageDetailViewController ()<UIGestureRecognizerDelegate,YYMessageChatCellDelegate,UITextViewDelegate,UITableViewDataSource,UITableViewDelegate, JRPhotoImageDelegate>
+@property (nonatomic, strong) YYNavView *navView;
+
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UITextView *textField;
@@ -63,37 +77,13 @@ static NSInteger textFieldDefautlHeight;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    //self.navigationBarViewController = navigationBarViewController;
-    navigationBarViewController.nowTitle = _brandName;
-    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    //[_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:self.brandName WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            [ws resetTimer];
-            [ws.textField resignFirstResponder];
-            if(ws.cancelButtonClicked){
-                ws.cancelButtonClicked();
-            }
-            blockVc = nil;
-        }
-    }];
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
 
     [self addHeader];
-    //    [self addFooter];
-
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
@@ -326,6 +316,14 @@ static NSInteger textFieldDefautlHeight;
 
 #pragma mark - --------------自定义响应----------------------
 #pragma mark - Action
+- (void)goBack {
+    [self resetTimer];
+    [self.textField resignFirstResponder];
+    if(self.cancelButtonClicked){
+        self.cancelButtonClicked();
+    }
+}
+
 - (IBAction)sendBtnClicked:(UIButton *)btn
 {
     if([NSString isNilOrEmpty:self.textField.text]){
@@ -479,7 +477,7 @@ static NSInteger textFieldDefautlHeight;
     WeakSelf(ws);
     __block YYMessageChatModel *blockchatModel = chatModel;
     [YYMessageApi sendTalkWithOppositeId:_userId content:chatModel.message charType:chatModel.chatType andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-        if(rspStatusAndMessage.status == kCode100){
+        if(rspStatusAndMessage.status == YYReqStatusCode100){
             [ws insertMessage:blockchatModel];
         }else{
             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];
@@ -522,7 +520,7 @@ static NSInteger textFieldDefautlHeight;
 
     __block BOOL blockEndrefreshing = endrefreshing;
     [YYMessageApi getMessageTalkHistoryWithOppositeId:_userId pageIndex:pageIndex pageSize:kPageSize andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYMessageTalkListModel *talkListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100) {
+        if (rspStatusAndMessage.status == YYReqStatusCode100) {
             if (pageIndex == 1) {
                 [ws.dataArray removeAllObjects];
             }
@@ -561,7 +559,7 @@ static NSInteger textFieldDefautlHeight;
 +(void)markAsRead{
     [YYMessageApi markAsReadMessageUserChatWithOppositeId:tempUserId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage,NSInteger num, NSError *error) {
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        appDelegate.unreadPersonalMsgAmount = MAX(0,appDelegate.unreadPersonalMsgAmount-num);
+        appDelegate.untreatedMsgAmountModel.unreadPersonalMsgAmount = MAX(0,appDelegate.untreatedMsgAmountModel.unreadPersonalMsgAmount-num);
         [[NSNotificationCenter defaultCenter] postNotificationName:UnreadMsgAmountChangeNotification object:nil userInfo:nil];
     }];
 }
@@ -622,7 +620,7 @@ static NSInteger textFieldDefautlHeight;
 
                         [changeCell setIsHiddenProgress:YES];
 
-                        if(rspStatusAndMessage.status == kCode100){
+                        if(rspStatusAndMessage.status == YYReqStatusCode100){
                             // 处理图片
                         }else{
                             [YYToast showToastWithTitle:rspStatusAndMessage.message andDuration:kAlertToastDuration];

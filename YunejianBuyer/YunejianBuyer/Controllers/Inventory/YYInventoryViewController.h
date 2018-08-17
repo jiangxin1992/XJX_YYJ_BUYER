@@ -2,8 +2,8 @@
 //  YYInventoryViewController.h
 //  YunejianBuyer
 //
-//  Created by Apple on 16/8/29.
-//  Copyright © 2016年 Apple. All rights reserved.
+//  Created by Victor on 2018/6/19.
+//  Copyright © 2018年 Apple. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -11,6 +11,6 @@
 
 @interface YYInventoryViewController : ViewPagerController
 
-@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, assign) NSInteger currentIndex;
 
 @end

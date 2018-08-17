@@ -15,6 +15,7 @@
 #import "AppDelegate.h"
 #import "YYMessageButton.h"
 #import "YYTopBarShoppingCarButton.h"
+#import "YYUntreatedMsgAmountModel.h"
 
 #define YY_NAVBAR_HEIGHT 20
 
@@ -294,17 +295,7 @@
 }
 -(void)updateMessageCount{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSInteger msgAmount = appDelegate.unreadOrderNotifyMsgAmount + appDelegate.unreadConnNotifyMsgAmount + appDelegate.unreadPersonalMsgAmount;
-    
-    if(msgAmount > 0 || appDelegate.unreadNewsAmount >0){
-        if(msgAmount > 0 ){
-            [_messageButton updateButtonNumber:[NSString stringWithFormat:@"%ld",(long)msgAmount]];
-        }else{
-            [_messageButton updateButtonNumber:@"dot"];
-        }
-    }else{
-        [_messageButton updateButtonNumber:@""];
-    }
+    [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
 }
 - (void)updateShoppingCar{
     WeakSelf(ws);

@@ -13,6 +13,7 @@
 #import "regular.h"
 #import "SCGIFImageView.h"
 #import "MBProgressHUD.h"
+#import "YYUserSeriesListModel.h"
 #import <MJRefresh.h>
 
 #import "YYUserSeriesCollectionCell.h"
@@ -216,7 +217,7 @@
     WeakSelf(ws);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [YYOpusApi getSeriesCollectListByPageIndex:pageIndex pageSize:YY_TABLEVIEW_PAGESZIE andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYUserSeriesListModel *seriesListModel, NSError *error) {
-        if (rspStatusAndMessage.status == kCode100 && seriesListModel.result
+        if (rspStatusAndMessage.status == YYReqStatusCode100 && seriesListModel.result
             && [seriesListModel.result count] > 0) {
             ws.currentPageInfo = seriesListModel.pageInfo;
             if (ws.currentPageInfo== nil || ws.currentPageInfo.isFirstPage) {
@@ -235,7 +236,7 @@
         }
 
         [MBProgressHUD hideAllHUDsForView:ws.view animated:YES];
-        if (rspStatusAndMessage.status != kCode100) {
+        if (rspStatusAndMessage.status != YYReqStatusCode100) {
             [YYToast showToastWithTitle:rspStatusAndMessage.message  andDuration:kAlertToastDuration];
         }
         [ws reloadTabeleViewData];
@@ -273,13 +274,13 @@
 
 
 -(void)CreateTableView{
-    _tableview=[[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableview = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     [self.view addSubview:_tableview];
     //    消除分割线
     _tableview.backgroundColor = [UIColor colorWithHex:@"f8f8f8"];
-    _tableview.separatorStyle=UITableViewCellSeparatorStyleNone;
-    _tableview.delegate=self;
-    _tableview.dataSource=self;
+    _tableview.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _tableview.delegate = self;
+    _tableview.dataSource = self;
     [_tableview mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
     }];

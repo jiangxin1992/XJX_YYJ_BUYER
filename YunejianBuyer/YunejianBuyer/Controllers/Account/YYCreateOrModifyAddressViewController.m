@@ -6,20 +6,31 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYCreateOrModifyAddressViewController.h"
-#import "YYRspStatusAndMessage.h"
-#import "YYUserApi.h"
-#import "YYOrderApi.h"
-#import "YYNavigationBarViewController.h"
-#import "UserDefaultsMacro.h"
+
+// 自定义视图
+#import "YYNavView.h"
 #import "YYPickView.h"
 #import "YYCountryPickView.h"
-#import "MLInputDodger.h"
-#import "regular.h"
+
+// 接口
 #import "YYUserApi.h"
-#import "YYCountryListModel.h"
-//static CGFloat yellowView_default_constant = 112;
+#import "YYOrderApi.h"
+#import "YYUserApi.h"
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "MLInputDodger.h"
 #import "MBProgressHUD.h"
+#import "YYRspStatusAndMessage.h"
+#import "YYCountryListModel.h"
+#import "YYBuyerAddressModel.h"
+#import "UserDefaultsMacro.h"
+#import "regular.h"
 #import "YYVerifyTool.h"
 
 @interface YYCreateOrModifyAddressViewController ()<UITextFieldDelegate,UITextViewDelegate,YYCountryPickViewDelegate>
@@ -45,11 +56,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *yellowViewTopLayoutConstraint;
 @property (weak, nonatomic) IBOutlet UIView *yellowView;
 
-//@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
-
-//@property (weak, nonatomic) IBOutlet UIView *whiteView;
-
-@property (weak, nonatomic) IBOutlet UIButton *defaultReceiveButton;//默认收货地址
+@property (weak, nonatomic) IBOutlet UIButton *defaultReceiveButton;//默认收件地址
 @property (weak, nonatomic) IBOutlet UIButton *defaultBillingButton;//默认发票地址
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UIButton *saveBtn;
@@ -80,7 +87,7 @@
 
 @property(nonatomic,assign) BOOL isDefaultReceive;
 @property(nonatomic,assign) BOOL isDefaultBilling;
-@property(nonatomic,strong) YYNavigationBarViewController *navigationBarViewController;
+@property(nonatomic,strong) YYNavView *navView;
 @end
 
 @implementation YYCreateOrModifyAddressViewController
@@ -103,35 +110,16 @@
     _phoneTipButton.hidden = YES;
     _countryTitle.text = [LanguageManager isEnglishLanguage]?@"Country*":@"国家*";
     
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    self.navigationBarViewController = navigationBarViewController;
-    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
-    
+    self.navView = [[YYNavView alloc] initWithTitle:nil WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            [ws cancelClicked:nil];
-            blockVc = nil;
-        }
-    }];
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
     self.view.shiftHeightAsDodgeViewForMLInputDodger = 44.0f+5.0f;
     [self.view registerAsDodgeViewForMLInputDodger];
     
     _provinceIsChanged = NO;
-    
-    // _cityButton.layer.borderWidth = 1;
     
     _postCodeField.keyboardType = UIKeyboardTypeNumberPad;
     _phoneField.keyboardType = UIKeyboardTypeNumberPad;
@@ -235,10 +223,10 @@
 
 - (void)updateUI{
     if (_currentOperationType == OperationTypeModify) {
-        _navigationBarViewController.nowTitle = NSLocalizedString(@"修改收货地址",nil);
+        [self.navView setNavTitle:NSLocalizedString(@"修改收件地址",nil)];
         [self setShowValue];
     }else if(_currentOperationType == OperationTypeCreate){
-        _navigationBarViewController.nowTitle = NSLocalizedString(@"新建收货地址",nil);
+        [self.navView setNavTitle:NSLocalizedString(@"新建收件地址",nil)];
         [self setDefaultCountry];
     }else if(_currentOperationType == OperationTypeHelpCreate){
         _defaultBillingButton.hidden = YES;
@@ -246,20 +234,16 @@
         _receiverAddressLabel.hidden = YES;
         _billAddressLabel.hidden = YES;
         
-        //NSInteger oldReceiverNameTopLayoutConstraint = _receiverNameTopLayoutConstraint.constant;
-        //_receiverNameTopLayoutConstraint.constant = 32;
-        //yellowView_default_constant = yellowView_default_constant - (oldReceiverNameTopLayoutConstraint- _receiverNameTopLayoutConstraint.constant)/2;
-        //_yellowViewHeightLayoutConstraint.constant = _yellowViewHeightLayoutConstraint.constant - (oldReceiverNameTopLayoutConstraint- _receiverNameTopLayoutConstraint.constant);
         if (![NSString isNilOrEmpty:_address.receiverName]) {
-            _navigationBarViewController.nowTitle = NSLocalizedString(@"修改买手店地址",nil);
+            [self.navView setNavTitle:NSLocalizedString(@"修改买手店地址",nil)];
             [self setShowValue];
         }else{
-            _navigationBarViewController.nowTitle = NSLocalizedString(@"添加买手店地址",nil);
+            [self.navView setNavTitle:NSLocalizedString(@"添加买手店地址",nil)];
             [self setDefaultCountry];
         }
     }
-    [_navigationBarViewController updateUI];
 }
+
 //确保只在符合的状态下进入该逻辑
 -(void)setDefaultCountry{
     
@@ -291,9 +275,6 @@
     }
 }
 
-
-
-
 - (void)updateDefaultButton{
     NSString *normalImage = @"confirm_normal.png";
     NSString *selectedImage = @"confirm_selected.png";
@@ -313,8 +294,11 @@
     
 }
 
-
 #pragma mark - SomeAction
+- (void)goBack {
+    [self cancelClicked:nil];
+}
+
 -(BOOL)checkPhoneWarnWithPhoneCode:(NSInteger )phoneCode{
     if([NSString isNilOrEmpty:_phoneField.text]){
         //没有的时候不显示警告
@@ -345,7 +329,7 @@
     
     if(!_countryInfo){
         [YYUserApi getCountryInfoWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 _countryInfo = countryListModel;
                 
                 if(_countryInfo.result.count){
@@ -369,7 +353,7 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [YYUserApi getSubCountryInfoWithCountryID:[_currentNationID integerValue] WithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYCountryListModel *countryListModel, NSInteger impId,NSError *error) {
             [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 if(countryListModel.result.count){
                     _provinceInfo = countryListModel;
                 }else{
@@ -486,7 +470,7 @@
     
     if (_currentOperationType == OperationTypeHelpCreate) {
         [YYOrderApi createOrModifyAddress:nowAddress orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBuyerAddressModel *addressModel, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100
+            if (rspStatusAndMessage.status == YYReqStatusCode100
                 && addressModel
                 && addressModel.addressId){
                 if (ws.addressForBuyerButtonClicked) {
@@ -498,7 +482,7 @@
         }];
     }else{
         [YYUserApi createOrModifyAddress:nowAddress andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
-            if (rspStatusAndMessage.status == kCode100) {
+            if (rspStatusAndMessage.status == YYReqStatusCode100) {
                 [YYToast showToastWithView:customView title:NSLocalizedString(@"操作成功！",nil) andDuration:kAlertToastDuration];
                 if (ws.modifySuccess) {
                     ws.modifySuccess();

@@ -12,8 +12,8 @@
 
 @interface YYIndexBannerDetailViewController : UIViewController
 
-@property (nonatomic,strong) YYBannerModel *bannerModel;
+@property (nonatomic, strong) YYBannerModel *bannerModel;
 
-@property (nonatomic,strong)CancelButtonClicked cancelButtonClicked;
+@property (nonatomic, strong) CancelButtonClicked cancelButtonClicked;
 
 @end

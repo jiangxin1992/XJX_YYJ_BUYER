@@ -69,7 +69,7 @@
 - (void)setTitleImageName:(NSString *)titleImageName{
     _titleImageName = titleImageName;
     self.titleImageView.image = [UIImage imageNamed:titleImageName];
-    if ([titleImageName isNilOrEmpty]) {
+    if ([NSString isNilOrEmpty:titleImageName]) {
         self.xingLabel.hidden = YES;
     }
 }
@@ -91,7 +91,7 @@
 
 - (void)setInputText:(NSString *)inputText{
     _inputText = inputText;
-    if (![inputText isNilOrEmpty]) {
+    if (![NSString isNilOrEmpty:inputText]) {
         self.inputTextField.text = inputText;
     }
 }

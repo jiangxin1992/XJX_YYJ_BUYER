@@ -9,13 +9,12 @@
 #import <Foundation/Foundation.h>
 
 #import "YYRspStatusAndMessage.h"
-#import "YYChooseStyleListModel.h"
-#import "YYChooseStyleReqModel.h"
+
+@class YYChooseStyleListModel,YYChooseStyleReqModel;
 
 @interface YYChooseStyleApi : NSObject
-//YYOpusStyleListModel
+
 //获取款式列表
 + (void)getOrderingListWithReqModel:(YYChooseStyleReqModel *)reqModel pageIndex:(int)pageIndex pageSize:(int)pageSize andBlock:(void (^)(YYRspStatusAndMessage *rspStatusAndMessage,YYChooseStyleListModel *chooseStyleListModel,NSError *error))block;
-
 
 @end

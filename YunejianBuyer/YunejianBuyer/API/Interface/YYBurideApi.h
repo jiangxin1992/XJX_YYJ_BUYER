@@ -14,6 +14,7 @@
  * 新增一条日活记录
  */
 + (void)addStatDaily;
+
 /**
  * 新增一条pv
  */

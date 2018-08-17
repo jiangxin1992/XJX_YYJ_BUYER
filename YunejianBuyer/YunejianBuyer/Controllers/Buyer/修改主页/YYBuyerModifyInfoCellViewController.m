@@ -6,10 +6,13 @@
 //  Copyright © 2016年 Apple. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYBuyerModifyInfoCellViewController.h"
 
-#import "YYNavigationBarViewController.h"
-
+// 自定义视图
+#import "YYNavView.h"
 #import "YYBuyerModifyCellDetailAddressViewCell.h"
 #import "YYBuyerModifyCellSubmitViewCell.h"
 #import "YYBuyerModifyCellDescViewCell.h"
@@ -19,13 +22,17 @@
 #import "YYBuyerModifyCellContactMobileViewCell.h"
 #import "YYBuyerModifyCellContactTelephoneViewCell.h"
 #import "YYBuyerModifyCellContactTxtViewCell.h"
-
 #import "YYPickView.h"
 
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+#import "MJExtension.h"
+#import "YYBuyerHomeUpdateModel.h"
 #import "regular.h"
 #import "YYVerifyTool.h"
-#import "YYBuyerHomeUpdateModel.h"
-#import "MJExtension.h"
 
 @interface YYBuyerModifyInfoCellViewController ()<UITableViewDelegate,UITableViewDataSource,YYTableCellDelegate,YYPickViewDelegate>
 @property (weak, nonatomic) IBOutlet UIView *containerView;
@@ -33,6 +40,7 @@
 
 @property (nonatomic ,strong) NSString *paramStr;
 
+@property (nonatomic, strong) YYNavView *navView;
 @property(nonatomic,strong) YYPickView *localTypePickerView;
 @property(nonatomic,assign)NSInteger selectlocalValue;
 
@@ -74,10 +82,7 @@
 -(void)PrepareUI
 {
     [_tableView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyborad)]];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    
-    navigationBarViewController.previousTitle = @"";
+
     NSString *_nowTitle = @"";
     if(_viewType == YYBuyerModifyInfoCellViewDetailAddress){
         _nowTitle = NSLocalizedString(@"详细地址",nil);
@@ -120,29 +125,12 @@
             _nowTitle = @"Facebook";
         }
     }
-    navigationBarViewController.nowTitle = _nowTitle;
-    
-    [_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-        
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:_nowTitle WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            if (ws.cancelButtonClicked) {
-                ws.cancelButtonClicked();
-            }
-            blockVc = nil;
-        }
-    }];
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
@@ -266,6 +254,12 @@
     return nil;
 }
 #pragma mark - SomeAction
+- (void)goBack {
+    if (self.cancelButtonClicked) {
+        self.cancelButtonClicked();
+    }
+}
+
 -(void)dismissKeyborad
 {
     [regular dismissKeyborad];
@@ -665,8 +659,5 @@
 }
 
 #pragma mark - Other
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 @end

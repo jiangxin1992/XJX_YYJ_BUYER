@@ -73,33 +73,35 @@ static YYYellowPanelManage *instance = nil;
     
     return instance;
 }
--(void)showOrderAddMoneyLogPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier orderCode:(NSString*)orderCode params:(NSArray*)params totalMoney:(double)totalMoney moneyType:(NSInteger)moneyType parentView:(UIViewController *)specialParentView andCallBack:(void (^)(NSString *orderCode, NSNumber *totalPercent))callback{
+-(void)showOrderAddMoneyLogPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier orderCode:(NSString*)orderCode params:(NSArray*)params totalMoney:(double)totalMoney moneyType:(NSInteger)moneyType isNeedRefund:(BOOL)isNeedRefund parentView:(UIViewController *)specialParentView andCallBack:(void (^)(NSString *orderCode, NSNumber *totalPercent))callback{
 
     WeakSelf(ws);
-    [YYOrderApi getPaymentNoteList:orderCode andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYPaymentNoteListModel *paymentNoteList, NSError *error) {
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:[NSBundle mainBundle]];
+    ws.moneyLogViewContorller = [storyboard instantiateViewControllerWithIdentifier:identifier];
+    ws.moneyLogViewContorller.totalMoney = totalMoney;
+    ws.moneyLogViewContorller.moneyType = moneyType;
+    ws.moneyLogViewContorller.orderCode = orderCode;
+    ws.moneyLogViewContorller.isNeedRefund = isNeedRefund;
+    if(params){
+        if([params count] >= 1)
+            ws.moneyLogViewContorller.brandLogo = [params objectAtIndex:0];
+        if([params count] >= 2)
+            ws.moneyLogViewContorller.designerId = [[params objectAtIndex:1] integerValue];
+    }
 
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:[NSBundle mainBundle]];
-        ws.moneyLogViewContorller = [storyboard instantiateViewControllerWithIdentifier:identifier];
-        ws.moneyLogViewContorller.totalMoney = totalMoney;
-        ws.moneyLogViewContorller.paymentNoteList = paymentNoteList;
-        ws.moneyLogViewContorller.moneyType = moneyType;
-        ws.moneyLogViewContorller.orderCode = orderCode;
-        if(params){
-            if([params count] >=1)
-                ws.moneyLogViewContorller.brandLogo = [params objectAtIndex:0];
-            if([params count] >=2)
-                ws.moneyLogViewContorller.designerId = [[params objectAtIndex:1] integerValue];
-        }
-        __block UIViewController *blockParentViewController = specialParentView;
-        [self.moneyLogViewContorller setCancelButtonClicked:^(){
-            [blockParentViewController.navigationController popViewControllerAnimated:YES];
-        }];
-        [self.moneyLogViewContorller setModifySuccess:^(NSString *orderCode, NSNumber *totalPercent) {
-            callback(orderCode,totalPercent);
-            [blockParentViewController.navigationController popViewControllerAnimated:YES];
-        }];
-        [specialParentView.navigationController pushViewController:ws.moneyLogViewContorller animated:YES];
+    __block UIViewController *blockParentViewController = specialParentView;
+
+    [ws.moneyLogViewContorller setCancelButtonClicked:^(){
+        [blockParentViewController.navigationController popViewControllerAnimated:YES];
     }];
+
+    [ws.moneyLogViewContorller setModifySuccess:^(NSString *orderCode, NSNumber *totalPercent) {
+        callback(orderCode,totalPercent);
+        [blockParentViewController.navigationController popViewControllerAnimated:YES];
+    }];
+
+    [specialParentView.navigationController pushViewController:ws.moneyLogViewContorller animated:YES];
+    
 }
 
 -(void)showYellowAlertPanel:(NSString *)storyboardName andIdentifier:(NSString *)identifier title:(NSString*)title msg:(NSString*)msg btn:(NSString*)btnStr align:(NSTextAlignment)textAlignment andCallBack:(YellowPabelCallBack)callback{
@@ -275,7 +277,7 @@ static YYYellowPanelManage *instance = nil;
     }else{
         __block YYBrandInfoView *blockBrandInfoView = brandInfoView;
         [YYUserApi getOrderDesignerInfoBrandInfo:orderCode designerId:designerId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYHomePageModel *homePageModel, NSError *error) {
-            if(rspStatusAndMessage.status == kCode100 && blockBrandInfoView != nil){
+            if(rspStatusAndMessage.status == YYReqStatusCode100 && blockBrandInfoView != nil){
                 NSString *phone = (homePageModel.brandIntroduction.phone?homePageModel.brandIntroduction.phone:@"");
                 NSString *email = (homePageModel.brandIntroduction.email?homePageModel.brandIntroduction.email:@"");
                 NSString *qq = (homePageModel.brandIntroduction.qq?homePageModel.brandIntroduction.qq:@"");

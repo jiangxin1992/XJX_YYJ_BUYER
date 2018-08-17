@@ -6,9 +6,20 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
+// c文件 —> 系统文件（c文件在前）
+
+// 控制器
 #import "YYAboutUsViewController.h"
-#import "YYNavigationBarViewController.h"
 #import "YYProtocolViewController.h"
+
+// 自定义视图
+#import "YYNavView.h"
+
+// 接口
+
+// 分类
+
+// 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
 #import <StoreKit/StoreKit.h>
 
 @interface YYAboutUsViewController ()<UITableViewDataSource,UITableViewDelegate, SKStoreProductViewControllerDelegate>
@@ -16,6 +27,8 @@
 @property(nonatomic,strong) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (nonatomic,assign) BOOL ProtocolViewIsShow;
+
+@property (nonatomic, strong) YYNavView *navView;
 
 @end
 
@@ -48,30 +61,11 @@
     _ProtocolViewIsShow = NO;
 }
 -(void)PrepareUI{
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = @"";
-    //self.navigationBarViewController = navigationBarViewController;
-    navigationBarViewController.nowTitle = NSLocalizedString(@"关于我们",nil);
-    [_containerView insertSubview:navigationBarViewController.view atIndex:0];
-    //[_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
-    
+    self.navView = [[YYNavView alloc] initWithTitle:NSLocalizedString(@"关于我们",nil) WithSuperView:self.view haveStatusView:YES];
     WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-    
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            [ws cancelClicked:nil];
-            blockVc = nil;
-        }
-    }];
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
 }
 
 #pragma mark - UITableViewDataSource
@@ -167,6 +161,10 @@
             ws.ProtocolViewIsShow = NO;
         }];
     }
+}
+
+- (void)goBack {
+    [self cancelClicked:nil];
 }
 
 -(void)goToAppStore

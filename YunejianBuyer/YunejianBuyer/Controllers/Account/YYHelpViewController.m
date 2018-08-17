@@ -6,14 +6,14 @@
 //  Copyright (c) 2015年 yyj. All rights reserved.
 //
 
-#import "YYHelpViewController.h"
 
 // c文件 —> 系统文件（c文件在前）
 
 // 控制器
-#import "YYNavigationBarViewController.h"
+#import "YYHelpViewController.h"
 
 // 自定义视图
+#import "YYNavView.h"
 #import "YYBaseWebView.h"
 
 // 接口
@@ -27,40 +27,20 @@
 @property (weak, nonatomic) IBOutlet YYBaseWebView *webView;
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 
+@property (nonatomic, strong) YYNavView *navView;
+
 @end
 
 @implementation YYHelpViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    YYNavigationBarViewController *navigationBarViewController = [storyboard instantiateViewControllerWithIdentifier:@"YYNavigationBarViewController"];
-    navigationBarViewController.previousTitle = NSLocalizedString(@"返回",nil);
-    navigationBarViewController.nowTitle = IsPhone6_gt?NSLocalizedString(@"帮助中心•买手店",nil):NSLocalizedString(@"帮助中心",nil);
-    [_containerView addSubview:navigationBarViewController.view];
-    __weak UIView *_weakContainerView = _containerView;
-    [navigationBarViewController.view mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_weakContainerView.mas_top);
-        make.left.equalTo(_weakContainerView.mas_left);
-        make.bottom.equalTo(_weakContainerView.mas_bottom);
-        make.right.equalTo(_weakContainerView.mas_right);
-    }];
-    
     WeakSelf(ws);
-    __block YYNavigationBarViewController *blockVc = navigationBarViewController;
-
-    [navigationBarViewController setNavigationButtonClicked:^(NavigationButtonType buttonType){
-        if (buttonType == NavigationButtonTypeGoBack) {
-            if(ws.webView.canGoBack){
-                [ws.webView goBack];
-            }else{
-                if(ws.cancelButtonClicked){
-                    ws.cancelButtonClicked();
-                }
-                blockVc = nil;
-            }
-        }
-    }];
+    self.navView = [[YYNavView alloc] initWithTitle:IsPhone6_gt?NSLocalizedString(@"帮助中心•买手店",nil):NSLocalizedString(@"帮助中心",nil) WithSuperView:self.view haveStatusView:YES];
+    [self.navView setBackButtonTitle:NSLocalizedString(@"返回",nil)];
+    self.navView.goBackBlock = ^{
+        [ws goBack];
+    };
     
     popWindowAddBgView(self.view);
     
@@ -96,5 +76,14 @@
     [MobClick endLogPageView:kYYPageHelp];
 }
 
+- (void)goBack {
+    if(self.webView.canGoBack){
+        [self.webView goBack];
+    }else{
+        if(self.cancelButtonClicked){
+            self.cancelButtonClicked();
+        }
+    }
+}
 
 @end

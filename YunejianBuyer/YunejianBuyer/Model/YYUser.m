@@ -20,6 +20,8 @@
 #define kYYUserStatusKey @"kYYUserStatusKey"
 #define kYYUserCheckStatusKey @"kYYUserCheckStatusKey"
 #define kYYUserNewsKey @"kYYUserNewsKey"
+#define kYYUserStockEnableKey @"kYYUserStockEnableKey"
+
 
 @implementation YYUser
 static YYUser *currentUser = nil;
@@ -56,6 +58,9 @@ static YYUser *currentUser = nil;
         return NO;
     }
     if(self.checkStatus !=object.status){
+        return NO;
+    }
+    if (self.stockEnable != object.stockEnable) {
         return NO;
     }
     return YES;
@@ -218,21 +223,22 @@ static YYUser *currentUser = nil;
     currentUser.logo = [userDefaults objectForKey:kYYUserLogoKey];
     currentUser.status = [userDefaults objectForKey:kYYUserStatusKey];
     currentUser.checkStatus = [userDefaults objectForKey:kYYUserCheckStatusKey];
+    currentUser.stockEnable = [userDefaults boolForKey:kYYUserStockEnableKey];
     return currentUser;
 }
 
-
-- (void)saveUserWithEmail:(NSString *)email username:(NSString *)username password:(NSString *)password userType:(NSInteger)userType userId:(NSString*)userId logo:(NSString *)logo status:(NSString*)status checkStatus:(NSString*)checkStatus{
-    currentUser.name = username;
+- (void)saveUserWithEmail:(NSString *)email password:(NSString *)password userInfo:(YYUserModel *)userModel {
+    currentUser.name = userModel.name;
     currentUser.email = email;
     currentUser.password = password;
-    currentUser.userType = userType;
-    currentUser.userId = userId;
-    currentUser.logo = logo;
-    currentUser.status = status;
-    currentUser.checkStatus = checkStatus;
+    currentUser.userType = [userModel.type intValue];
+    currentUser.userId = userModel.id;
+    currentUser.logo = userModel.logo;
+    currentUser.status = [userModel.authStatus stringValue];
+    currentUser.checkStatus = userModel.checkStatus ? [userModel.checkStatus stringValue] : nil;
+    currentUser.stockEnable = [userModel.buyerNormal boolValue];
     [self saveUserData];
-//    [JpushHandler sendUserIdToAlias];
+    //    [JpushHandler sendUserIdToAlias];
     [JpushHandler sendTagsAndAlias];
 }
 
@@ -246,6 +252,7 @@ static YYUser *currentUser = nil;
     [userDefaults setObject:_logo forKey:kYYUserLogoKey];
     [userDefaults setObject:_status forKey:kYYUserStatusKey];
     [userDefaults setObject:_checkStatus forKey:kYYUserCheckStatusKey];
+    [userDefaults setBool:self.stockEnable forKey:kYYUserStockEnableKey];
 
     [userDefaults synchronize];
 }
@@ -264,6 +271,7 @@ static YYUser *currentUser = nil;
     [userDefaults setObject:nil forKey:kScrtKey];
     [userDefaults setObject:nil forKey:kYYUserStatusKey];
     [userDefaults setObject:nil forKey:kYYUserCheckStatusKey];
+    [userDefaults setBool:NO forKey:kYYUserStockEnableKey];
     
     [userDefaults synchronize];
     [JpushHandler sendEmptyAlias];

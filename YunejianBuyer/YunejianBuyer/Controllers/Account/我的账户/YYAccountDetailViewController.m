@@ -44,11 +44,11 @@
 @property (weak, nonatomic) IBOutlet YYTableView *tableView;
 @property (weak, nonatomic) IBOutlet YYMessageButton *messageButton;
 
-@property(nonatomic,strong) YYAccountUserInfoViewController *accountUserInfoView;
+@property (nonatomic, strong) YYAccountUserInfoViewController *accountUserInfoView;
 
-@property (strong, nonatomic) YYUserInfo *userInfo;
+@property (nonatomic, strong) YYUserInfo *userInfo;
 
-@property(nonatomic,strong) YYBuyerStoreModel *currenBuyerStoreModel;
+@property (nonatomic, strong) YYBuyerStoreModel *currenBuyerStoreModel;
 
 @end
 

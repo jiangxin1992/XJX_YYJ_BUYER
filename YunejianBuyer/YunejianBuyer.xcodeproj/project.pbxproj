@@ -2345,6 +2345,8 @@
 		1820783C1C3E029300F64A74 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				3F895B81212FA69C008A8D89 /* YYBaseLogic.h */,
+				3F895B82212FA69C008A8D89 /* YYBaseLogic.m */,
 				182077991C3E029200F64A74 /* CommonHelper.h */,
 				1820779A1C3E029200F64A74 /* CommonHelper.m */,
 				1820782A1C3E029300F64A74 /* AppDelegate.h */,
@@ -3836,8 +3838,6 @@
 		3FC3CB6F1FDE2C6500A784D3 /* Index */ = {
 			isa = PBXGroup;
 			children = (
-				3F895B81212FA69C008A8D89 /* YYBaseLogic.h */,
-				3F895B82212FA69C008A8D89 /* YYBaseLogic.m */,
 				3F2BF76E1F3C572600AC21AD /* YYIndexBannerDetailViewController.h */,
 				3F2BF76F1F3C572600AC21AD /* YYIndexBannerDetailViewController.m */,
 				3FC3CB701FDE2C7E00A784D3 /* CustomView */,

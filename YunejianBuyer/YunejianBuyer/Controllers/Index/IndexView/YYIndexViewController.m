@@ -205,17 +205,13 @@
 
     }else if(logicAPIType == YYLogicAPITypeSeriesDetail){//获取系列详情
 
-        [self PushSeriesDetailView];
+        [self pushSeriesDetailViewWithSeriesInfo:_indexViewLogic.seriesInfoModel];
 
     }else if(logicAPIType == YYLogicAPITypeSweepToStyleInfo){//获取款式信息
 
         [self.hud hideAnimated:YES];
         [_QRCode dismissController];
-        if(_indexViewLogic.styleInfoModel){
-            AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-            YYStyleOneColorModel *infoModel = [_indexViewLogic.styleInfoModel transformToStyleOneColorModel];
-            [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
-        }
+        [self pushStyleDetailViewWithStyleInfo:_indexViewLogic.styleInfoModel];
 
     }
 }
@@ -278,6 +274,14 @@
 }
 
 #pragma mark - --------------Event Response----------------------
+#pragma mark push-跳转款式详情页
+-(void)pushStyleDetailViewWithStyleInfo:(YYStyleInfoModel *)styleInfoModel{
+    if(styleInfoModel){
+        AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        YYStyleOneColorModel *infoModel = [styleInfoModel transformToStyleOneColorModel];
+        [appDelegate showStyleInfoViewController:infoModel parentViewController:self];
+    }
+}
 #pragma mark push-查看更多品牌
 -(void)scanMoreBrands{
     [[NSNotificationCenter defaultCenter] postNotificationName:kShowBrandListNotification object:nil userInfo:nil];
@@ -377,12 +381,12 @@
     [self.navigationController pushViewController:indexBannerDetailViewController animated:YES];
 }
 #pragma mark push-跳转系列详情页 先获取系列详情
--(void)PushSeriesDetailView{
-    if(_indexViewLogic.seriesInfoModel){
+-(void)pushSeriesDetailViewWithSeriesInfo:(YYSeriesInfoDetailModel *)seriesInfoModel{
+    if(seriesInfoModel){
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        NSString *brandName = [NSString isNilOrEmpty:_indexViewLogic.seriesInfoModel.brandName]?@"":_indexViewLogic.seriesInfoModel.brandName;
-        NSString *brandLogo = [NSString isNilOrEmpty:_indexViewLogic.seriesInfoModel.series.designerBrandLogo]?@"":_indexViewLogic.seriesInfoModel.series.designerBrandLogo;
-        [appDelegate showSeriesInfoViewController:_indexViewLogic.seriesInfoModel.series.designerId seriesId:_indexViewLogic.seriesInfoModel.series.id designerInfo:@[brandName,brandLogo] parentViewController:self];
+        NSString *brandName = [NSString isNilOrEmpty:seriesInfoModel.brandName]?@"":seriesInfoModel.brandName;
+        NSString *brandLogo = [NSString isNilOrEmpty:seriesInfoModel.series.designerBrandLogo]?@"":seriesInfoModel.series.designerBrandLogo;
+        [appDelegate showSeriesInfoViewController:seriesInfoModel.series.designerId seriesId:seriesInfoModel.series.id designerInfo:@[brandName,brandLogo] parentViewController:self];
     }
 }
 #pragma mark push-查看更多订货会

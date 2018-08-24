@@ -39,9 +39,10 @@
 -(BOOL)isAllowRendering;
 
 /**
- 更新一下未读消息
+ 更新一下未读消息数量
  */
 -(void)checkNoticeCount;
+
 
 /**
  获取首页banner

@@ -80,6 +80,7 @@
     }
 }
 - (void)viewWillLayoutSubviews{
+    [super viewWillLayoutSubviews];
 
     [_sweepYardButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(kStatusBarHeight);
@@ -277,17 +278,11 @@
 }
 
 #pragma mark - --------------Event Response----------------------
-#pragma mark 下拉刷新
--(void)headerWithRefreshingStart{
-    [self headerWithRefreshingActionIsShowHud:YES];
-    [_indexViewLogic checkNoticeCount];
-    [[YYUser currentUser] updateUserCheckStatus];
-}
-#pragma mark 查看更多品牌
+#pragma mark push-查看更多品牌
 -(void)scanMoreBrands{
     [[NSNotificationCenter defaultCenter] postNotificationName:kShowBrandListNotification object:nil userInfo:nil];
 }
-#pragma mark 完善资料
+#pragma mark push-完善资料
 -(void)fillInformation{
     //完善后回调，更新状态。并reload
     YYVisibleContactInfoViewController *visibleContactInfoViewController = [[YYVisibleContactInfoViewController alloc] init];
@@ -305,7 +300,7 @@
         [[YYUser currentUser] updateUserCheckStatus];
     }];
 }
-#pragma mark 查看更多订单
+#pragma mark push-查看更多订单
 -(void)showOrderViewAtIndex:(NSInteger)pageIndex{
     WeakSelf(ws);
 
@@ -318,7 +313,7 @@
     }];
     [self.navigationController pushViewController:orderListViewController animated:YES];
 }
-#pragma mark 跳转banner详情页
+#pragma mark push-跳转banner详情页
 -(void)clickBannerWithIndex:(NSInteger )index{
 
     YYBannerModel *banner = _indexViewLogic.bannerListModelArray[index];
@@ -381,7 +376,7 @@
     }];
     [self.navigationController pushViewController:indexBannerDetailViewController animated:YES];
 }
-#pragma mark 跳转系列详情页 先获取系列详情
+#pragma mark push-跳转系列详情页 先获取系列详情
 -(void)PushSeriesDetailView{
     if(_indexViewLogic.seriesInfoModel){
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -390,7 +385,7 @@
         [appDelegate showSeriesInfoViewController:_indexViewLogic.seriesInfoModel.series.designerId seriesId:_indexViewLogic.seriesInfoModel.series.id designerInfo:@[brandName,brandLogo] parentViewController:self];
     }
 }
-#pragma mark 查看更多订货会
+#pragma mark push-查看更多订货会
 -(void)showOrderingListView{
     WeakSelf(ws);
     YYOrderingListViewController *orderingListViewController = [[YYOrderingListViewController alloc] init];
@@ -399,7 +394,7 @@
     }];
     [self.navigationController pushViewController:orderingListViewController animated:YES];
 }
-#pragma mark 进入订货会详情
+#pragma mark push-进入订货会详情
 -(void)clickOrderingCellWithModel:(YYOrderingListItemModel *)orderingListModel{
     WeakSelf(ws);
     YYOrderingDetailViewController *orderingDetailView = [[YYOrderingDetailViewController alloc] init];
@@ -409,7 +404,7 @@
     }];
     [self.navigationController pushViewController:orderingDetailView animated:YES];
 }
-#pragma mark 进入品牌主页
+#pragma mark push-进入品牌主页
 -(void)enterDesignerBrandsHomePageWithModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
 
     AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -418,12 +413,12 @@
     [appdelegate showBrandInfoViewController:hotDesignerBrandsModel.designerId WithBrandName:brandName WithLogoPath:logoPath parentViewController:self WithHomePageBlock:nil WithSelectedValue:nil];
 
 }
-#pragma mark 进入消息
+#pragma mark push-进入消息
 -(void)messageButtonClicked{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate showMessageView:nil parentViewController:self];
 }
-#pragma mark 进入购物车
+#pragma mark push-进入购物车
 -(void)shoppingCarButtonClicked{
     WeakSelf(ws);
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Order" bundle:[NSBundle mainBundle]];
@@ -443,6 +438,12 @@
     }];
 
     [self presentViewController:nav animated:YES completion:nil];
+}
+#pragma mark 下拉刷新
+-(void)headerWithRefreshingStart{
+    [self headerWithRefreshingActionIsShowHud:YES];
+    [_indexViewLogic checkNoticeCount];
+    [[YYUser currentUser] updateUserCheckStatus];
 }
 #pragma mark 扫码
 -(void)sweepYardButtonClicked{

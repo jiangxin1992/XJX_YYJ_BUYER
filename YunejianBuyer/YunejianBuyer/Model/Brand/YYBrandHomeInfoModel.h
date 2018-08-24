@@ -9,6 +9,7 @@
 #import <JSONModel/JSONModel.h>
 #import "YYBuyerSocialInfoModel.h"
 #import "YYBuyerContactInfoModel.h"
+#import "YYHotDesignerBrandsModel.h"
 
 @interface YYBrandHomeInfoModel : JSONModel
 
@@ -16,6 +17,7 @@
 @property (strong, nonatomic) NSArray <Optional, ConvertOnDemand>*indexPics;//
 @property (strong, nonatomic) NSArray<YYBuyerContactInfoModel,Optional, ConvertOnDemand>* userContactInfos;
 @property (strong, nonatomic) NSNumber <Optional>*brandId;//
+@property (strong, nonatomic) NSNumber <Optional>*designerId;
 @property (strong, nonatomic) NSArray <Optional, ConvertOnDemand>*retailerName;//
 @property (strong, nonatomic) NSNumber <Optional>*connectStatus;
 @property (strong, nonatomic) NSArray<YYBuyerSocialInfoModel,Optional, ConvertOnDemand>* userSocialInfos;
@@ -34,5 +36,8 @@
 
 //storeImgs首张图
 -(NSString *)getStoreImgCover;
+
+//模型转换
+-(YYHotDesignerBrandsModel *)toHotDesignerBrandsModel;
 
 @end

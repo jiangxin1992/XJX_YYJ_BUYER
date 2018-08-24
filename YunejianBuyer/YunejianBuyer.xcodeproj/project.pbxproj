@@ -341,7 +341,6 @@
 		3F203FD51F39B25700B2ADB7 /* YYLatestSeriesModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F203FD41F39B25700B2ADB7 /* YYLatestSeriesModel.m */; };
 		3F203FD81F39B2F700B2ADB7 /* YYLatestSeriesListModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F203FD71F39B2F700B2ADB7 /* YYLatestSeriesListModel.m */; };
 		3F203FE51F39CB2700B2ADB7 /* YYIndexApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F203FE41F39CB2700B2ADB7 /* YYIndexApi.m */; };
-		3F203FE81F39CE6700B2ADB7 /* YYIndexManageModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F203FE71F39CE6700B2ADB7 /* YYIndexManageModel.m */; };
 		3F2152DC1E9DCB4200104360 /* YYBrandSmallInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2152DB1E9DCB4200104360 /* YYBrandSmallInfoCell.m */; };
 		3F23351B20F238C10094E0A5 /* YYOrderPackageInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F23351A20F238C10094E0A5 /* YYOrderPackageInfoCell.m */; };
 		3F23352020F239650094E0A5 /* YYOrderPackageStatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F23351F20F239650094E0A5 /* YYOrderPackageStatModel.m */; };
@@ -486,6 +485,9 @@
 		3F8745471E4C08EA0093EFDF /* YYBrandModifyInfoSocialViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F8745431E4C08EA0093EFDF /* YYBrandModifyInfoSocialViewCell.m */; };
 		3F87C1DE1F1466BD00464AC1 /* YYChooseStyleSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F87C1DD1F1466BD00464AC1 /* YYChooseStyleSearchViewController.m */; };
 		3F894C831FFCFF1C0039D67A /* YYBrandSeriesHeadView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F894C821FFCFF1B0039D67A /* YYBrandSeriesHeadView.m */; };
+		3F895B83212FA69D008A8D89 /* YYBaseLogic.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F895B82212FA69C008A8D89 /* YYBaseLogic.m */; };
+		3F895B86212FAEDA008A8D89 /* YYIndexViewLogic.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F895B85212FAEDA008A8D89 /* YYIndexViewLogic.m */; };
+		3F895B8B212FD1B2008A8D89 /* YYIndexTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F895B8A212FD1B2008A8D89 /* YYIndexTableView.m */; };
 		3F8F979C1E2F710200EB2CA1 /* YYBuyerModifyInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1882D1C51E0A543B0059A420 /* YYBuyerModifyInfoViewController.m */; };
 		3F8FCBFD1FB2AE6100B81411 /* NSArray+extra.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F8FCBFC1FB2AE6100B81411 /* NSArray+extra.m */; };
 		3F902F7B1F74A4B10069A168 /* YYHotSeriesCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F902F7A1F74A4B10069A168 /* YYHotSeriesCardView.m */; };
@@ -1369,8 +1371,6 @@
 		3F203FD71F39B2F700B2ADB7 /* YYLatestSeriesListModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYLatestSeriesListModel.m; sourceTree = "<group>"; };
 		3F203FE31F39CB2700B2ADB7 /* YYIndexApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYIndexApi.h; sourceTree = "<group>"; };
 		3F203FE41F39CB2700B2ADB7 /* YYIndexApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYIndexApi.m; sourceTree = "<group>"; };
-		3F203FE61F39CE6700B2ADB7 /* YYIndexManageModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYIndexManageModel.h; sourceTree = "<group>"; };
-		3F203FE71F39CE6700B2ADB7 /* YYIndexManageModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYIndexManageModel.m; sourceTree = "<group>"; };
 		3F2152DA1E9DCB4200104360 /* YYBrandSmallInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBrandSmallInfoCell.h; sourceTree = "<group>"; };
 		3F2152DB1E9DCB4200104360 /* YYBrandSmallInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYBrandSmallInfoCell.m; sourceTree = "<group>"; };
 		3F23351920F238C00094E0A5 /* YYOrderPackageInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYOrderPackageInfoCell.h; sourceTree = "<group>"; };
@@ -1708,6 +1708,13 @@
 		3F87C1DD1F1466BD00464AC1 /* YYChooseStyleSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYChooseStyleSearchViewController.m; sourceTree = "<group>"; };
 		3F894C811FFCFF1B0039D67A /* YYBrandSeriesHeadView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBrandSeriesHeadView.h; sourceTree = "<group>"; };
 		3F894C821FFCFF1B0039D67A /* YYBrandSeriesHeadView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYBrandSeriesHeadView.m; sourceTree = "<group>"; };
+		3F895B81212FA69C008A8D89 /* YYBaseLogic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYBaseLogic.h; sourceTree = "<group>"; };
+		3F895B82212FA69C008A8D89 /* YYBaseLogic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYBaseLogic.m; sourceTree = "<group>"; };
+		3F895B84212FAEDA008A8D89 /* YYIndexViewLogic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYIndexViewLogic.h; sourceTree = "<group>"; };
+		3F895B85212FAEDA008A8D89 /* YYIndexViewLogic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYIndexViewLogic.m; sourceTree = "<group>"; };
+		3F895B87212FBC08008A8D89 /* YYIndexViewProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYIndexViewProtocol.h; sourceTree = "<group>"; };
+		3F895B89212FD1B2008A8D89 /* YYIndexTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYIndexTableView.h; sourceTree = "<group>"; };
+		3F895B8A212FD1B2008A8D89 /* YYIndexTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYIndexTableView.m; sourceTree = "<group>"; };
 		3F8FCBFB1FB2AE6100B81411 /* NSArray+extra.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+extra.h"; sourceTree = "<group>"; };
 		3F8FCBFC1FB2AE6100B81411 /* NSArray+extra.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+extra.m"; sourceTree = "<group>"; };
 		3F902F791F74A4B10069A168 /* YYHotSeriesCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYHotSeriesCardView.h; sourceTree = "<group>"; };
@@ -2256,8 +2263,6 @@
 		182077DB1C3E029200F64A74 /* Index */ = {
 			isa = PBXGroup;
 			children = (
-				3F203FE61F39CE6700B2ADB7 /* YYIndexManageModel.h */,
-				3F203FE71F39CE6700B2ADB7 /* YYIndexManageModel.m */,
 				3FA14CBA1FB1606200266969 /* YYHotDesignerBrandsModel.h */,
 				3FA14CBB1FB1606200266969 /* YYHotDesignerBrandsModel.m */,
 				3FA14CBD1FB1629600266969 /* YYHotDesignerBrandsSeriesModel.h */,
@@ -3390,6 +3395,20 @@
 			path = "包裹单";
 			sourceTree = "<group>";
 		};
+		3F895B88212FD174008A8D89 /* IndexView */ = {
+			isa = PBXGroup;
+			children = (
+				3F895B87212FBC08008A8D89 /* YYIndexViewProtocol.h */,
+				3F895B84212FAEDA008A8D89 /* YYIndexViewLogic.h */,
+				3F895B85212FAEDA008A8D89 /* YYIndexViewLogic.m */,
+				3F895B89212FD1B2008A8D89 /* YYIndexTableView.h */,
+				3F895B8A212FD1B2008A8D89 /* YYIndexTableView.m */,
+				3F203FB41F3978C200B2ADB7 /* YYIndexViewController.h */,
+				3F203FB51F3978C200B2ADB7 /* YYIndexViewController.m */,
+			);
+			path = IndexView;
+			sourceTree = "<group>";
+		};
 		3FC3CB481FDE18D200A784D3 /* Other */ = {
 			isa = PBXGroup;
 			children = (
@@ -3817,11 +3836,12 @@
 		3FC3CB6F1FDE2C6500A784D3 /* Index */ = {
 			isa = PBXGroup;
 			children = (
-				3FC3CB701FDE2C7E00A784D3 /* CustomView */,
-				3F203FB41F3978C200B2ADB7 /* YYIndexViewController.h */,
-				3F203FB51F3978C200B2ADB7 /* YYIndexViewController.m */,
+				3F895B81212FA69C008A8D89 /* YYBaseLogic.h */,
+				3F895B82212FA69C008A8D89 /* YYBaseLogic.m */,
 				3F2BF76E1F3C572600AC21AD /* YYIndexBannerDetailViewController.h */,
 				3F2BF76F1F3C572600AC21AD /* YYIndexBannerDetailViewController.m */,
+				3FC3CB701FDE2C7E00A784D3 /* CustomView */,
+				3F895B88212FD174008A8D89 /* IndexView */,
 			);
 			path = Index;
 			sourceTree = "<group>";
@@ -4858,7 +4878,6 @@
 				F725CF451FA341840047F21F /* YYVisibleSocialContactView.m in Sources */,
 				184B4B611C7C063900D5FFB1 /* YYBrandIntroductionViewCell.m in Sources */,
 				18207A2C1C3E029300F64A74 /* YYSeriesInfoDetailModel.m in Sources */,
-				3F203FE81F39CE6700B2ADB7 /* YYIndexManageModel.m in Sources */,
 				3F47C7681EE149330086FF60 /* YYOrderingHistoryListModel.m in Sources */,
 				3F203FBC1F398C4C00B2ADB7 /* YYIndexTableHeadView.m in Sources */,
 				3F5483EB1E9E029C00DFBA66 /* YYBrandAddHeadView.m in Sources */,
@@ -4928,13 +4947,16 @@
 				180856A31DBDD0DF0047385F /* YYMessageChatCell.m in Sources */,
 				1891748C1CC72D9000090BD9 /* YYOrderOtherCloseReqDealViewController.m in Sources */,
 				3F24B7A71E1E49A70002E402 /* YYTypeButton.m in Sources */,
+				3F895B83212FA69D008A8D89 /* YYBaseLogic.m in Sources */,
 				18207A201C3E029300F64A74 /* YYConnDesignerModel.m in Sources */,
+				3F895B86212FAEDA008A8D89 /* YYIndexViewLogic.m in Sources */,
 				3F9C4CD41EF83E8E00BDA9BA /* YYTaxChooseViewController.m in Sources */,
 				18207B091C3E029300F64A74 /* SCLoopManager.m in Sources */,
 				3F24B79C1E1DF8A30002E402 /* UIButton+EnlargeEdge.m in Sources */,
 				579733101FF08FF500275AF7 /* YYStepInfoModel.m in Sources */,
 				18EA111B1C915C690052B79E /* HMSegmentedControl.m in Sources */,
 				1882D1F91E0B6D000059A420 /* YYBuyerModifyCellSocialViewCell.m in Sources */,
+				3F895B8B212FD1B2008A8D89 /* YYIndexTableView.m in Sources */,
 				3F8498D71D45E92B00677A80 /* SCGIFImageView.m in Sources */,
 				1882D1D21E0A6EB20059A420 /* YYBuyerModifyInfoHeadViewCell.m in Sources */,
 				18AB50611D7E590900B2B119 /* YYNewsTableViewCell.m in Sources */,

@@ -21,5 +21,16 @@
     }
     return albumImgPath;
 }
+-(YYHotDesignerBrandsModel *)toHotDesignerBrandsModel{
 
+    YYHotDesignerBrandsModel *hotDesignerBrandsModel = [[YYHotDesignerBrandsModel alloc] init];
+    hotDesignerBrandsModel.brandName = self.brandName;
+    hotDesignerBrandsModel.logo = self.logoPath;
+    hotDesignerBrandsModel.designerId = self.designerId;
+    //    brandName
+//    logo
+//designerId
+
+    return hotDesignerBrandsModel;
+}
 @end

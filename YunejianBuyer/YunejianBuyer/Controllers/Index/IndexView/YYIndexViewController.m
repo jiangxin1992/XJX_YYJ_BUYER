@@ -69,7 +69,7 @@
     [self UIConfig];
     [self RequestData];
 }
--(void)viewWillAppear:(BOOL)animated{
+- (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     if(_indexViewLogic){
         if(!_indexViewLogic.isFirstLoad){
@@ -152,17 +152,17 @@
 }
 
 #pragma mark - --------------UIConfig----------------------
--(void)UIConfig{
+- (void)UIConfig{
     [self.view addSubview:self.tableView];
 }
 
 #pragma mark - --------------Request----------------------
 //错误的时候不提示。仅仅在刷新的时候取消小菊花
--(void)RequestData{
+- (void)RequestData{
     // 进入刷新状态就会回调这个Block
     [self headerWithRefreshingActionIsShowHud:YES];
 }
--(void)headerWithRefreshingActionIsShowHud:(BOOL )isShowHud{
+- (void)headerWithRefreshingActionIsShowHud:(BOOL)isShowHud{
     if(isShowHud){
         [self.hud showAnimated:YES];
     }
@@ -181,7 +181,7 @@
 
 #pragma mark - --------------CustomDelegate----------------------
 #pragma mark logicDelegate
--(void)requestDataCompletedWithType:(YYLogicAPIType)logicAPIType{
+- (void)requestDataCompletedWithType:(YYLogicAPIType)logicAPIType{
     if(logicAPIType == YYLogicAPITypeBannerList){//获取首页banner
 
         [self updateStatusAfterMainRequestEnd];
@@ -215,7 +215,7 @@
 
     }
 }
--(void)requestDataErrorWithType:(YYLogicAPIType)logicAPIType WithError:(NSError *)error{
+- (void)requestDataErrorWithType:(YYLogicAPIType)logicAPIType WithError:(NSError *)error{
     if(logicAPIType == YYLogicAPITypeBannerList){//获取首页banner
 
         [self updateStatusAfterMainRequestEnd];
@@ -244,7 +244,7 @@
     }
 }
 
--(void)requestDataFailureWithType:(YYLogicAPIType)logicAPIType{
+- (void)requestDataFailureWithType:(YYLogicAPIType)logicAPIType{
     if(logicAPIType == YYLogicAPITypeBannerList){//获取首页banner
 
         [self updateStatusAfterMainRequestEnd];
@@ -275,7 +275,7 @@
 
 #pragma mark - --------------Event Response----------------------
 #pragma mark push-跳转款式详情页
--(void)pushStyleDetailViewWithStyleInfo:(YYStyleInfoModel *)styleInfoModel{
+- (void)pushStyleDetailViewWithStyleInfo:(YYStyleInfoModel *)styleInfoModel{
     if(styleInfoModel){
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         YYStyleOneColorModel *infoModel = [styleInfoModel transformToStyleOneColorModel];
@@ -283,11 +283,11 @@
     }
 }
 #pragma mark push-查看更多品牌
--(void)scanMoreBrands{
+- (void)scanMoreBrands{
     [[NSNotificationCenter defaultCenter] postNotificationName:kShowBrandListNotification object:nil userInfo:nil];
 }
 #pragma mark push-完善资料
--(void)fillInformation{
+- (void)fillInformation{
     //完善后回调，更新状态。并reload
     YYVisibleContactInfoViewController *visibleContactInfoViewController = [[YYVisibleContactInfoViewController alloc] init];
     [self.navigationController pushViewController:visibleContactInfoViewController animated:YES];
@@ -305,7 +305,7 @@
     }];
 }
 #pragma mark push-查看更多订单
--(void)showOrderViewAtIndex:(NSInteger)pageIndex{
+- (void)showOrderViewAtIndex:(NSInteger)pageIndex{
     WeakSelf(ws);
 
     UIStoryboard *orderStoryboard = [UIStoryboard storyboardWithName:@"OrderDetail" bundle:[NSBundle mainBundle]];
@@ -318,7 +318,7 @@
     [self.navigationController pushViewController:orderListViewController animated:YES];
 }
 #pragma mark push-跳转banner详情页
--(void)clickBannerWithIndex:(NSInteger )index{
+- (void)clickBannerWithIndex:(NSInteger)index{
 
     YYBannerModel *banner = _indexViewLogic.bannerListModelArray[index];
 
@@ -381,7 +381,7 @@
     [self.navigationController pushViewController:indexBannerDetailViewController animated:YES];
 }
 #pragma mark push-跳转系列详情页 先获取系列详情
--(void)pushSeriesDetailViewWithSeriesInfo:(YYSeriesInfoDetailModel *)seriesInfoModel{
+- (void)pushSeriesDetailViewWithSeriesInfo:(YYSeriesInfoDetailModel *)seriesInfoModel{
     if(seriesInfoModel){
         AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
         NSString *brandName = [NSString isNilOrEmpty:seriesInfoModel.brandName]?@"":seriesInfoModel.brandName;
@@ -390,7 +390,7 @@
     }
 }
 #pragma mark push-查看更多订货会
--(void)showOrderingListView{
+- (void)showOrderingListView{
     WeakSelf(ws);
     YYOrderingListViewController *orderingListViewController = [[YYOrderingListViewController alloc] init];
     [orderingListViewController setCancelButtonClicked:^(){
@@ -399,7 +399,7 @@
     [self.navigationController pushViewController:orderingListViewController animated:YES];
 }
 #pragma mark push-进入订货会详情
--(void)clickOrderingCellWithModel:(YYOrderingListItemModel *)orderingListModel{
+- (void)clickOrderingCellWithModel:(YYOrderingListItemModel *)orderingListModel{
     WeakSelf(ws);
     YYOrderingDetailViewController *orderingDetailView = [[YYOrderingDetailViewController alloc] init];
     orderingDetailView.orderingModel = orderingListModel;
@@ -409,7 +409,7 @@
     [self.navigationController pushViewController:orderingDetailView animated:YES];
 }
 #pragma mark push-进入品牌主页
--(void)enterDesignerBrandsHomePageWithModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
+- (void)enterDesignerBrandsHomePageWithModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
 
     AppDelegate *appdelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     NSString *brandName = hotDesignerBrandsModel.brandName;
@@ -418,12 +418,12 @@
 
 }
 #pragma mark push-进入消息
--(void)messageButtonClicked{
+- (void)messageButtonClicked{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate showMessageView:nil parentViewController:self];
 }
 #pragma mark push-进入购物车
--(void)shoppingCarButtonClicked{
+- (void)shoppingCarButtonClicked{
     WeakSelf(ws);
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Order" bundle:[NSBundle mainBundle]];
     YYCartDetailViewController *cartVC = [storyboard instantiateViewControllerWithIdentifier:@"YYCartDetailViewController"];
@@ -444,13 +444,13 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 #pragma mark 下拉刷新
--(void)headerWithRefreshingStart{
+- (void)headerWithRefreshingStart{
     [self headerWithRefreshingActionIsShowHud:YES];
     [_indexViewLogic checkNoticeCount];
     [[YYUser currentUser] updateUserCheckStatus];
 }
 #pragma mark 扫码
--(void)sweepYardButtonClicked{
+- (void)sweepYardButtonClicked{
     _QRCode = [YYQRCodeController QRCodeSuccessMessageBlock:^(YYQRCodeController *code, NSString *messageString) {
         NSData *JSONData = [messageString dataUsingEncoding:NSUTF8StringEncoding];
         NSDictionary *responseJSON = [NSJSONSerialization JSONObjectWithData:JSONData options:NSJSONReadingMutableLeaves error:nil];
@@ -476,7 +476,7 @@
 }
 
 //获取款式信息 并跳转款式页面
--(void)sweepYardStyleTypeAction:(YYScanFunctionModel *)scanModel code:(YYQRCodeController *)code{
+- (void)sweepYardStyleTypeAction:(YYScanFunctionModel *)scanModel code:(YYQRCodeController *)code{
 
     [self.hud showAnimated:YES];
     [_indexViewLogic getStyleInfoByStyleId:[scanModel.id longLongValue]];
@@ -489,7 +489,7 @@
 - (void)userCheckStatusChangeNotification:(NSNotification *)notification{
     [_tableView reloadTableData];
 }
--(void)applicationDidBecomeActiveAction:(NSNotification *)notification{
+- (void)applicationDidBecomeActiveAction:(NSNotification *)notification{
     if([[YYUser currentUser] hasPermissionsToVisit]){
         if(_indexViewLogic){
             [self headerWithRefreshingActionIsShowHud:YES];
@@ -505,7 +505,7 @@
     [appDelegate.untreatedMsgAmountModel setUnreadMessageAmount:_messageButton];
 }
 #pragma mark - --------------Private Methods----------------------
--(void)updateStatusAfterMainRequestEnd{
+- (void)updateStatusAfterMainRequestEnd{
     //三次都到了 放开那个fresh 菊花
     BOOL canReload = YES;
     if(_indexViewLogic.isHeadRefresh){
@@ -525,7 +525,7 @@
 }
 #pragma mark - --------------Getter/Setter Methods----------------------
 #pragma mark UI Setter
--(YYIndexTableView *)tableView{
+- (YYIndexTableView *)tableView{
     if(!_tableView){
         WeakSelf(ws);
         _tableView = [[YYIndexTableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
@@ -570,14 +570,14 @@
     _tableView.indexViewLogic = _indexViewLogic;
     return _tableView;
 }
--(UIButton *)sweepYardButton{
+- (UIButton *)sweepYardButton{
     if(!_sweepYardButton){
         _sweepYardButton = [UIButton getCustomImgBtnWithImageStr:@"scan_button_icon" WithSelectedImageStr:nil];
         [_sweepYardButton addTarget:self action:@selector(sweepYardButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     }
     return _sweepYardButton;
 }
--(YYMessageButton *)messageButton{
+- (YYMessageButton *)messageButton{
     if(!_messageButton){
         _messageButton = [[YYMessageButton alloc] init];
         [_messageButton addTarget:self action:@selector(messageButtonClicked) forControlEvents:UIControlEventTouchUpInside];
@@ -585,7 +585,7 @@
     }
     return _messageButton;
 }
--(MBProgressHUD *)hud{
+- (MBProgressHUD *)hud{
     if(!_hud){
         _hud = [[MBProgressHUD alloc] initWithView:self.view];
         [self.view addSubview:_hud];

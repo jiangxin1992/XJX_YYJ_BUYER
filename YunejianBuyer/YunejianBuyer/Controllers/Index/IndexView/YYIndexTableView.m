@@ -62,7 +62,7 @@
 @implementation YYIndexTableView
 
 #pragma mark - --------------Life Cycle--------------
--(instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style{
+- (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style{
     self = [super initWithFrame:frame style:style];
     if(self){
         [self SomePrepare];
@@ -110,7 +110,7 @@
 
 #pragma mark - --------------SystemDelegate----------------------
 #pragma mark UITableViewDataSource
--(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     if([_indexViewLogic isAllowRendering]){
         if([[YYUser currentUser] hasPermissionsToVisit]){
             return 3;
@@ -120,7 +120,7 @@
     }
     return 1;
 }
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if([_indexViewLogic isAllowRendering]){
         if([[YYUser currentUser] hasPermissionsToVisit]){
@@ -136,7 +136,7 @@
     return 1;
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     WeakSelf(ws);
     if([_indexViewLogic isAllowRendering]){
@@ -256,10 +256,10 @@
     return cell;
 }
 #pragma mark UITableViewDelegate
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
     return [self getHeadViewHeightInSection:section];
 }
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
     if([_indexViewLogic isAllowRendering] && (section == 0 || section == 1 || section == 2)){
         YYIndexSectionHeadCell *cell = [[YYIndexSectionHeadCell alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, [self getHeadViewHeightInSection:section])];
         if(section == 0){
@@ -312,16 +312,15 @@
     UIView *view = [UIView getCustomViewWithColor:nil];
     return view;
 }
--(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
     return 0.01;
 }
-
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
     UIView *footer = [[UIView alloc] init];
     footer.backgroundColor = _define_white_color;
     return footer;
 }
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if([_indexViewLogic isAllowRendering]){
         if(indexPath.section == 0){
@@ -359,7 +358,7 @@
 #pragma mark - --------------Getter/Setter Methods----------------------
 
 #pragma mark - --------------Private Methods----------------------
--(void)reloadTableData{
+- (void)reloadTableData{
     WeakSelf(ws);
     if([_indexViewLogic isAllowRendering]){
         if(!_headView){
@@ -378,10 +377,10 @@
     }
     [self reloadData];
 }
--(void)endRefreshing{
+- (void)endRefreshing{
     [self.mj_header endRefreshing];
 }
--(CGFloat)getHotCellHeightWithIndexPath:(NSIndexPath *)indexPath{
+- (CGFloat)getHotCellHeightWithIndexPath:(NSIndexPath *)indexPath{
     if(![NSArray isNilOrEmpty:_indexViewLogic.hotDesignerBrandsModelArray]){
         if(_indexViewLogic.hotDesignerBrandsModelArray.count > indexPath.row){
             YYHotDesignerBrandsModel *brandsModel = _indexViewLogic.hotDesignerBrandsModelArray[indexPath.row];
@@ -398,7 +397,7 @@
     }
     return 0;
 }
--(CGFloat)getHeadViewHeightInSection:(NSInteger)section{
+- (CGFloat)getHeadViewHeightInSection:(NSInteger)section{
     if([_indexViewLogic isAllowRendering]){
         if(section == 0){
             return IndexSectionHeadOrder;

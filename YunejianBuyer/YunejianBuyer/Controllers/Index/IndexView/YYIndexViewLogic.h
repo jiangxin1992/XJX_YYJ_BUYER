@@ -36,52 +36,52 @@
  YYIndexViewController 是否允许渲染
  * 三类数据都曾获取成功过，才允许渲染
  */
--(BOOL)isAllowRendering;
+- (BOOL)isAllowRendering;
 
 /**
  更新一下未读消息数量
  */
--(void)checkNoticeCount;
+- (void)checkNoticeCount;
 
 
 /**
  获取首页banner
  */
--(void)loadBannerInfo;
+- (void)loadBannerInfo;
 
 /**
  获取首页订货会列表
  */
--(void)loadIndexOrderingInfo;
+- (void)loadIndexOrderingInfo;
 
 /**
  获取热门品牌列表
  */
--(void)loadHotBrandsList;
+- (void)loadHotBrandsList;
 
 /**
  获取banner对应的设计师信息
  */
--(void)getDesignerHomeInfoWithDesignerId:(NSInteger)designerId;
+- (void)getDesignerHomeInfoWithDesignerId:(NSInteger)designerId;
 
 @property (nonatomic, strong) YYBrandHomeInfoModel *bannerDesignerHomeInfoModel;
 
 /**
  修改当前用户与品牌的关联状态 添加
  */
--(void)connInviteByDesignerBrandsModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel;
+- (void)connInviteByDesignerBrandsModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel;
 
 /**
  获取系列详情
  */
--(void)getConnSeriesInfoWithDesignerId:(NSInteger)designerId WithSeriesID:(NSInteger)seriesId;
+- (void)getConnSeriesInfoWithDesignerId:(NSInteger)designerId WithSeriesID:(NSInteger)seriesId;
 
 @property (nonatomic, strong) YYSeriesInfoDetailModel *seriesInfoModel;
 
 /**
  获取款式信息
  */
--(void)getStyleInfoByStyleId:(NSInteger)styleId;
+- (void)getStyleInfoByStyleId:(NSInteger)styleId;
 
 @property (nonatomic, strong) YYStyleInfoModel *styleInfoModel;
 

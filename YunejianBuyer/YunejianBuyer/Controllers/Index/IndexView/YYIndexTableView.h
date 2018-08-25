@@ -42,11 +42,11 @@ typedef NS_ENUM(NSInteger, YYIndexTableViewUserActionType)
 /**
  reload/update
  */
--(void)reloadTableData;
+- (void)reloadTableData;
 
 /**
  停止下拉或加载
  */
--(void)endRefreshing;
+- (void)endRefreshing;
 
 @end

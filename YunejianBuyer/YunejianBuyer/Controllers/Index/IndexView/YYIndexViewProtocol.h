@@ -21,12 +21,12 @@ typedef NS_ENUM(NSInteger, YYLogicAPIType)
 
 @protocol YYIndexViewProtocol <NSObject>
 
--(void)requestDataCompletedWithType:(YYLogicAPIType)logicAPIType;//success
+- (void)requestDataCompletedWithType:(YYLogicAPIType)logicAPIType;//success
 
 @optional
 
--(void)requestDataErrorWithType:(YYLogicAPIType)logicAPIType WithError:(NSError *)error;//unsuccess response
+- (void)requestDataErrorWithType:(YYLogicAPIType)logicAPIType WithError:(NSError *)error;//unsuccess response
 
--(void)requestDataFailureWithType:(YYLogicAPIType)logicAPIType;//maybe network error
+- (void)requestDataFailureWithType:(YYLogicAPIType)logicAPIType;//maybe network error
 
 @end

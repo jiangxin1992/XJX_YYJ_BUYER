@@ -33,7 +33,7 @@
 
 @implementation YYIndexViewLogic
 #pragma mark - --------------Life Cycle--------------
--(instancetype)init{
+- (instancetype)init{
     self = [super init];
     if(self){
         [self SomePrepare];
@@ -59,7 +59,7 @@
 }
 #pragma mark - --------------API----------------------
 //获取首页banner
--(void)loadBannerInfo{
+- (void)loadBannerInfo{
     WeakSelf(ws);
     //获取首页banner
     [YYIndexApi getBannerListWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSArray *returnArr, NSError *error) {
@@ -90,7 +90,7 @@
     }];
 }
 //获取首页订货会列表
--(void)loadIndexOrderingInfo{
+- (void)loadIndexOrderingInfo{
     WeakSelf(ws);
     //获取首页订货会列表
     [YYOrderingApi getIndexOrderingListWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYOrderingListModel *orderingListModel, NSError *error) {
@@ -121,7 +121,7 @@
     }];
 }
 //获取热门品牌列表
--(void)loadHotBrandsList{
+- (void)loadHotBrandsList{
     WeakSelf(ws);
     //获取首页订货会列表
     [YYIndexApi getHotBrandsListWithBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSArray *hotList, NSError *error) {
@@ -158,7 +158,7 @@
     }];
 }
 // 获取banner对应的设计师信息
--(void)getDesignerHomeInfoWithDesignerId:(NSInteger)designerId{
+- (void)getDesignerHomeInfoWithDesignerId:(NSInteger)designerId{
     WeakSelf(ws);
     _bannerDesignerHomeInfoModel = nil;
     [YYUserApi getDesignerHomeInfo:[[NSString alloc] initWithFormat:@"%ld",designerId] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYBrandHomeInfoModel *infoModel, NSError *error) {
@@ -182,7 +182,7 @@
     }];
 }
 //修改当前用户与品牌的关联状态 添加
--(void)connInviteByDesignerBrandsModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
+- (void)connInviteByDesignerBrandsModel:(YYHotDesignerBrandsModel *)hotDesignerBrandsModel{
     WeakSelf(ws);
     if(hotDesignerBrandsModel && [hotDesignerBrandsModel.connectStatus integerValue] == YYUserConnStatusNone){
         [YYConnApi invite:[hotDesignerBrandsModel.designerId integerValue] andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, NSError *error) {
@@ -207,7 +207,7 @@
 }
 
 //获取系列详情
--(void)getConnSeriesInfoWithDesignerId:(NSInteger)designerId WithSeriesID:(NSInteger)seriesId{
+- (void)getConnSeriesInfoWithDesignerId:(NSInteger)designerId WithSeriesID:(NSInteger)seriesId{
     WeakSelf(ws);
     _seriesInfoModel = nil;
     [YYOpusApi getConnSeriesInfoWithId:designerId seriesId:seriesId andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYSeriesInfoDetailModel *infoDetailModel, NSError *error) {
@@ -231,7 +231,7 @@
 }
 
 //获取款式信息
--(void)getStyleInfoByStyleId:(NSInteger)styleId{
+- (void)getStyleInfoByStyleId:(NSInteger)styleId{
     WeakSelf(ws);
     _styleInfoModel = nil;
     [YYOpusApi getStyleInfoByStyleId:styleId orderCode:nil andBlock:^(YYRspStatusAndMessage *rspStatusAndMessage, YYStyleInfoModel *styleInfoModel, NSError *error) {
@@ -258,7 +258,7 @@
 #pragma mark - --------------Event Response----------------------
 
 #pragma mark - --------------Private Methods----------------------
--(BOOL)isAllowRendering{
+- (BOOL)isAllowRendering{
     if(self){
         if([[YYUser currentUser] hasPermissionsToVisit]){
             if(self.bannerListHaveBeenSuccessful && self.orderingListHaveBeenSuccessful && self.hotDesignerBrandsHaveBeenSuccessful){
@@ -272,7 +272,7 @@
     }
     return NO;
 }
--(void)checkNoticeCount{
+- (void)checkNoticeCount{
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     [appDelegate checkNoticeCount];
 }

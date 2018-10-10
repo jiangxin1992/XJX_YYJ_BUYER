@@ -218,41 +218,63 @@ static NSString * const text;
 @property(nonatomic, strong) UIButton *confirmButtom
 ...
 
-#pragma mark - --------------生命周期--------------
-//
+#pragma mark - --------------Life Cycle--------------
 //- (void)viewDidLoad {
 //    [super viewDidLoad];
 //    [self SomePrepare];
+//    [self UIConfig];
+//    [self RequestData];
+//}
+//- (void)viewWillAppear:(BOOL)animated{
+//    [super viewWillAppear:animated];
+//    // 进入埋点
+//    [MobClick beginLogPageView:<#(NSString *)#>];
 //}
 //
+//- (void)viewWillDisappear:(BOOL)animated{
+//    [super viewWillDisappear:animated];
+//    // 退出埋点
+//    [MobClick endLogPageView:<#(NSString *)#>];
+//}
+//- (void)viewWillLayoutSubviews{
+//    [super viewWillLayoutSubviews];
+//}
+//- (void)didReceiveMemoryWarning {
+//    [super didReceiveMemoryWarning];
+//}
 #pragma mark - --------------SomePrepare--------------
-//
-//#pragma mark - SomePrepare
-//-(void)SomePrepare
-//{
+//- (void)SomePrepare {
 //    [self PrepareData];
 //    [self PrepareUI];
 //}
-//-(void)PrepareData{}
-//-(void)PrepareUI{}
+//- (void)PrepareData {
 //
-#pragma mark - --------------UI----------------------
+//}
+//- (void)PrepareUI {
+//
+//}
 
-// 创建子控件
+#pragma mark - --------------UIConfig----------------------
+//- (void)UIConfig {
+//
+//}
 
-#pragma mark - --------------系统代理----------------------
+#pragma mark - --------------Request----------------------
+//- (void)RequestData {
+//
+//}
+
+#pragma mark - --------------SystemDelegate----------------------
 
 
-#pragma mark - --------------自定义代理/block----------------------
+#pragma mark - --------------CustomDelegate----------------------
 
 
-#pragma mark - --------------自定义响应----------------------
+#pragma mark - --------------Event Response----------------------
 
+#pragma mark - --------------Getter/Setter Methods----------------------
 
-#pragma mark - --------------自定义方法----------------------
-
-
-#pragma mark - --------------other----------------------
+#pragma mark - --------------Private Methods----------------------
 ...
 
 ```

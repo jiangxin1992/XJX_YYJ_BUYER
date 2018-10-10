@@ -44,11 +44,11 @@
 @property (weak, nonatomic) IBOutlet YYTableView *tableView;
 @property (weak, nonatomic) IBOutlet YYMessageButton *messageButton;
 
-@property (nonatomic, strong) YYAccountUserInfoViewController *accountUserInfoView;
+@property(nonatomic,strong) YYAccountUserInfoViewController *accountUserInfoView;
 
-@property (nonatomic, strong) YYUserInfo *userInfo;
+@property (strong, nonatomic) YYUserInfo *userInfo;
 
-@property (nonatomic, strong) YYBuyerStoreModel *currenBuyerStoreModel;
+@property(nonatomic,strong) YYBuyerStoreModel *currenBuyerStoreModel;
 
 @end
 
@@ -466,7 +466,7 @@
     }
     return isShow;
 }
-#pragma mark push-跳转完善资料界面
+#pragma mark 跳转完善资料界面
 //完善资料
 -(void)fillInformation{
 
@@ -487,7 +487,7 @@
 
     [self.navigationController pushViewController:visibleContactInfoViewController animated:YES];
 }
-#pragma mark push-跳转编辑资料界面
+#pragma mark 跳转编辑资料界面
 -(void)showUserInfoView{
     if(_userInfo){
 
@@ -510,7 +510,7 @@
         [self.navigationController pushViewController:_accountUserInfoView animated:YES];
     }
 }
-#pragma mark push-跳转设置页面
+#pragma mark 跳转设置页面
 -(void)showTypeSetttingView{
 
     WeakSelf(ws);
@@ -526,7 +526,7 @@
 
     [YYGuideHandler markGuide:GuideTypeSettingDot];
 }
-#pragma mark push-跳转我的合作品牌
+#pragma mark 跳转我的合作品牌
 -(void)showUserCopBrands{
 
     WeakSelf(ws);
@@ -540,7 +540,7 @@
 
     [self.navigationController pushViewController:brandViewController animated:YES];
 }
-#pragma mark push-跳转我的收件地址界面
+#pragma mark 跳转我的收件地址界面
 -(void)showAddressView{
 
     WeakSelf(ws);
@@ -555,7 +555,7 @@
 
     [self.navigationController pushViewController:buyerAddressViewController animated:YES];
 }
-#pragma mark push-跳转我的收藏界面
+#pragma mark 跳转我的收藏界面
 -(void)showUserCollectionView{
 
     WeakSelf(ws);
@@ -569,7 +569,7 @@
     [self.navigationController pushViewController:userCollectionView animated:YES];
 }
 
-#pragma mark push-跳转修改密码界面
+#pragma mark 跳转修改密码界面
 -(void)modifyPassword{
 
     WeakSelf(ws);
@@ -588,7 +588,7 @@
 
     [self.navigationController pushViewController:modifyPasswordViewController animated:YES];
 }
-#pragma mark push-跳转我的主页界面
+#pragma mark 跳转我的主页界面
 -(void)showBuyerHomePage{
 
     WeakSelf(ws);
@@ -610,7 +610,7 @@
 
     [self.navigationController pushViewController:connInfoController animated:YES];
 }
-#pragma mark push-跳转我的预约界面
+#pragma mark 跳转我的预约界面
 -(void)showUserOrderingHistoryView{
 
     WeakSelf(ws);

@@ -10,4 +10,7 @@
 
 @interface YYIndexViewController : UIViewController
 
+//跳转更多订单界面
+//-(void)showOrderView:(NSString *)type;
+
 @end

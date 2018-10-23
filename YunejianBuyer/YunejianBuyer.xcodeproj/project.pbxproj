@@ -535,8 +535,6 @@
 		3FDAC5541FE3A4C50088B615 /* YYCartStyleSizeInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FDAC5531FE3A4C40088B615 /* YYCartStyleSizeInfoView.m */; };
 		3FDB3FDB1F6A87E5006636CF /* YYWebImageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FDB3FDA1F6A87E5006636CF /* YYWebImageHelper.m */; };
 		3FF73D8A1F5E7E62001FDA7A /* YYScanFunctionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FF73D891F5E7E62001FDA7A /* YYScanFunctionModel.m */; };
-		3FFA2A62217EBD80009790CA /* libTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FFA2A61217EBD80009790CA /* libTest.a */; };
-		3FFA2A92217EC6FA009790CA /* framework_test.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FFA2A91217EC6FA009790CA /* framework_test.framework */; };
 		3FFE5AEE1F233C3F00004A36 /* YYZbarCodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FFE5AED1F233C3F00004A36 /* YYZbarCodeView.m */; };
 		3FFE5AF11F23437800004A36 /* YYBuyerInfoHeadView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FFE5AF01F23437800004A36 /* YYBuyerInfoHeadView.m */; };
 		5716B74420E9CABF0085D229 /* YYOrderingJSObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5716B74320E9CABF0085D229 /* YYOrderingJSObject.m */; };
@@ -1802,9 +1800,6 @@
 		3FDB3FDA1F6A87E5006636CF /* YYWebImageHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYWebImageHelper.m; sourceTree = "<group>"; };
 		3FF73D881F5E7E62001FDA7A /* YYScanFunctionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYScanFunctionModel.h; sourceTree = "<group>"; };
 		3FF73D891F5E7E62001FDA7A /* YYScanFunctionModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYScanFunctionModel.m; sourceTree = "<group>"; };
-		3FFA2A5E217EBCF6009790CA /* person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = person.h; sourceTree = "<group>"; };
-		3FFA2A61217EBD80009790CA /* libTest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTest.a; sourceTree = "<group>"; };
-		3FFA2A91217EC6FA009790CA /* framework_test.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = framework_test.framework; sourceTree = "<group>"; };
 		3FFE5AEC1F233C3F00004A36 /* YYZbarCodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYZbarCodeView.h; sourceTree = "<group>"; };
 		3FFE5AED1F233C3F00004A36 /* YYZbarCodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYZbarCodeView.m; sourceTree = "<group>"; };
 		3FFE5AEF1F23437800004A36 /* YYBuyerInfoHeadView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBuyerInfoHeadView.h; sourceTree = "<group>"; };
@@ -1968,7 +1963,6 @@
 				3FA1AF2A1EE51AA800A03725 /* libsqlite3.tbd in Frameworks */,
 				3FA1AF281EE51AA200A03725 /* ImageIO.framework in Frameworks */,
 				3FA1AF231EE51A8600A03725 /* libicucore.tbd in Frameworks */,
-				3FFA2A92217EC6FA009790CA /* framework_test.framework in Frameworks */,
 				3FA1AF241EE51A8D00A03725 /* libz.tbd in Frameworks */,
 				3FA1AF261EE51A9400A03725 /* libstdc++.tbd in Frameworks */,
 				3F3AB0491EE040460029C500 /* JavaScriptCore.framework in Frameworks */,
@@ -1983,7 +1977,6 @@
 				182F69421D375DD8007C5AEC /* CoreMotion.framework in Frameworks */,
 				182F69401D375DBB007C5AEC /* Foundation.framework in Frameworks */,
 				182F693E1D375DAA007C5AEC /* UIKit.framework in Frameworks */,
-				3FFA2A62217EBD80009790CA /* libTest.a in Frameworks */,
 				182F693C1D375D99007C5AEC /* QuartzCore.framework in Frameworks */,
 				182F693A1D375D71007C5AEC /* libc++.tbd in Frameworks */,
 				18612BB01D1389E300DEC53C /* jpush-ios-2.1.7.a in Frameworks */,
@@ -2100,9 +2093,6 @@
 		182073D71C3DF4A400F64A74 /* YunejianBuyer */ = {
 			isa = PBXGroup;
 			children = (
-				3FFA2A91217EC6FA009790CA /* framework_test.framework */,
-				3FFA2A61217EBD80009790CA /* libTest.a */,
-				3FFA2A5E217EBCF6009790CA /* person.h */,
 				182077B01C3E029200F64A74 /* Model */,
 				182078331C3E029300F64A74 /* Category */,
 				1820783C1C3E029300F64A74 /* Controllers */,

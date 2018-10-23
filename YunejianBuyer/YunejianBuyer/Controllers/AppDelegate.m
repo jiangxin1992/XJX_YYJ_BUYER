@@ -93,6 +93,8 @@
 
 static NSString * const isFirstOpenApp = @"isFirstOpenApp";
 
+extern CFAbsoluteTime StartTime;
+
 @interface AppDelegate ()
 
 /** 是否需要强制更新 */
@@ -237,7 +239,8 @@ static NSString * const isFirstOpenApp = @"isFirstOpenApp";
     if(_isNeedUpdate){
         [YYUpdateAppStore checkVersion];
     }
-    
+    double launchTime = (CFAbsoluteTimeGetCurrent() - StartTime);
+    NSLog(@"start launch times: %.6lf", launchTime);
     return YES;
 }
 

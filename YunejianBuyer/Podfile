@@ -22,6 +22,8 @@ target 'YunejianBuyer' do
  pod 'UMengAnalytics-NO-IDFA', '~> 4.2.5' # 无 idfa版本
  pod 'Bugly', '~> 2.4.8'
  pod 'MJRefresh', '~> 3.1.12'
+ pod 'YYText', '~> 1.0.7'
+ pod 'YYImage', '~> 1.0.4'
 
  # 主模块(必须)
  pod 'mob_sharesdk', '4.1.1’

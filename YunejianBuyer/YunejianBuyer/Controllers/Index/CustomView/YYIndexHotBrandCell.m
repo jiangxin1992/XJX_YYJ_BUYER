@@ -22,6 +22,9 @@
 #import "UIImage+Tint.h"
 
 // 自定义类和三方类（ cocoapods类 > model > 工具类 > 其他）
+//#import <YYText.h>
+//#import <YYImage.h>
+
 #import "YYHotDesignerBrandsModel.h"
 
 @interface YYIndexHotBrandCell()
@@ -37,6 +40,7 @@
 @property (nonatomic,strong) UILabel *brandNameLabel;
 @property (nonatomic,strong) UILabel *brandIntroduceLabel;
 @property (nonatomic,strong) UILabel *brandDesLabel;
+//@property (nonatomic,strong) YYLabel *brandDesLabel;
 
 @property (nonatomic,strong) UIButton *connectStatusBtn;
 
@@ -177,10 +181,16 @@
     }
 
     _brandDesLabel = [UILabel getLabelWithAlignment:0 WithTitle:nil WithFont:11 WithTextColor:[UIColor colorWithHex:@"919191"] WithSpacing:0];
+//    _brandDesLabel = [[YYLabel alloc] init];
+//    _brandDesLabel.textAlignment = 0;
+//    _brandDesLabel.font = getFont(11.0f);
+//    _brandDesLabel.textColor = [UIColor colorWithHex:@"919191"];
+//    _brandDesLabel.numberOfLines = 0;
     [_brandView addSubview:_brandDesLabel];
     [_brandDesLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(10);
         make.right.mas_equalTo(-10);
+//        make.bottom.mas_equalTo(0);
         make.top.mas_equalTo(_iconImg.mas_bottom).with.offset(10);
     }];
     _brandDesLabel.numberOfLines = 2;
@@ -325,7 +335,16 @@
     
     _brandIntroduceLabel.text = [[NSString alloc] initWithFormat: NSLocalizedString(@"%ld 个系列  %ld 个款式",nil),[_hotDesignerBrandsModel.seriesCount integerValue],[_hotDesignerBrandsModel.styleCount integerValue]];
 
+    // 嵌入 UIImage
+//    UIImage *image = [UIImage imageNamed:@"chooseStyle_Select"];
+//    NSMutableAttributedString *attachment = [NSMutableAttributedString yy_attachmentStringWithContent:image contentMode:UIViewContentModeLeft attachmentSize:image.size alignToFont:getFont(11.0f) alignment:YYTextVerticalAlignmentCenter];
+//    NSMutableAttributedString *attachment1 = [[NSMutableAttributedString alloc] initWithString:_hotDesignerBrandsModel.brandDescription];
+//    NSMutableAttributedString *text = [NSMutableAttributedString new];
+//    [text appendAttributedString: attachment];
+//    [text appendAttributedString: attachment1];
+//    _brandDesLabel.attributedText = text;
     _brandDesLabel.text = _hotDesignerBrandsModel.brandDescription;
+
     //关系类型 -1 没有关系  0 我已发送邀请，对方未处理  1 已为好友   2 对方已发出邀请，我未处理
     NSString *connedImg = @"brandadd_icon";
     _connectStatusBtn.userInteractionEnabled = YES;

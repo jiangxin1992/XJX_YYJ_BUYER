@@ -23,8 +23,6 @@ target 'YunejianBuyer' do
  pod 'Bugly', '~> 2.4.8'
  pod 'MJRefresh', '~> 3.1.12'
  pod 'YYText', '~> 1.0.7'
- pod 'YYImage', '~> 1.0.4'
- pod 'YYWebImage', '~> 1.0.5'
 
  # 主模块(必须)
  pod 'mob_sharesdk', '4.1.1’

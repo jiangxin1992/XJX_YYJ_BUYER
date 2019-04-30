@@ -133,7 +133,7 @@
 
 /* Class = "UILabel"; text = "订单编号"; ObjectID = "bJh-t3-yTy"; */
 "bJh-t3-yTy.text" = "Order No. ";
-x
+
 /* Class = "UITextField"; placeholder = "填写数值"; ObjectID = "c1n-I2-O8Q"; */
 "c1n-I2-O8Q.placeholder" = "Enter a value";
 
@@ -255,5 +255,5 @@ x
 "zyM-ld-pC8.placeholder" = "List other channels";
 
 /* Class = "UIButton"; normalTitle = "返回登录"; ObjectID = "83F-QP-uno"; */
-"83F-QP-uno.normalTitle" = "Return to login"
+"83F-QP-uno.normalTitle" = "Return to login";
 

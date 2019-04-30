@@ -4391,7 +4391,7 @@
 				TargetAttributes = {
 					182073D41C3DF4A400F64A74 = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 86BC6SR69M;
+						DevelopmentTeam = 8S92E4NW68;
 						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -4424,6 +4424,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 				"zh-Hans",
@@ -5535,7 +5536,7 @@
 				CODE_SIGN_ENTITLEMENTS = "YunejianBuyer/Supporting Files/YunejianBuyer.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 86BC6SR69M;
+				DEVELOPMENT_TEAM = 8S92E4NW68;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5590,7 +5591,7 @@
 					"\"UIKit\"",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yunejian.yunejianBuyer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onebox.boxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5609,7 +5610,7 @@
 				CODE_SIGN_ENTITLEMENTS = "YunejianBuyer/Supporting Files/YunejianBuyer.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 86BC6SR69M;
+				DEVELOPMENT_TEAM = 8S92E4NW68;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5664,7 +5665,7 @@
 					"\"UIKit\"",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.yunejian.yunejianBuyer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onebox.boxs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

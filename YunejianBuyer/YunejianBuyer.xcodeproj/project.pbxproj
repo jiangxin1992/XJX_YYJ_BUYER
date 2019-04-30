@@ -245,7 +245,6 @@
 		184B4B5E1C7AE63900D5FFB1 /* YYBrandAddViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 184B4B5D1C7AE63900D5FFB1 /* YYBrandAddViewCell.m */; };
 		184B4B611C7C063900D5FFB1 /* YYBrandIntroductionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 184B4B601C7C063900D5FFB1 /* YYBrandIntroductionViewCell.m */; };
 		184B4B641C7C31B400D5FFB1 /* YYBrandPicsViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 184B4B631C7C31B400D5FFB1 /* YYBrandPicsViewCell.m */; };
-		18612BB01D1389E300DEC53C /* jpush-ios-2.1.7.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 18612BAE1D12E1B500DEC53C /* jpush-ios-2.1.7.a */; };
 		1882D1C91E0A58DD0059A420 /* YYBuyerInfoPicsViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1882D1C81E0A58DD0059A420 /* YYBuyerInfoPicsViewCell.m */; };
 		1882D1CC1E0A592A0059A420 /* YYBuyerInfoAboutViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1882D1CB1E0A592A0059A420 /* YYBuyerInfoAboutViewCell.m */; };
 		1882D1CF1E0A597B0059A420 /* YYBuyerInfoConactViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1882D1CE1E0A597B0059A420 /* YYBuyerInfoConactViewCell.m */; };
@@ -1101,8 +1100,6 @@
 		184B4B601C7C063900D5FFB1 /* YYBrandIntroductionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYBrandIntroductionViewCell.m; sourceTree = "<group>"; };
 		184B4B621C7C31B400D5FFB1 /* YYBrandPicsViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBrandPicsViewCell.h; sourceTree = "<group>"; };
 		184B4B631C7C31B400D5FFB1 /* YYBrandPicsViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYBrandPicsViewCell.m; sourceTree = "<group>"; };
-		18612BAD1D12E1B500DEC53C /* JPUSHService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JPUSHService.h; sourceTree = "<group>"; };
-		18612BAE1D12E1B500DEC53C /* jpush-ios-2.1.7.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "jpush-ios-2.1.7.a"; sourceTree = "<group>"; };
 		1882D1C41E0A543B0059A420 /* YYBuyerModifyInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBuyerModifyInfoViewController.h; sourceTree = "<group>"; };
 		1882D1C51E0A543B0059A420 /* YYBuyerModifyInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYBuyerModifyInfoViewController.m; sourceTree = "<group>"; };
 		1882D1C71E0A58DD0059A420 /* YYBuyerInfoPicsViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYBuyerInfoPicsViewCell.h; sourceTree = "<group>"; };
@@ -1979,7 +1976,6 @@
 				182F693E1D375DAA007C5AEC /* UIKit.framework in Frameworks */,
 				182F693C1D375D99007C5AEC /* QuartzCore.framework in Frameworks */,
 				182F693A1D375D71007C5AEC /* libc++.tbd in Frameworks */,
-				18612BB01D1389E300DEC53C /* jpush-ios-2.1.7.a in Frameworks */,
 				182A37801CD836170072E2D9 /* SafariServices.framework in Frameworks */,
 				182A377E1CD836100072E2D9 /* SystemConfiguration.framework in Frameworks */,
 				182A377C1CD836060072E2D9 /* CoreTelephony.framework in Frameworks */,
@@ -2734,7 +2730,6 @@
 			isa = PBXGroup;
 			children = (
 				182F69471D376136007C5AEC /* Alipay */,
-				182A37831CD8362E0072E2D9 /* JPush */,
 				182079801C3E029300F64A74 /* libqrencode */,
 			);
 			path = Libs;
@@ -2867,15 +2862,6 @@
 				3F4B483F1F16442900164C29 /* YYDetailContentBrandViewCell.m */,
 			);
 			path = Custom;
-			sourceTree = "<group>";
-		};
-		182A37831CD8362E0072E2D9 /* JPush */ = {
-			isa = PBXGroup;
-			children = (
-				18612BAD1D12E1B500DEC53C /* JPUSHService.h */,
-				18612BAE1D12E1B500DEC53C /* jpush-ios-2.1.7.a */,
-			);
-			path = JPush;
 			sourceTree = "<group>";
 		};
 		182F69471D376136007C5AEC /* Alipay */ = {
